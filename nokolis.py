@@ -12,6 +12,7 @@ class oblist:
 def oblist_name(x):
     x=x.replace('+','Nplus').replace('-','Nminus').replace('*','Ntimes').replace('/','Ndivide').replace('[','Nvhaka')
     x=x.replace(']','Nohaka').replace('.','Npiste').replace('<','Nless').replace('>','Ngreater').replace('=','Nequal')
+    x=x.replace('`',"Lapo").replace('@',"Miumau")
     return f'oblist.NNN_{x}'
 
 def parse(program):
@@ -341,6 +342,9 @@ lsp("""(defun pprint (x tabs)
 lsp("""(defun cond-jatko (((x . y) . z))
            (list 'if x (cons 'progn y) (if z (cond-jatko z)))))""")
 lsp("(defmacro cond (x) (cond-jatko x))")
+
+lsp("(defun append  (x y) (if x (cons (car x) (append (cdr x) y)) y))")
+
 
 lsp("""
  (defun fib (x)
