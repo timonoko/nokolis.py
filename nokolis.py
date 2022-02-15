@@ -1,8 +1,8 @@
+#! /usr/bin/python3
 
-from __future__ import division
 import math
 import time
-import operator as op
+#import operator as op
 
 class oblist:
     NNN_nil=[]
