@@ -5,10 +5,9 @@ import time
 #import operator as op
 
 class oblist:
-    NNN_nil=[]
-    NNN_T="T"
     args=[]
     jemma=[]
+    NNN_t="t"
 
 def oblist_name(x):
     x=x.replace('+','Nplus').replace('-','Nminus').replace('*','Ntimes').replace('/','Ndivide').replace('[','Nvhaka')
@@ -207,13 +206,16 @@ def Nlambda(vars,args,y):
     restore_vars_list(vars)
     return tulos
 
-def Nmlambda(vars,args,y):
+def Nmacroexpand(vars,args,y):
     z=args
     save_vars_list(vars)
     assign_vars(vars,z)
     tulos=Nprogn(y)
     restore_vars_list(vars)
-    return Neval(tulos)
+    return tulos
+
+def Nmacro(vars,args,y):
+    return Neval(Nmacroexpand(vars,args,y))
 
 def Nif(x,y,z):
     if Neval(x)!=[]:
@@ -250,7 +252,6 @@ def Nwhile(x,y):
         tul=Nprogn(y)       
     return []
 
-defq("koe",13)
 defq('plus', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('minus','lambda x: Neval(car(x))-Neval(cadr(x))')
 defq('times','lambda x: Neval(car(x))*Neval(cadr(x))')
@@ -271,8 +272,8 @@ defq('cdr', 'lambda x: cdr(Neval(car(x)))')
 defq('list', 'lambda x: Nlist(x)')
 defq('lambda', 'lambda x: Nlambda(car(x),oblist.args[-1],cdr(x))')
 defq('progn', 'lambda x: Nprogn(x)')
-defq('mlambda', 'lambda x: Nmlambda(car(x),oblist.args[-1],cdr(x))')
-defq('macro', 'lambda x: Nmlambda(car(car(x)),oblist.args[-1],cdr(x))')
+defq('macro', 'lambda x: Nmacro(car(car(x)),oblist.args[-1],cdr(x))')
+defq('macrotest', 'lambda x: Nmacroexpand(car(car(x)),oblist.args[-1],cdr(x))')
 defq('if', 'lambda x: Nif(car(x),cadr(x),caddr(x))')
 defq('and', 'lambda x: Nand(x)')
 defq('or', 'lambda x: Nor(x)')
@@ -281,9 +282,11 @@ defq('sp', 'lambda x: print(" ",end="")')
 defq('lb', 'lambda x: print("(",end="")')
 defq('rp', 'lambda x: print(") ",end="")')
 defq('while', 'lambda x: Nwhile(car(x),cdr(x))')
+defq('eval', 'lambda x: Neval(Neval(car(x)))')
 
 lsp("(defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))")
 lsp("(defq defmacro (macro (x) (list 'defq (car x) (cons 'macro (cdr x)))))")
+lsp("(defq defmacrotest (macro (x) (list 'defq (car x) (cons 'macrotest (cdr x)))))")
 
 lsp('(defun cadr (x) (car (cdr x)))')
 lsp('(defun cddr (x) (cdr (cdr x)))')
@@ -334,6 +337,11 @@ lsp("""(defun pprint (x tabs)
                 (if (cdr x) (progn (cr) (tab tabs))) 
                 (setq x (cdr x)))
               (rb))))""")
+
+lsp("""(defun cond-jatko (((x . y) . z))
+           (list 'if x (cons 'progn y) (if z (cond-jatko z)))))""")
+lsp("(defmacro cond (x) (cond-jatko x))")
+
 lsp("""
  (defun fib (x)
     (if (< x 2)
