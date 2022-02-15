@@ -334,6 +334,11 @@ lsp("""(defun pprint (x tabs)
                 (if (cdr x) (progn (cr) (tab tabs))) 
                 (setq x (cdr x)))
               (rb))))""")
+lsp("""
+ (defun fib (x)
+    (if (< x 2)
+        x
+        (+ (fib (- x 1)) (fib (- x 2)))))""")
  
 def repl():
     while True:
