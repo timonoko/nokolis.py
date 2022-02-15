@@ -4,12 +4,6 @@ import math
 import time
 import operator as op
 
-################ Types
-
-Symbol = str          # A Lisp Symbol is implemented as a Python str
-List   = list         # A Lisp List is implemented as a Python list
-Number = (int, float) # A Lisp Number is implemented as a Python int or float
-
 class oblist:
     NNN_nil=[]
     NNN_T="T"
