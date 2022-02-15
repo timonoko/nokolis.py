@@ -11,7 +11,8 @@ class oblist:
     jemma=[]
 
 def oblist_name(x):
-    x=x.replace('+','Nplus').replace('-','Nminus').replace('*','Ntimes').replace('/','Ndivide').replace('[','Nvhaka').replace(']','Nohaka').replace('.','Npiste')
+    x=x.replace('+','Nplus').replace('-','Nminus').replace('*','Ntimes').replace('/','Ndivide').replace('[','Nvhaka')
+    x=x.replace(']','Nohaka').replace('.','Npiste').replace('<','Nless').replace('>','Ngreater').replace('=','Nequal')
     return f'oblist.NNN_{x}'
 
 def parse(program):
@@ -257,7 +258,7 @@ defq('quotient','lambda x: Neval(car(x))/Neval(cadr(x))')
 defq('eqn','lambda x: Ntest(Neval(car(x))==Neval(cadr(x)))')
 defq('eq','lambda x: Ntest(Neval(car(x))==Neval(cadr(x)))')
 defq('lessp','lambda x: Ntest(Neval(car(x))<Neval(cadr(x)))')
-defq('greaterpp','lambda x: Ntest(Neval(car(x))>Neval(cadr(x)))')
+defq('greaterp','lambda x: Ntest(Neval(car(x))>Neval(cadr(x)))')
 defq('atom','lambda x: Ntest(atom(Neval(car(x))))')
 defq('print','lambda x: Nprint(Neval(car(x)))')
 defq('quote','lambda x: car(x)')
@@ -290,15 +291,23 @@ lsp('(defun cdddr (x) (cdr (cddr x)))')
 lsp('(defun caddr (x) (car (cddr x)))')
 lsp('(defun cadddr (x) (car (cdddr x)))')
 
-
-lsp("""(defun *+-/ ((x y . z) ope)
+lsp("""(defun arith-macroes ((x y . z) ope)
          (if z 
-           (list ope (list ope x y) (*+-/ z ope))
+           (list ope (list ope x y) (arith-macroes z ope))
            (if y (list ope x y) x)))""")
-lsp("(defmacro + (x) (*+-/ x 'plus))")
-lsp("(defmacro - (x) (*+-/ x 'minus))")
-lsp("(defmacro * (x) (*+-/ x 'times))")
-lsp("(defmacro / (x) (*+-/ x 'quotient))")
+lsp("(defmacro + (x) (arith-macroes x 'plus))")
+lsp("(defmacro - (x) (arith-macroes x 'minus))")
+lsp("(defmacro * (x) (arith-macroes x 'times))")
+lsp("(defmacro / (x) (arith-macroes x 'quotient))")
+
+lsp("""(defun comp-macroes ((x y . z) ope)
+         (if z 
+           (list 'and (list ope x y) (comp-macroes (cons y z) ope))
+           (if y (list ope x y) x)))""")
+
+lsp("(defmacro < (x) (comp-macroes x 'lessp))")
+lsp("(defmacro > (x) (comp-macroes x 'greaterp))")
+lsp("(defmacro = (x) (comp-macroes x 'equal))")
 
 lsp("""(defun equal (x y)
           (or (eq x y) 
