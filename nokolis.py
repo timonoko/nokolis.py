@@ -148,6 +148,8 @@ def defq(x,y):
     exec(f'{oblist_name(x)}={y}')
     return x
 
+def lsp(x):
+    Neval(parse(x)
 
 def cons(x,y):
     return [x,y]
@@ -279,9 +281,6 @@ defq('lb', 'lambda x: print("(",end="")')
 defq('rp', 'lambda x: print(") ",end="")')
 defq('while', 'lambda x: Nwhile(car(x),cdr(x))')
 
-def lsp(x):
-    Neval(parse(x))
-
 lsp("(defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))")
 lsp("(defq defmacro (macro (x) (list 'defq (car x) (cons 'macro (cdr x)))))")
 
@@ -308,10 +307,12 @@ lsp("""(defun equal (x y)
                (car y)
                (equal (car x) (car y))
                (equal (cdr x) (cdr y)))))""")
+
 lsp("""(defun atomcount (n x)
            (if (atom x)
                (+ n 1)
                (plus (atomcount n  (car x))(atomcount n (cdr x)))))""")
+
 lsp("(defun tab (x) (if (lessp 0 x) (progn (sp) (tab (- x 1)))))")
 
 lsp("""(defun pprint (x tabs)
@@ -324,13 +325,11 @@ lsp("""(defun pprint (x tabs)
                 (if (cdr x) (progn (cr) (tab tabs))) 
                 (setq x (cdr x)))
               (rb))))""")
-               
-
+ 
 def repl():
     while True:
         Nprint(Neval(parse(input("> "))))
         print('')
-
 
 repl()
 
