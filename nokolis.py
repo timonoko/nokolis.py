@@ -59,7 +59,7 @@ def atomi(token):
         except ValueError:
             try: return float(token)
             except ValueError:
-                return Symbol(token)
+                return token
 
 def car(x):
     if atom(x): return []
@@ -149,7 +149,7 @@ def defq(x,y):
     return x
 
 def lsp(x):
-    Neval(parse(x)
+    Neval(parse(x))
 
 def cons(x,y):
     return [x,y]
