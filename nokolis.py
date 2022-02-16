@@ -137,13 +137,13 @@ def value_of(x):
        if identp(x): exec(f'{oblist_name(x)}=[]')
        return []
 
-def setq(x,y):
+def setq(x9,y):
     z=Neval(y)
     try:
-        exec(f'{oblist_name(x)}={z}')
+        exec(f'{oblist_name(x9)}={z}')
     except:
         try:
-            setattr(oblist,oblist_name2(x),z)
+            setattr(oblist,oblist_name2(x9),z)
         except: pass
     return z
 
@@ -172,7 +172,7 @@ def save_vars_list(x):
     if atom(x):
         if identp(x):
             try: exec(f'oblist.jemma.append({oblist_name(x)})')
-            except: exec(f'oblist.jemma.append([])')
+            except: exec(f'oblist.jemma.append(x)')
     else:
         save_vars_list(car(x))
         save_vars_list(cdr(x))
@@ -185,19 +185,19 @@ def restore_vars_list(x):
         restore_vars_list(cdr(x))
         restore_vars_list(car(x))
 
-def assign_vars(x,y):
-    if atom(x):
-        if identp(x):
+def assign_vars(x2a9,y2a9):
+    if atom(x2a9):
+        if identp(x2a9):
            try:
-               exec(f'{oblist_name(x)}={y}')
+               exec(f'{oblist_name(x2a9)}={y2a9}')
            except:
-               if identp(y):
-                   exec(f'{oblist_name(x)}="{y}"')
+               if identp(y2a9):
+                   exec(f'{oblist_name(x2a9)}="{y2a9}"')
                else:
-                   setattr(oblist,oblist_name2(x),y)
+                   setattr(oblist,oblist_name2(x2a9),y2a9)
     else:
-        assign_vars(car(x),car(y))
-        assign_vars(cdr(x),cdr(y))
+        assign_vars(car(x2a9),car(y2a9))
+        assign_vars(cdr(x2a9),cdr(y2a9))
 
 
 def Nprogn(x):
