@@ -303,54 +303,57 @@ defq('rp', 'lambda x: print(") ",end="")')
 defq('while', 'lambda x: Nwhile(car(x),cdr(x))')
 defq('eval', 'lambda x: Neval(Neval(car(x)))')
 defq('repeat-times', 'lambda x: Nrepeat_times(Neval(car(x)),cdr(x))')
+defq('read', 'lambda x: parse(input("? "))')
 
-lsp("(defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))")
-lsp("(defq defmacro (macro (x) (list 'defq (car x) (cons 'mlambda (cdr x)))))")
-lsp("(defq defmacrotest (macro (x) (list 'defq (car x) (cons 'nlambda (cdr x)))))")
-lsp("(defq defnacro (macro (x) (list 'defq (car x) (cons 'macro (cdr x)))))")
-lsp("(defq defnacrotest (macro (x) (list 'defq (car x) (cons 'macrotest (cdr x)))))")
+lsp(""" (progn
+ (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
+ (defq defmacro (macro (x) (list 'defq (car x) (cons 'mlambda (cdr x)))))
+ (defq defmacrotest (macro (x) (list 'defq (car x) (cons 'nlambda (cdr x)))))
+ (defq defnacro (macro (x) (list 'defq (car x) (cons 'macro (cdr x)))))
+ (defq defnacrotest (macro (x) (list 'defq (car x) (cons 'macrotest (cdr x)))))) """)
 
-lsp('(defun cadr (x) (car (cdr x)))')
-lsp('(defun cddr (x) (cdr (cdr x)))')
-lsp('(defun cdddr (x) (cdr (cddr x)))')
-lsp('(defun caddr (x) (car (cddr x)))')
-lsp('(defun cadddr (x) (car (cdddr x)))')
-lsp('(defun caar (x) (car (car x)))')
+lsp(""" (progn
+ (defun cadr (x) (car (cdr x)))
+ (defun cddr (x) (cdr (cdr x)))
+ (defun cdddr (x) (cdr (cddr x)))
+ (defun caddr (x) (car (cddr x)))
+ (defun cadddr (x) (car (cdddr x)))
+ (defun caar (x) (car (car x))) 
 
-lsp("""(defun arith-macroes ((x y . z) ope)
+ (defun arith-macroes ((x y . z) ope)
          (if z 
            (list ope (list ope x y) (arith-macroes z ope))
-           (if y (list ope x y) x)))""")
-lsp("(defnacro + (x) (arith-macroes x 'plus))")
-lsp("(defnacro - (x) (arith-macroes x 'minus))")
-lsp("(defnacro * (x) (arith-macroes x 'times))")
-lsp("(defnacro / (x) (arith-macroes x 'quotient))")
+           (if y (list ope x y) x)))
+ (defnacro + (x) (arith-macroes x 'plus))
+ (defnacro - (x) (arith-macroes x 'minus))
+ (defnacro * (x) (arith-macroes x 'times))
+ (defnacro / (x) (arith-macroes x 'quotient))
 
-lsp("""(defun comp-macroes ((x y . z) ope)
+ (defun comp-macroes ((x y . z) ope)
          (if z 
            (list 'and (list ope x y) (comp-macroes (cons y z) ope))
-           (if y (list ope x y) x)))""")
+           (if y (list ope x y) x)))
 
-lsp("(defnacro < (x) (comp-macroes x 'lessp))")
-lsp("(defnacro > (x) (comp-macroes x 'greaterp))")
-lsp("(defnacro = (x) (comp-macroes x 'equal))")
+ (defnacro < (x) (comp-macroes x 'lessp))
+ (defnacro > (x) (comp-macroes x 'greaterp))
+ (defnacro = (x) (comp-macroes x 'equal))
 
-lsp("""(defun equal (x y)
+ (defun equal (x y)
           (or (eq x y) 
               (and 
                (car x)
                (car y)
                (equal (car x) (car y))
-               (equal (cdr x) (cdr y)))))""")
+               (equal (cdr x) (cdr y)))))
 
-lsp("""(defun atomcount (n x)
+ (defun atomcount (n x)
            (if (atom x)
                (+ n 1)
-               (plus (atomcount n  (car x))(atomcount n (cdr x)))))""")
+               (plus (atomcount n  (car x))(atomcount n (cdr x)))))
 
-lsp("(defun tab (x) (if (lessp 0 x) (progn (sp) (tab (- x 1)))))")
+ (defun tab (x) (if (lessp 0 x) (progn (sp) (tab (- x 1)))))
 
-lsp("""(defun pprint (x tabs)
+ (defun pprint (x tabs)
            (or tabs (setq tabs 1))
            (if (lessp (atomcount 0 x) 20)
               (print x)
@@ -359,23 +362,25 @@ lsp("""(defun pprint (x tabs)
                 (pprint (car x) (+ 1 tabs))
                 (if (cdr x) (progn (cr) (tab tabs))) 
                 (setq x (cdr x)))
-              (rb))))""")
+              (rb))))
 
-lsp("""(defun cond-jatko (((xZ . yZ) . zZ))
-           (list 'if xZ (cons 'progn yZ) (if zZ (cond-jatko zZ)))))""")
-lsp("(defnacro cond (xZ) (cond-jatko xZ))")
+ (defun cond-jatko (((xZ . yZ) . zZ))
+           (list 'if xZ (cons 'progn yZ) (if zZ (cond-jatko zZ))))
 
-lsp("(defun append  (x9 y9) (if x9 (cons (car x9) (append (cdr x9) y9)) y9))")
+ (defnacro cond (xZ) (cond-jatko xZ)))
 
+)))""")
 
-lsp("""
- (defun map (m%f m%x)
+lsp(""" (progn 
+
+(defun append  (x9 y9) (if x9 (cons (car x9) (append (cdr x9) y9)) y9))
+ 
+(defun map (m%f m%x)
   (if m%x
-   (cons (m%f (car m%x)) (map m%f (cdr m%x)))))""")
+   (cons (m%f (car m%x)) (map m%f (cdr m%x)))))
 
-lsp("(defmacro backquote ZYKSX (blockq2 ZYKSX))")
+(defmacro backquote ZYKSX (blockq2 ZYKSX))
 
-lsp("""
 (defun blockq2 (XYPY)
  (cond
   ((atom XYPY) XYPY)
@@ -394,16 +399,14 @@ lsp("""
     (list 'list 'quote (cadr XYPY))
     (blockq2 (cddr XYPY))))
   (t
-   (list 'cons (blockq2 (car XYPY)) (blockq2 (cdr XYPY))))))""")
-
-lsp("""
+   (list 'cons (blockq2 (car XYPY)) (blockq2 (cdr XYPY))))))
+ 
 (defmacro let (vars . rest)
  (backquote
   (quote
    (lambda , (if (caar vars) (map car vars) vars) @ rest))
-  @(if (caar vars) (map cadr vars))))""")
-
-lsp("""
+  @(if (caar vars) (map cadr vars))))
+ 
 (defmacro for ((varb alku loppu steppi) . body)
  (if steppi () (setq steppi 1))
  (backquote
@@ -412,9 +415,9 @@ lsp("""
   (repeat-times
    (/ (- (+ , loppu , steppi) , alku) , steppi)
    @ body
-   (setq , varb (plus , varb , steppi)))))""")
+   (setq , varb (plus , varb , steppi)))))
 
-
+)))""")
 
 with open("bootpy.lsp","r") as f:
     c =f.read()
@@ -422,7 +425,8 @@ f.close
 c="(progn "+c+"))))))"
 lsp(c)
 
-
+lsp("""
+  (while t (cr) (pprint (eval (read)))) """)
 
 repl()
 
