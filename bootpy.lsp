@@ -1,24 +1,6 @@
 
-'((16 / 2 - 2022) (16 : 6 : 35 11))
+'((16 / 2 - 2022) (19 : 46 : 41 78))
 (defq *package* BOOTPY)
-
-(defq forz
- (nlambda
-  ((varb alku loppu steppi) . body)
-  (backquote lett
-   ((, varb , alku))
-   (repeat-times @ body (setq varb (plus varb steppi))))))
-
-(defq forrr
- (nlambda
-  ((varb alku loppu steppi) . body)
-  (if steppi () (setq steppi 1))
-  (backquote lett
-   ((, varb , alku))
-   (repeat-times
-    (/ (- (+ , loppu , steppi) , alku) , steppi)
-    @ body
-    (setq , varb (plus , varb , steppi))))))
 
 (defmacro forr
  ((varb alku loppu steppi) . body)
@@ -117,4 +99,4 @@
   (t
    (list 'cons (blockq2 (car XYPY)) (blockq2 (cdr XYPY))))))
 
-(defq BOOTPY (forz forrr forr backquote save lett mab blockq2 BOOTPY))
+(defq BOOTPY (forr backquote save lett mab blockq2 BOOTPY))
