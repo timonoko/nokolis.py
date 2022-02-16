@@ -1,8 +1,36 @@
 
-'((16 / 2 - 2022) (13 : 52 : 54 83))
+'((16 / 2 - 2022) (16 : 6 : 35 11))
 (defq *package* BOOTPY)
 
-(defq backquote (macro (x) (blockq2 x)))
+(defq forz
+ (nlambda
+  ((varb alku loppu steppi) . body)
+  (backquote lett
+   ((, varb , alku))
+   (repeat-times @ body (setq varb (plus varb steppi))))))
+
+(defq forrr
+ (nlambda
+  ((varb alku loppu steppi) . body)
+  (if steppi () (setq steppi 1))
+  (backquote lett
+   ((, varb , alku))
+   (repeat-times
+    (/ (- (+ , loppu , steppi) , alku) , steppi)
+    @ body
+    (setq , varb (plus , varb , steppi))))))
+
+(defmacro forr
+ ((varb alku loppu steppi) . body)
+ (if steppi () (setq steppi 1))
+ (backquote lett
+  ((, varb , alku))
+  (repeat-times
+   (/ (- (+ , loppu , steppi) , alku) , steppi)
+   @ body
+   (setq , varb (plus , varb , steppi)))))
+
+(defq backquote (macro (ZYKSX) (blockq2 ZYKSX)))
 
 (defun save
  (y x)
@@ -69,24 +97,24 @@
   (cons (m%f (car m%x)) (mab m%f (cdr m%x)))))
 
 (defun blockq2
- (x)
+ (XYPY)
  (cond
-  ((atom x) x)
-  ((eq (car x) ',)
-   (list 'cons (cadr x) (blockq2 (cddr x))))
-  ((eq (car x) '@)
-   (list 'append (cadr x) (blockq2 (cddr x))))
-  ((atom (car x))
+  ((atom XYPY) XYPY)
+  ((eq (car XYPY) ',)
+   (list 'cons (cadr XYPY) (blockq2 (cddr XYPY))))
+  ((eq (car XYPY) '@)
+   (list 'append (cadr XYPY) (blockq2 (cddr XYPY))))
+  ((atom (car XYPY))
    (list
     'cons
-    (list 'quote (car x))
-    (blockq2 (cdr x))))
-  ((equal (car x) '',)
+    (list 'quote (car XYPY))
+    (blockq2 (cdr XYPY))))
+  ((equal (car XYPY) '',)
    (list
     'cons
-    (list 'list 'quote (cadr x))
-    (blockq2 (cddr x))))
+    (list 'list 'quote (cadr XYPY))
+    (blockq2 (cddr XYPY))))
   (t
-   (list 'cons (blockq2 (car x)) (blockq2 (cdr x))))))
+   (list 'cons (blockq2 (car XYPY)) (blockq2 (cdr XYPY))))))
 
-(defq BOOTPY (backquote save lett mab blockq2 BOOTPY))
+(defq BOOTPY (forz forrr forr backquote save lett mab blockq2 BOOTPY))
