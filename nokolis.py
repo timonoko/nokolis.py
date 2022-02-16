@@ -1,19 +1,25 @@
 #! /usr/bin/python3
 
-import math
-import time
-#import operator as op
+import math,time
 
 class oblist:
     args=[]
     jemma=[]
     NNN_t="t"
 
-def oblist_name(x):
+def repl():
+    while True:
+        Nprint(Neval(parse(input("> "))))
+        print('')
+
+def oblist_name2(x):
     x=x.replace('+','Nplus').replace('-','Nminus').replace('*','Ntimes').replace('/','Ndivide').replace('[','Nvhaka')
     x=x.replace(']','Nohaka').replace('.','Npiste').replace('<','Nless').replace('>','Ngreater').replace('=','Nequal')
-    x=x.replace('`',"Lapo").replace('@',"Miumau")
-    return f'oblist.NNN_{x}'
+    x=x.replace('`',"Lapo").replace('@',"Miumau").replace('%',"Nperc")
+    return f'NNN_{x}'
+
+def oblist_name(x):
+    return f'oblist.{oblist_name2(x)}'
 
 def parse(program):
     a,b=readtokens(tokenize(program))
@@ -57,10 +63,7 @@ def atomi(token):
     try: return int(token)
     except:
         try: return float(token)
-        except ValueError:
-            try: return float(token)
-            except ValueError:
-                return token
+        except: return token
 
 def car(x):
     if atom(x): return []
@@ -115,7 +118,6 @@ def Neval(x):
     elif atom(x):
         if x==[] :
             return []
-        x=str(x)
         try:
             return int(x)
         except:
@@ -141,12 +143,15 @@ def setq(x,y):
         exec(f'{oblist_name(x)}={z}')
     except:
         try:
-            exec(f'{oblist_name(x)}="{z}"')
+            setattr(oblist,oblist_name2(x),z)
         except: pass
     return z
 
 def defq(x,y):
-    exec(f'{oblist_name(x)}={y}')
+    try:
+        exec(f'{oblist_name(x)}={y}')
+    except:
+        exec(f'{oblist_name(x)}="{y}"')
     return x
 
 def lsp(x):
@@ -185,8 +190,11 @@ def assign_vars(x,y):
         if identp(x):
            try:
                exec(f'{oblist_name(x)}={y}')
-           except: 
-               exec(f'{oblist_name(x)}="{y}"')
+           except:
+               if identp(y):
+                   exec(f'{oblist_name(x)}="{y}"')
+               else:
+                   setattr(oblist,oblist_name2(x),y)
     else:
         assign_vars(car(x),car(y))
         assign_vars(cdr(x),cdr(y))
@@ -253,6 +261,14 @@ def Nwhile(x,y):
         tul=Nprogn(y)       
     return []
 
+def Nrepeat_times(x,y):
+    x=int(x)
+    z=[]
+    while x>0:
+        z=Nprogn(y)
+        x=x-1
+    return z
+
 defq('plus', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('minus','lambda x: Neval(car(x))-Neval(cadr(x))')
 defq('times','lambda x: Neval(car(x))*Neval(cadr(x))')
@@ -284,6 +300,7 @@ defq('lb', 'lambda x: print("(",end="")')
 defq('rp', 'lambda x: print(") ",end="")')
 defq('while', 'lambda x: Nwhile(car(x),cdr(x))')
 defq('eval', 'lambda x: Neval(Neval(car(x)))')
+defq('repeat-times', 'lambda x: Nrepeat_times(Neval(car(x)),cdr(x))')
 
 lsp("(defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))")
 lsp("(defq defmacro (macro (x) (list 'defq (car x) (cons 'macro (cdr x)))))")
@@ -351,7 +368,15 @@ lsp("""
     (if (< x 2)
         x
         (+ (fib (- x 1)) (fib (- x 2)))))""")
- 
+
+
+with open("bootpy.lsp","r") as f:
+    c =f.read()
+f.close
+c="(progn "+c+"))))))"
+lsp(c)
+
+
 def repl():
     while True:
         Nprint(Neval(parse(input("> "))))
