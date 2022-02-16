@@ -369,10 +369,51 @@ lsp("(defun append  (x9 y9) (if x9 (cons (car x9) (append (cdr x9) y9)) y9))")
 
 
 lsp("""
- (defun fib (x)
-    (if (< x 2)
-        x
-        (+ (fib (- x 1)) (fib (- x 2)))))""")
+ (defun map (m%f m%x)
+  (if m%x
+   (cons (m%f (car m%x)) (map m%f (cdr m%x)))))""")
+
+lsp("(defmacro backquote ZYKSX (blockq2 ZYKSX))")
+
+lsp("""
+(defun blockq2 (XYPY)
+ (cond
+  ((atom XYPY) XYPY)
+  ((eq (car XYPY) ',)
+   (list 'cons (cadr XYPY) (blockq2 (cddr XYPY))))
+  ((eq (car XYPY) '@)
+   (list 'append (cadr XYPY) (blockq2 (cddr XYPY))))
+  ((atom (car XYPY))
+   (list
+    'cons
+    (list 'quote (car XYPY))
+    (blockq2 (cdr XYPY))))
+  ((equal (car XYPY) '',)
+   (list
+    'cons
+    (list 'list 'quote (cadr XYPY))
+    (blockq2 (cddr XYPY))))
+  (t
+   (list 'cons (blockq2 (car XYPY)) (blockq2 (cdr XYPY))))))""")
+
+lsp("""
+(defmacro let (vars . rest)
+ (backquote
+  (quote
+   (lambda , (if (caar vars) (map car vars) vars) @ rest))
+  @(if (caar vars) (map cadr vars))))""")
+
+lsp("""
+(defmacro for ((varb alku loppu steppi) . body)
+ (if steppi () (setq steppi 1))
+ (backquote
+  let
+  ((, varb , alku))
+  (repeat-times
+   (/ (- (+ , loppu , steppi) , alku) , steppi)
+   @ body
+   (setq , varb (plus , varb , steppi)))))""")
+
 
 
 with open("bootpy.lsp","r") as f:
@@ -382,10 +423,6 @@ c="(progn "+c+"))))))"
 lsp(c)
 
 
-def repl():
-    while True:
-        Nprint(Neval(parse(input("> "))))
-        print('')
 
 repl()
 
