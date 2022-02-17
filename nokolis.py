@@ -299,7 +299,7 @@ defq('or', 'lambda x: Nor(x)')
 defq('cr', 'lambda x: print("")')
 defq('sp', 'lambda x: print(" ",end="")')
 defq('lb', 'lambda x: print("(",end="")')
-defq('rp', 'lambda x: print(") ",end="")')
+defq('rb', 'lambda x: print(")",end="")')
 defq('while', 'lambda x: Nwhile(car(x),cdr(x))')
 defq('eval', 'lambda x: Neval(Neval(car(x)))')
 defq('repeat-times', 'lambda x: Nrepeat_times(Neval(car(x)),cdr(x))')
@@ -381,26 +381,27 @@ lsp(""" (progn
 
 (defmacro backquote ZYKSX (blockq2 ZYKSX))
 
-(defun blockq2 (XYPY)
+(defun blockq2
+ (XYPY)
  (cond
   ((atom XYPY) XYPY)
   ((eq (car XYPY) ',)
    (list 'cons (cadr XYPY) (blockq2 (cddr XYPY))))
   ((eq (car XYPY) '@)
    (list 'append (cadr XYPY) (blockq2 (cddr XYPY))))
+  ((equal (car XYPY) 'QUOTE)
+   (list
+    'cons
+    (list 'list ''quote (cadr XYPY))
+    (blockq2 (cddr XYPY))))
   ((atom (car XYPY))
    (list
     'cons
     (list 'quote (car XYPY))
     (blockq2 (cdr XYPY))))
-  ((equal (car XYPY) '',)
-   (list
-    'cons
-    (list 'list 'quote (cadr XYPY))
-    (blockq2 (cddr XYPY))))
   (t
    (list 'cons (blockq2 (car XYPY)) (blockq2 (cdr XYPY))))))
- 
+
 (defmacro let (vars . rest)
  (backquote
   (quote
