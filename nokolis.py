@@ -312,8 +312,11 @@ def explo2(x):
     else:
        return []
 
- 
-
+def compress(x):
+     if x==[]:
+         return ""
+     else:
+         return chr(x[0])+compress(x[1])
     
 
 defq('plus', 'lambda x: Neval(car(x))+Neval(cadr(x))')
@@ -364,6 +367,7 @@ defq('str-raw', 'lambda x: str(Neval(car(x)))')
 defq('oblist', 'lambda x: str(dir(oblist))')
 defq('oblist-name-raw', 'lambda x: str(oblist_name2(Neval(car(x))))')
 defq('explode', 'lambda x: explode(Neval(car(x)))')
+defq('compress', 'lambda x: compress(Neval(car(x)))')
 
 
 lsp(""" (progn
