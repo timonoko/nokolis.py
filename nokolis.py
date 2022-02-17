@@ -26,7 +26,7 @@ def parse(program):
     return a
 
 def tokenize(s):
-    return s.replace('(',' ( ').replace(')',' ) ').replace("'"," ' ").replace(","," , ").split()
+    return s.replace('(',' ( ').replace(')',' ) ').replace("'"," ' ").replace(","," , ").replace('"',' ').split()
 
 def readrest(tokens):
     if tokens==[]: return [],[]
@@ -368,7 +368,8 @@ defq('oblist-name-raw', 'lambda x: str(oblist_name2(Neval(car(x))))')
 defq('explode', 'lambda x: explode(Neval(car(x)))')
 defq('compress', 'lambda x: compress(Neval(car(x)))')
 defq('python-call', 'lambda x: exec(str(Neval(car(x)))+"("+str(Neval(cadr(x)))+")")')
-defq('read-str', 'lambda x: input("? ")')
+dq='"'
+defq('read-str', 'lambda x: input("? ").replace(dq,"")')
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
