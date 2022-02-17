@@ -303,6 +303,19 @@ def Nnot(x):
     else:
         return []
 
+def explode(word):
+    return explo2([ord(char) for char in word])
+
+def explo2(x):
+    if x!=[]:
+        return [x[0],explo2(x[1:])]
+    else:
+       return []
+
+ 
+
+    
+
 defq('plus', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('minus','lambda x: Neval(car(x))-Neval(cadr(x))')
 defq('times','lambda x: Neval(car(x))*Neval(cadr(x))')
@@ -350,6 +363,7 @@ defq('type', 'lambda x: str(type(Neval(car(x))))')
 defq('str-raw', 'lambda x: str(Neval(car(x)))')
 defq('oblist', 'lambda x: str(dir(oblist))')
 defq('oblist-name-raw', 'lambda x: str(oblist_name2(Neval(car(x))))')
+defq('explode', 'lambda x: explode(Neval(car(x)))')
 
 
 lsp(""" (progn
