@@ -1,5 +1,5 @@
 # Python Nokolisp
-I copied best part of Peter Norvig's Python Lisp. 
+I copied best part of Peter Norvig's Python Lisp. https://norvig.com/lispy.html
 
 But I made real Lisp lists:
 
