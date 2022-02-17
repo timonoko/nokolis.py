@@ -348,6 +348,7 @@ defq('nconc', 'lambda x: Nnconc(Neval(car(x)),Neval(cadr(x)))')
 defq('identp', 'lambda x: Ntest(identp(Neval(car(x))))')
 defq('type', 'lambda x: str(type(Neval(car(x))))')
 defq('str-raw', 'lambda x: str(Neval(car(x)))')
+defq('oblist', 'lambda x: str(dir(oblist))')
 
 
 lsp(""" (progn
