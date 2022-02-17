@@ -491,8 +491,11 @@ c="(progn "+c+"))))))"
 lsp(c)
 
 lsp("""
-  (while t (cr) (pprint (eval (read)))) """)
+ (progn
+   (defun repl () (while t (cr) (pprint (eval (read)))))
+   (repl))""")
 
+#secondary repl
 repl()
 
     
