@@ -368,7 +368,7 @@ defq('oblist', 'lambda x: str(dir(oblist))')
 defq('oblist-name-raw', 'lambda x: str(oblist_name2(Neval(car(x))))')
 defq('explode', 'lambda x: explode(Neval(car(x)))')
 defq('compress', 'lambda x: compress(Neval(car(x)))')
-
+defq('python-call', 'lambda x: exec(str(Neval(car(x)))+"("+str(Neval(cadr(x)))+")")')
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
