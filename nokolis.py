@@ -40,7 +40,7 @@ def readrest(tokens):
         return toka,tokens4
     else:
         toka,tokens3=readrest(tokens2)
-        if toka==[] : return [eka],tokens3 
+        if toka==[] : return [eka,[]],tokens3 
         else: return [eka,toka],tokens3
     
 def readtokens(tokens):
@@ -139,12 +139,16 @@ def value_of(x):
 
 def setq(x9,y):
     z=Neval(y)
-    try:
-        exec(f'{oblist_name(x9)}={z}')
-    except:
-        try:
-            setattr(oblist,oblist_name2(x9),z)
-        except: pass
+    if identp(z):
+        exec(f'{oblist_name(x9)}="{z}"')
+    else:    
+      try:
+          exec(f'{oblist_name(x9)}={z}')
+      except:
+          try:
+              setattr(oblist,oblist_name2(x9),z)
+          except:
+              pass
     return z
 
 def defq(x,y):
@@ -166,7 +170,7 @@ def Nlist(x):
         return cons(Neval(car(x)),Nlist(cdr(x)))
 
 def identp(x):
-    return type(x)==type("a")
+    return type(x)==type("abba")
         
 def save_vars_list(x):
     if atom(x):
@@ -188,13 +192,13 @@ def restore_vars_list(x):
 def assign_vars(x2a9,y2a9):
     if atom(x2a9):
         if identp(x2a9):
-           try:
+          if identp(y2a9):
+            exec(f'{oblist_name(x2a9)}="{y2a9}"')
+          else:    
+            try:
                exec(f'{oblist_name(x2a9)}={y2a9}')
-           except:
-               if identp(y2a9):
-                   exec(f'{oblist_name(x2a9)}="{y2a9}"')
-               else:
-                   setattr(oblist,oblist_name2(x2a9),y2a9)
+            except:
+               setattr(oblist,oblist_name2(x2a9),y2a9)
     else:
         assign_vars(car(x2a9),car(y2a9))
         assign_vars(cdr(x2a9),cdr(y2a9))
@@ -207,6 +211,12 @@ def Nprogn(x):
     else:
         return Nprogn(cdr(x))
 
+def Nprog1(x):
+    tul=Neval(car(x))
+    if cdr(x) != []:
+        Nprog1(cdr(x))
+    return tul
+        
 def Nlambda(vars,args,y):
     z=Nlist(args)
     save_vars_list(vars)
@@ -269,15 +279,41 @@ def Nrepeat_times(x,y):
         x=x-1
     return z
 
+def Nrplaca(x,y):
+    x[0]=y
+    return x
+
+def Nrplacd(x2,y2):
+    x2[1]=y2
+    return x2
+
+def Nlast(x):
+    if cdr(x)==[]:
+        return x
+    else:
+        return Nlast(cdr(x))
+
+def Nnconc(x,y):
+    Nrplacd(Nlast(x),y)
+    return x
+
+def Nnot(x):
+    if x==[]:
+        return "t"
+    else:
+        return []
+
 defq('plus', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('minus','lambda x: Neval(car(x))-Neval(cadr(x))')
 defq('times','lambda x: Neval(car(x))*Neval(cadr(x))')
 defq('quotient','lambda x: Neval(car(x))/Neval(cadr(x))')
+defq('remainder','lambda x: Neval(car(x))%Neval(cadr(x))')
 defq('eqn','lambda x: Ntest(Neval(car(x))==Neval(cadr(x)))')
 defq('eq','lambda x: Ntest(Neval(car(x))==Neval(cadr(x)))')
 defq('lessp','lambda x: Ntest(Neval(car(x))<Neval(cadr(x)))')
 defq('greaterp','lambda x: Ntest(Neval(car(x))>Neval(cadr(x)))')
 defq('atom','lambda x: Ntest(atom(Neval(car(x))))')
+defq('not','lambda x: Nnot(Neval(car(x)))')
 defq('print','lambda x: Nprint(Neval(car(x)))')
 defq('quote','lambda x: car(x)')
 defq('setq','lambda x: setq(car(x),cadr(x))')
@@ -289,6 +325,7 @@ defq('cdr', 'lambda x: cdr(Neval(car(x)))')
 defq('list', 'lambda x: Nlist(x)')
 defq('lambda', 'lambda x: Nlambda(car(x),oblist.args[-1],cdr(x))')
 defq('progn', 'lambda x: Nprogn(x)')
+defq('prog1', 'lambda x: Nprog1(x)')
 defq('macro', 'lambda x: Nmacro(car(car(x)),oblist.args[-1],cdr(x))')
 defq('mlambda', 'lambda x: Nmacro(car(x),oblist.args[-1],cdr(x))')
 defq('macrotest', 'lambda x: Nmacroexpand(car(car(x)),oblist.args[-1],cdr(x))')
@@ -304,6 +341,13 @@ defq('while', 'lambda x: Nwhile(car(x),cdr(x))')
 defq('eval', 'lambda x: Neval(Neval(car(x)))')
 defq('repeat-times', 'lambda x: Nrepeat_times(Neval(car(x)),cdr(x))')
 defq('read', 'lambda x: parse(input("? "))')
+defq('rplaca', 'lambda x: Nrplaca(Neval(car(x)),Neval(cadr(x)))')
+defq('rplacd', 'lambda x: Nrplacd(Neval(car(x)),Neval(cadr(x)))')
+defq('last', 'lambda x: Nlast(Neval(car(x)))')
+defq('nconc', 'lambda x: Nnconc(Neval(car(x)),Neval(cadr(x)))')
+defq('identp', 'lambda x: Ntest(identp(Neval(car(x))))')
+defq('type', 'lambda x: str(type(Neval(car(x))))')
+
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
@@ -345,6 +389,24 @@ lsp(""" (progn
                (car y)
                (equal (car x) (car y))
                (equal (cdr x) (cdr y)))))
+
+ (defun member (x y)
+  (if y (if (equal x (car y))
+            y
+            (member x (cdr y)))))
+
+ (defun assoc (x y)
+  (if y (if (equal x (caar y))
+            (car y)
+            (assoc x (cdr y)))))
+
+(defun reverse
+ (x)
+ (if
+  (cdr x)
+  (nconc (reverse (cdr x)) (list (car x)))
+  (list (car x))))
+
 
  (defun atomcount (n x)
            (if (atom x)
