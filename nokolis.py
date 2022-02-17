@@ -26,7 +26,7 @@ def parse(program):
     return a
 
 def tokenize(s):
-    return s.replace('(',' ( ').replace(')',' ) ').replace("'"," ' ").replace(","," , ").replace('"',' ').split()
+    return s.replace('(',' ( ').replace(')',' ) ').replace("'"," ' ").replace(","," , ").replace('"',' " ').split()
 
 def readrest(tokens):
     if tokens==[]: return [],[]
@@ -140,7 +140,7 @@ def value_of(x):
 def setq(x9,y):
     z=Neval(y)
     if identp(z):
-        exec(f'{oblist_name(x9)}="{z}"')
+        exec(f"{oblist_name(x9)}='{z}'")
     else:    
       try:
           exec(f'{oblist_name(x9)}={z}')
@@ -155,7 +155,7 @@ def defq(x,y):
     try:
         exec(f'{oblist_name(x)}={y}')
     except:
-        exec(f'{oblist_name(x)}="{y}"')
+        exec(f"{oblist_name(x)}='{y}'")
     return x
 
 def lsp(x):
@@ -193,7 +193,7 @@ def assign_vars(x2a9,y2a9):
     if atom(x2a9):
         if identp(x2a9):
           if identp(y2a9):
-            exec(f'{oblist_name(x2a9)}="{y2a9}"')
+            exec(f"{oblist_name(x2a9)}='{y2a9}'")
           else:    
             try:
                exec(f'{oblist_name(x2a9)}={y2a9}')
