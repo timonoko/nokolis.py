@@ -1,7 +1,7 @@
 # Python Nokolisp
 I copied best part of Peter Norvig's Python Lisp. 
 
-But I made real lists:
+But I made real Lisp lists:
 
 (str-raw (cons 'Lets 'Go)) ==> ['Lets', 'Go']
 
