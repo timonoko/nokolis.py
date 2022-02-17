@@ -318,7 +318,6 @@ def compress(x):
      else:
          return chr(x[0])+compress(x[1])
     
-
 defq('plus', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('minus','lambda x: Neval(car(x))-Neval(cadr(x))')
 defq('times','lambda x: Neval(car(x))*Neval(cadr(x))')
@@ -500,9 +499,9 @@ lsp(""" (progn
  (if steppi () (setq steppi 1))
  (backquote
   let
-  ((, varb , alku))
+  ((,varb ,alku))
   (repeat-times
-   (/ (- (+ , loppu , steppi) , alku) , steppi)
+   (/ (- (+ ,loppu , steppi) , alku) , steppi)
    @ body
    (setq , varb (plus , varb , steppi)))))
 
@@ -510,6 +509,8 @@ lsp(""" (progn
 (defmacro pop (x) (backquote prog1 (car ,x) (setq ,x (cdr ,x))))
 
 (defun numberp (x) (equal (type x) (type 1)))
+
+(defun listp (x) (equal (type x) (type '(1 2))))
 
 )))""")
 
