@@ -356,7 +356,7 @@ defq('rb', 'lambda x: print(")",end="")')
 defq('while', 'lambda x: Nwhile(car(x),cdr(x))')
 defq('eval', 'lambda x: Neval(Neval(car(x)))')
 defq('repeat-times', 'lambda x: Nrepeat_times(Neval(car(x)),cdr(x))')
-defq('read', 'lambda x: parse(input("? "))')
+defq('read', 'lambda x: parse(input("> "))')
 defq('rplaca', 'lambda x: Nrplaca(Neval(car(x)),Neval(cadr(x)))')
 defq('rplacd', 'lambda x: Nrplacd(Neval(car(x)),Neval(cadr(x)))')
 defq('last', 'lambda x: Nlast(Neval(car(x)))')
@@ -369,6 +369,7 @@ defq('oblist-name-raw', 'lambda x: str(oblist_name2(Neval(car(x))))')
 defq('explode', 'lambda x: explode(Neval(car(x)))')
 defq('compress', 'lambda x: compress(Neval(car(x)))')
 defq('python-call', 'lambda x: exec(str(Neval(car(x)))+"("+str(Neval(cadr(x)))+")")')
+defq('read-str', 'lambda x: input("? ")')
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
@@ -447,6 +448,10 @@ lsp(""" (progn
                 (setq x (cdr x)))
               (rb))))
 
+(defun nthcdr (x y) (if (= x 0) y (nthcdr (- x 1) (cdr y))))
+(defun nth (x y) (car (nthcdr x y)))
+
+
  (defun cond-jatko (((xZ . yZ) . zZ))
            (list 'if xZ (cons 'progn yZ) (if zZ (cond-jatko zZ))))
 
@@ -500,6 +505,11 @@ lsp(""" (progn
    (/ (- (+ , loppu , steppi) , alku) , steppi)
    @ body
    (setq , varb (plus , varb , steppi)))))
+
+(defmacro push (x y) (backquote setq ,y (cons ,x ,y)))
+(defmacro pop (x) (backquote prog1 (car ,x) (setq ,x (cdr ,x))))
+
+(defun numberp (x) (equal (type x) (type 1)))
 
 )))""")
 
