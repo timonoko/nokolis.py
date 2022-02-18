@@ -12,7 +12,12 @@ class oblist:
 
 def repl():
     while True:
-        Nprint(Neval(parse(input("> "))))
+        rivi=input("> ")
+        if rivi[0]=="@":
+            exec("oblist.NNN_Miumau="+rivi[1:])
+            Nprint(oblist.NNN_Miumau)
+        else:
+            Nprint(Neval(parse(rivi)))
         print('')
 
 def oblist_name2(x):
@@ -553,10 +558,7 @@ f.close
 c="(progn "+c+"))))))"
 lsp(c)
 
-lsp("""
- (progn
-   (defun repl () (while t (cr) (pprint (eval (read)))))
-   (repl))""")
+lsp("(defun repl () (while t (cr) (pprint (eval (read)))))")
 
 #secondary repl
 repl()
