@@ -1,6 +1,9 @@
 #! /usr/bin/python3
 
 import math,time
+import resource, sys
+resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
+sys.setrecursionlimit(10**6)
 
 class oblist:
     args=[]
@@ -26,7 +29,7 @@ def parse(program):
     return a
 
 def tokenize(s):
-    return s.replace('(',' ( ').replace(')',' ) ').replace("'"," ' ").replace(","," , ").replace('"',' " ').split()
+    return s.replace('(',' ( ').replace(')',' ) ').replace("'"," ' ").replace(","," , ").replace('"',' " ').replace('[',' [ ').replace(']',' ] ').split()
 
 def readrest(tokens):
     if tokens==[]: return [],[]
@@ -52,6 +55,8 @@ def readtokens(tokens):
         return token,tokens
     elif '.' == token:
         return token,tokens
+#    elif '[' == token:
+#        return " ".join([token]+tokens),tokens
     elif "'" == token:
         yksi,tokens2=readtokens(tokens)
         return ["quote",[yksi]],tokens2
@@ -104,6 +109,8 @@ def Nprint(x):
             print('()',end='')
         else:
             print(x,end='')
+    elif len(x)>2:
+        print(x,end="")
     elif car(x)=='quote':
         print("'",end='')
         Nprint(car(cdr(x)))
@@ -140,7 +147,10 @@ def value_of(x):
 def setq(x9,y):
     z=Neval(y)
     if identp(z):
-        exec(f"{oblist_name(x9)}='{z}'")
+       try:
+           exec(f"{oblist_name(x9)}='{z}'")
+       except:
+           exec(f'{oblist_name(x9)}="{z}"')
     else:    
       try:
           exec(f'{oblist_name(x9)}={z}')
@@ -193,7 +203,10 @@ def assign_vars(x2a9,y2a9):
     if atom(x2a9):
         if identp(x2a9):
           if identp(y2a9):
-            exec(f"{oblist_name(x2a9)}='{y2a9}'")
+              try:
+                  exec(f"{oblist_name(x2a9)}='{y2a9}'")
+              except:
+                  exec(f'{oblist_name(x2a9)}="{y2a9}"')
           else:    
             try:
                exec(f'{oblist_name(x2a9)}={y2a9}')
@@ -307,16 +320,30 @@ def explode(word):
     return explo2([ord(char) for char in word])
 
 def explo2(x):
-    if x!=[]:
-        return [x[0],explo2(x[1:])]
+  if x!=[]:
+    if type(x[0])==type([1]):
+        y=explo2(x[0])
     else:
-       return []
+        y=x[0]
+    return [y,explo2(x[1:])]
+  else:
+    return []
 
 def compress(x):
      if x==[]:
          return ""
      else:
          return chr(x[0])+compress(x[1])
+
+def list2array(x):
+    if atom(car(x)):
+        y=car(x)
+    else:
+        y=list2array(car(x))
+    if cdr(x)==[]:
+         return [y]
+    else:
+         return [y]+list2array(cdr(x))
     
 defq('plus', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('minus','lambda x: Neval(car(x))-Neval(cadr(x))')
@@ -363,13 +390,16 @@ defq('nconc', 'lambda x: Nnconc(Neval(car(x)),Neval(cadr(x)))')
 defq('identp', 'lambda x: Ntest(identp(Neval(car(x))))')
 defq('type', 'lambda x: str(type(Neval(car(x))))')
 defq('str-raw', 'lambda x: str(Neval(car(x)))')
-defq('oblist', 'lambda x: str(dir(oblist))')
+defq('oblist', 'lambda x: dir(oblist)')
 defq('oblist-name-raw', 'lambda x: str(oblist_name2(Neval(car(x))))')
 defq('explode', 'lambda x: explode(Neval(car(x)))')
 defq('compress', 'lambda x: compress(Neval(car(x)))')
-defq('python-call', 'lambda x: exec(str(Neval(car(x)))+"("+str(Neval(cadr(x)))+")")')
-dq='"'
-defq('read-str', 'lambda x: input("? ").replace(dq,"")')
+defq('read-str', 'lambda x: input("? ")')
+defq('array2list', 'lambda x: explo2(Neval(car(x)))')
+defq('list2array', 'lambda x: list2array(Neval(car(x)))')
+defq('array2str',  'lambda x: "".join(str(Neval(car(x))))')
+defq('python-eval', 'lambda x: eval(Neval(car(x)))')
+
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
@@ -430,16 +460,17 @@ lsp(""" (progn
   (list (car x))))
 
 
- (defun atomcount (n x)
-           (if (atom x)
-               (+ n 1)
-               (plus (atomcount n  (car x))(atomcount n (cdr x)))))
-
+ (defun depthless (n x)
+      (if (> 0 n) 0
+        (if (atom x)
+             (- n 1)
+             (depthless (depthless n (car x)) (cdr x)))))
+              
  (defun tab (x) (if (lessp 0 x) (progn (sp) (tab (- x 1)))))
 
  (defun pprint (x tabs)
            (or tabs (setq tabs 1))
-           (if (lessp (atomcount 0 x) 20)
+           (if (< 1 (depthless 20 x))
               (print x)
               (progn (lb)
                (while x 
