@@ -7,7 +7,7 @@ But I made real Lisp lists:
 
 (str-raw (list 1 2 'a 'b)) ==> [1, [2, ['a', ['b', []]]]]
 
-Print Novelty: if x[2] exists it not a LispList, but a Python Array:
+Print Novelty: if X[2] exists X is not a LispList, but a Python Array:
 
 (list2array '(1 2 3)) ==> [1, 2, 3]
 
