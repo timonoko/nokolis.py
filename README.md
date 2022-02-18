@@ -7,8 +7,7 @@ But I made real Lisp lists:
 
 (str-raw (list 1 2 'a 'b)) ==> [1, [2, ['a', ['b', []]]]]
 
-And dynamic scoping in Lisp-1. To the best Nokolisp tradition. It is 50 years old soon. And I am 70 soon.
+Epiphany: if x[2] exists it not a LispList, but an Array:
 
-This made me happy in 1975:
-
-(compress (reverse (explode 'INNOSTUNUTSONNI))) ==> INNOSTUNUTSONNI
+(list2array '(1 2 3)) ==> [1, 2, 3]
+(list2array '(1 2)) ==> (1  .  2 )
