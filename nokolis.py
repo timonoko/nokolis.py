@@ -162,9 +162,6 @@ def Nset(x,y):
           except:
               pass
     return y
-   
-def setq(x,y):
-    return Nset(x,Neval(y))
 
 def defq(x,y):
     try:
@@ -352,8 +349,8 @@ defq('atom','lambda x: Ntest(atom(Neval(car(x))))')
 defq('not','lambda x: Nnot(Neval(car(x)))')
 defq('print','lambda x: Nprint(Neval(car(x)))')
 defq('quote','lambda x: car(x)')
-defq('setq','lambda x: setq(car(x),cadr(x))')
-defq('set','lambda x: setq(Neval(car(x)),cadr(x))')
+defq('setq','lambda x: Nset(car(x),Neval(cadr(x)))')
+defq('set','lambda x: Nset(Neval(car(x)),Neval(cadr(x)))')
 defq('defq','lambda x: defq(car(x),cadr(x))')
 defq('cons', 'lambda x: [Neval(car(x)),Neval(cadr(x))]')
 defq('car', 'lambda x: car(Neval(car(x)))')
