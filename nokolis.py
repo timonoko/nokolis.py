@@ -60,8 +60,6 @@ def readtokens(tokens):
         return token,tokens
     elif '.' == token:
         return token,tokens
-#    elif '[' == token:
-#        return " ".join([token]+tokens),tokens
     elif "'" == token:
         yksi,tokens2=readtokens(tokens)
         return ["quote",[yksi]],tokens2
@@ -149,22 +147,24 @@ def value_of(x):
        if identp(x): exec(f'{oblist_name(x)}=[]')
        return []
 
-def setq(x9,y):
-    z=Neval(y)
-    if identp(z):
+def Nset(x,y):   
+    if identp(y):
        try:
-           exec(f"{oblist_name(x9)}='{z}'")
+           exec(f"{oblist_name(x)}='{y}'")
        except:
-           exec(f'{oblist_name(x9)}="{z}"')
+           exec(f'{oblist_name(x)}="{y}"')
     else:    
       try:
-          exec(f'{oblist_name(x9)}={z}')
+          exec(f'{oblist_name(x)}={y}')
       except:
           try:
-              setattr(oblist,oblist_name2(x9),z)
+              setattr(oblist,oblist_name2(x),y)
           except:
               pass
-    return z
+    return y
+   
+def setq(x,y):
+    return Nset(x,Neval(y))
 
 def defq(x,y):
     try:
@@ -187,40 +187,29 @@ def Nlist(x):
 def identp(x):
     return type(x)==type("abba")
         
-def save_vars_list(x):
+def save_vars(x):
     if atom(x):
         if identp(x):
             try: exec(f'oblist.jemma.append({oblist_name(x)})')
             except: exec(f'oblist.jemma.append(x)')
     else:
-        save_vars_list(car(x))
-        save_vars_list(cdr(x))
+        save_vars(car(x))
+        save_vars(cdr(x))
     
-def restore_vars_list(x):
+def restore_vars(x):
     if atom(x):
         if identp(x):
             exec(f'{oblist_name(x)}=oblist.jemma.pop()')
     else:
-        restore_vars_list(cdr(x))
-        restore_vars_list(car(x))
+        restore_vars(cdr(x))
+        restore_vars(car(x))
 
-def assign_vars(x2a9,y2a9):
-    if atom(x2a9):
-        if identp(x2a9):
-          if identp(y2a9):
-              try:
-                  exec(f"{oblist_name(x2a9)}='{y2a9}'")
-              except:
-                  exec(f'{oblist_name(x2a9)}="{y2a9}"')
-          else:    
-            try:
-               exec(f'{oblist_name(x2a9)}={y2a9}')
-            except:
-               setattr(oblist,oblist_name2(x2a9),y2a9)
+def assign_vars(x,y):
+    if atom(x):
+        Nset(x,y)
     else:
-        assign_vars(car(x2a9),car(y2a9))
-        assign_vars(cdr(x2a9),cdr(y2a9))
-
+        assign_vars(car(x),car(y))
+        assign_vars(cdr(x),cdr(y))
 
 def Nprogn(x):
     tul=Neval(car(x))
@@ -237,18 +226,18 @@ def Nprog1(x):
         
 def Nlambda(vars,args,y):
     z=Nlist(args)
-    save_vars_list(vars)
+    save_vars(vars)
     assign_vars(vars,z)
     tulos=Nprogn(y)
-    restore_vars_list(vars)
+    restore_vars(vars)
     return tulos
 
 def Nmacroexpand(vars,args,y):
     z=args
-    save_vars_list(vars)
+    save_vars(vars)
     assign_vars(vars,z)
     tulos=Nprogn(y)
-    restore_vars_list(vars)
+    restore_vars(vars)
     return tulos
 
 def Nmacro(vars,args,y):
