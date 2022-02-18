@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 
-import math,time
-import resource, sys
+import math,time,os,sys
+import resource
 resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
 sys.setrecursionlimit(10**6)
 
@@ -399,6 +399,7 @@ defq('array2list', 'lambda x: explo2(Neval(car(x)))')
 defq('list2array', 'lambda x: list2array(Neval(car(x)))')
 defq('array2str',  'lambda x: "".join(str(Neval(car(x))))')
 defq('python-eval', 'lambda x: eval(Neval(car(x)))')
+defq('quit', 'lambda x: os._exit(1)')
 
 
 lsp(""" (progn

@@ -1,7 +1,13 @@
 
-'((16 / 2 - 2022) (19 : 46 : 41 78))
+'((18 / 2 - 2022) (11 : 11 : 32 7))
 (defq *package* BOOTPY)
 
+(defun fib
+ (x)
+ (if
+  (< x 2)
+  x
+  (+ (fib (- x 1)) (fib (- x 2)))))
 
 (defun save
  (y x)
@@ -54,6 +60,4 @@
  (out 0)
  (close y))
 
-
-
-(defq BOOTPY ( save  BOOTPY))
+(defq BOOTPY (fib save BOOTPY))
