@@ -9,6 +9,6 @@ But I made real Lisp lists:
 
 Print Novelty: if X[2] exists X is not a LispList, but a Python Array:
 
-(list2array '(1 2 3)) ==> [1, 2, 3]
+(list2array '(1 a 3)) ==> [1, 'a', 3]
 
-(list2array '(1 2)) ==> (1  .  2 )
+(list2array '(1 a)) ==> (1 . a)
