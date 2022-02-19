@@ -54,9 +54,11 @@ def readrest(tokens):
 def readarray(tokens):
     if tokens==[]: return [],[]
     eka,tokens2=readtokens(tokens)
+    if car(eka)=='quote':
+        eka=(cadr(eka)) 
     if eka==']':
         return [],tokens2
-    if eka==',':
+    elif eka==',':
         toka,tokens3=readarray(tokens2)
         return toka,tokens3
     else:
@@ -158,8 +160,7 @@ def Neval(x):
     
 def value_of(x):
    try:
-       exec(f'oblist.temp={oblist_name(x)}')
-       return oblist.temp
+       return eval(oblist_name(x))
    except:
        if identp(x): exec(f'{oblist_name(x)}=[]')
        return []
@@ -170,9 +171,10 @@ def Nset(x,y):
            exec(f"{oblist_name(x)}='{y}'")
        except:
            exec(f'{oblist_name(x)}="{y}"')
-    else:    
+    else:
       try:
-          exec(f'{oblist_name(x)}={y}')
+          oblist.temp=y
+          exec(f'{oblist_name(x)}=oblist.temp')
       except:
           try:
               setattr(oblist,oblist_name2(x),y)
@@ -204,8 +206,8 @@ def identp(x):
 def save_vars(x):
     if atom(x):
         if identp(x):
-            try: exec(f'oblist.jemma.append({oblist_name(x)})')
-            except: exec(f'oblist.jemma.append(x)')
+            try: oblist.jemma.append(eval(oblist_name(x)))
+            except: oblist.jemma.append([])
     else:
         save_vars(car(x))
         save_vars(cdr(x))
@@ -358,14 +360,28 @@ def list2array(x):
          return [y]
     else:
          return [y]+list2array(cdr(x))
-    
+
+def arraynthset(x,y,z):
+     y[x]=z
+     return y
+
+
+def nthcdr(x,y):
+     if y==[]:
+        return []
+     elif x==0:
+        return y
+     else:
+        return nthcdr(x-1,cdr(y))
+ 
+     
 defq('plus', 'lambda x: Neval(car(x))+Neval(cadr(x))')
-defq('minus','lambda x: Neval(car(x))-Neval(cadr(x))')
+defq('difference','lambda x: Neval(car(x))-Neval(cadr(x))')
 defq('times','lambda x: Neval(car(x))*Neval(cadr(x))')
 defq('quotient','lambda x: Neval(car(x))/Neval(cadr(x))')
 defq('remainder','lambda x: Neval(car(x))%Neval(cadr(x))')
 defq('eqn','lambda x: Ntest(Neval(car(x))==Neval(cadr(x)))')
-defq('eq','lambda x: Ntest(Neval(car(x))==Neval(cadr(x)))')
+defq('eq','lambda x: Ntest(Neval(car(x)) is Neval(cadr(x)))')
 defq('lessp','lambda x: Ntest(Neval(car(x))<Neval(cadr(x)))')
 defq('greaterp','lambda x: Ntest(Neval(car(x))>Neval(cadr(x)))')
 defq('atom','lambda x: Ntest(atom(Neval(car(x))))')
@@ -378,6 +394,7 @@ defq('defq','lambda x: defq(car(x),cadr(x))')
 defq('cons', 'lambda x: [Neval(car(x)),Neval(cadr(x))]')
 defq('car', 'lambda x: car(Neval(car(x)))')
 defq('cdr', 'lambda x: cdr(Neval(car(x)))')
+defq('cddr', 'lambda x: cddr(Neval(car(x)))')
 defq('list', 'lambda x: Nlist(x)')
 defq('lambda', 'lambda x: Nlambda(car(x),oblist.args[-1],cdr(x))')
 defq('progn', 'lambda x: Nprogn(x)')
@@ -414,6 +431,12 @@ defq('list2array', 'lambda x: list2array(Neval(car(x)))')
 defq('array2str',  'lambda x: "".join(str(Neval(car(x))))')
 defq('python-eval', 'lambda x: eval(Neval(car(x)))')
 defq('quit', 'lambda x: os._exit(1)')
+defq('array-nth', 'lambda x: Neval(cadr(x))[Neval(car(x))]')
+defq('array-nth-set', 'lambda x: arraynthset(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
+defq('array-append', 'lambda x: Neval(car(x))+Neval(cadr(x))')
+defq('array-length', 'lambda x: len(Neval(car(x)))')
+defq('nthcdr', 'lambda x: nthcdr(Neval(car(x)),Neval(cadr(x)))')
+
 
 
 lsp(""" (progn
@@ -425,7 +448,6 @@ lsp(""" (progn
 
 lsp(""" (progn
  (defun cadr (x) (car (cdr x)))
- (defun cddr (x) (cdr (cdr x)))
  (defun cdddr (x) (cdr (cddr x)))
  (defun caddr (x) (car (cddr x)))
  (defun cadddr (x) (car (cdddr x)))
@@ -436,7 +458,7 @@ lsp(""" (progn
            (list ope (list ope x y) (arith-macroes z ope))
            (if y (list ope x y) x)))
  (defnacro + (x) (arith-macroes x 'plus))
- (defnacro - (x) (arith-macroes x 'minus))
+ (defnacro - (x) (arith-macroes x 'difference))
  (defnacro * (x) (arith-macroes x 'times))
  (defnacro / (x) (arith-macroes x 'quotient))
 
@@ -451,6 +473,7 @@ lsp(""" (progn
 
  (defun equal (x y)
           (or (eq x y) 
+              (eqn x y) 
               (and 
                (car x)
                (car y)
@@ -494,8 +517,7 @@ lsp(""" (progn
                 (setq x (cdr x)))
               (rb))))
 
-(defun nthcdr (x y) (if (= x 0) y (nthcdr (- x 1) (cdr y))))
-(defun nth (x y) (car (nthcdr x y)))
+(defun nth (x y) (if (arrayp y) (array-nth x y) (car (nthcdr x y))))
 
 
  (defun cond-jatko (((xZ . yZ) . zZ))
@@ -558,6 +580,22 @@ lsp(""" (progn
 (defun numberp (x) (equal (type x) (type 1)))
 
 (defun listp (x) (equal (type x) (type '(1 2))))
+
+(defun array x (array2list x))
+
+(defun arrayp (x) (> (array-length x) 2))
+
+(defun length (x) 
+    (if x 
+      (if (arrayp x) (array-length x) (plus 1 (length(cdr x))))
+       0))
+
+(defmacro nth-set (x y z)
+   (backquote progn
+         (if (arrayp ,y) 
+                 (array-nth-set ,x ,y ,z)
+                 (rplaca (nthcdr ,x ,y) ,z))
+    ,y))
 
 )))""")
 
