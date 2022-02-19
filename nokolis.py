@@ -217,6 +217,8 @@ def Nlist(x):
 
 def identp(x):
     return type(x)==type("abba")
+def numberp(x):
+    return type(x)==type(1)
         
 def save_vars(x):
     if atom(x):
@@ -342,6 +344,8 @@ def Nnot(x):
         return []
 
 def explode(x):
+    if numberp(x):
+       return explode(str(x))
     if identp(x):
        return array2list([ord(char) for char in x])
     elif atom(x): return []
@@ -388,7 +392,23 @@ def nthcdr(x,y):
         return y
      else:
         return nthcdr(x-1,cdr(y))
- 
+
+class _GetchUnix:
+    def __init__(self):
+        import tty, sys
+
+    def __call__(self):
+        import sys, tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+readcc=_GetchUnix()
      
 defq('plus', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('difference','lambda x: Neval(car(x))-Neval(cadr(x))')
@@ -453,6 +473,8 @@ defq('array-length', 'lambda x: len(Neval(car(x)))')
 defq('nthcdr', 'lambda x: nthcdr(Neval(car(x)),Neval(cadr(x)))')
 defq('int', 'lambda x: int(Neval(car(x)))')
 defq('dir', 'lambda x: os.listdir()')
+defq('printc', 'lambda x: print(chr(Neval(car(x))),end="")')
+defq('readcc', 'lambda x: ord(readcc())')
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
@@ -519,7 +541,8 @@ lsp(""" (progn
              (- n 1)
              (depthless (depthless n (car x)) (cdr x)))))
               
- (defun tab (x) (if (lessp 0 x) (progn (sp) (tab (- x 1)))))
+ (defun tab (x) (if (numberp x)
+       (if (lessp 0 x) (progn (sp) (tab (- x 1)))))30)
 
  (defun pprint (x tabs)
            (or tabs (setq tabs 1))
@@ -544,6 +567,7 @@ lsp(""" (progn
 
 lsp(""" (progn 
 
+(print 'hello)
 (defun append  (x9 y9) (if x9 (cons (car x9) (append (cdr x9) y9)) y9))
  
 (defun map (m%f m%x)
@@ -621,6 +645,8 @@ lsp(""" (progn
 
 (defun getchar (x n) (nth (difference n 1) (explode x)))
 
+(defmacro when (x . y) (backquote if ,x (progn @ y))
+
 )))""")
 
 lsp("(defun sort (x) (array2list (arraysort (list2array x))))")
@@ -637,6 +663,7 @@ def loadlisp(name):
 defq('load', 'lambda x: loadlisp(Neval(car(x)))')
 
 loadlisp("bootpy.lsp")
+loadlisp("cursor.lsp")
 
 lsp("(defun repl () (while t (cr) (pprint (eval (read)))))")
 
