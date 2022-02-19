@@ -8,14 +8,14 @@ sys.setrecursionlimit(10**6)
 class oblist:
     args=[]
     jemma=[]
-    NNN_t="t"
+    _id_t="t"
 
 def repl():
     while True:
         rivi=input("> ")
         if rivi[0]=="@":
-            exec("oblist.NNN_Miumau="+rivi[1:])
-            Nprint(oblist.NNN_Miumau)
+            exec("oblist._id_Miumau="+rivi[1:])
+            Nprint(oblist._id_Miumau)
         else:
             Nprint(Neval(parse(rivi)))
         print('')
@@ -24,7 +24,7 @@ def oblist_name2(x):
     x=x.replace('+','Nplus').replace('-','Nminus').replace('*','Ntimes').replace('/','Ndivide').replace('[','Nvhaka')
     x=x.replace(']','Nohaka').replace('.','Npiste').replace('<','Nless').replace('>','Ngreater').replace('=','Nequal')
     x=x.replace('`',"Lapo").replace('@',"Miumau").replace('%',"Nperc")
-    return f'NNN_{x}'
+    return f'_id_{x}'
 
 def oblist_name(x):
     return f'oblist.{oblist_name2(x)}'
