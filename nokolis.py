@@ -50,13 +50,30 @@ def readrest(tokens):
         toka,tokens3=readrest(tokens2)
         if toka==[] : return [eka,[]],tokens3 
         else: return [eka,toka],tokens3
-    
+
+def readarray(tokens):
+    if tokens==[]: return [],[]
+    eka,tokens2=readtokens(tokens)
+    if eka==']':
+        return [],tokens2
+    if eka==',':
+        toka,tokens3=readarray(tokens2)
+        return toka,tokens3
+    else:
+        toka,tokens3=readarray(tokens2)
+        if toka==[] : return [eka],tokens3 
+        else: return [eka]+toka,tokens3
+            
 def readtokens(tokens):
     if tokens==[]: return [],[]
     token = tokens.pop(0)
     if '(' == token:
         return readrest(tokens)
     elif ')' == token:
+        return token,tokens
+    elif '[' == token:
+        return readarray(tokens)
+    elif ']' == token:
         return token,tokens
     elif '.' == token:
         return token,tokens
@@ -307,16 +324,21 @@ def Nnot(x):
     else:
         return []
 
-def explode(word):
-    return explo2([ord(char) for char in word])
-
-def explo2(x):
+def explode(x):
+    if identp(x):
+       return array2list([ord(char) for char in x])
+    elif atom(x): return []
+    else:
+      return cons(explode(car(x)),explode(cdr(x)))
+ 
+     
+def array2list(x):
   if x!=[]:
     if type(x[0])==type([1]):
-        y=explo2(x[0])
+        y=array2list(x[0])
     else:
         y=x[0]
-    return [y,explo2(x[1:])]
+    return [y,array2list(x[1:])]
   else:
     return []
 
@@ -325,6 +347,7 @@ def compress(x):
          return ""
      else:
          return chr(x[0])+compress(x[1])
+
 
 def list2array(x):
     if atom(car(x)):
@@ -386,7 +409,7 @@ defq('oblist-name-raw', 'lambda x: str(oblist_name2(Neval(car(x))))')
 defq('explode', 'lambda x: explode(Neval(car(x)))')
 defq('compress', 'lambda x: compress(Neval(car(x)))')
 defq('read-str', 'lambda x: input("? ")')
-defq('array2list', 'lambda x: explo2(Neval(car(x)))')
+defq('array2list', 'lambda x: array2list(Neval(car(x)))')
 defq('list2array', 'lambda x: list2array(Neval(car(x)))')
 defq('array2str',  'lambda x: "".join(str(Neval(car(x))))')
 defq('python-eval', 'lambda x: eval(Neval(car(x)))')
