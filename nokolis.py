@@ -436,6 +436,8 @@ defq('array-nth-set', 'lambda x: arraynthset(Neval(car(x)),Neval(cadr(x)),Neval(
 defq('array-append', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('array-length', 'lambda x: len(Neval(car(x)))')
 defq('nthcdr', 'lambda x: nthcdr(Neval(car(x)),Neval(cadr(x)))')
+defq('int', 'lambda x: int(Neval(car(x)))')
+defq('arraysort', 'lambda x: Neval(car(x)).sort()')
 
 
 
@@ -597,7 +599,21 @@ lsp(""" (progn
                  (rplaca (nthcdr ,x ,y) ,z))
     ,y))
 
+(defun add1 (x) (plus 1 x))
+(defun sub1 (x) (difference x 1))
+
+(setq null not)
+
+(defun numberp(x) (equal (type x) (type 1)))
+
+(defun getchar (x n) (nth (difference n 1) (explode x)))
+
+
 )))""")
+
+
+
+ 
 
 with open("bootpy.lsp","r") as f:
     c =f.read()
