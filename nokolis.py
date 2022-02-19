@@ -437,9 +437,6 @@ defq('array-append', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('array-length', 'lambda x: len(Neval(car(x)))')
 defq('nthcdr', 'lambda x: nthcdr(Neval(car(x)),Neval(cadr(x)))')
 defq('int', 'lambda x: int(Neval(car(x)))')
-defq('arraysort', 'lambda x: Neval(car(x)).sort()')
-
-
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
@@ -608,12 +605,11 @@ lsp(""" (progn
 
 (defun getchar (x n) (nth (difference n 1) (explode x)))
 
-
 )))""")
 
-
-
- 
+lsp("(defun sort (x) (array2list (arraysort (list2array x))))")
+defq('arraysort', 'lambda x: arraysort(Neval(car(x)))')
+def arraysort(x): x.sort(); return x
 
 with open("bootpy.lsp","r") as f:
     c =f.read()
