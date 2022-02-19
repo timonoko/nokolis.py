@@ -6,11 +6,16 @@ resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
 sys.setrecursionlimit(10**6)
 
 class oblist:
+    func=[]
     args=[]
     jemma=[]
     _id_t="t"
 
 def repl():
+  oblist.func=[]
+  oblist.args=[]
+  oblist.jemma=[]
+  try:
     while True:
         rivi=input("> ")
         if rivi[0]=="@":
@@ -19,7 +24,14 @@ def repl():
         else:
             Nprint(Neval(parse(rivi)))
         print('')
-
+  except Exception as ex:
+    print("Error:",ex)
+    print("TRACE=",oblist.func)
+    print("(quit) 2 exit.")
+    oblist._id_TRACE=(oblist.func)
+    repl()
+       
+        
 def oblist_name2(x):
     x=x.replace('+','Nplus').replace('-','Nminus').replace('*','Ntimes').replace('/','Ndivide').replace('[','Nvhaka')
     x=x.replace(']','Nohaka').replace('.','Npiste').replace('<','Nless').replace('>','Ngreater').replace('=','Nequal')
@@ -155,8 +167,11 @@ def Neval(x):
             except:
                 return value_of(x)
     else:
+        oblist.func.append(car(x))
         oblist.args.append(cdr(x))
-        return Neval(Neval(car(x)))
+        retu=Neval(Neval(car(x)))
+        oblist.func.pop()
+        return retu
     
 def value_of(x):
    try:
@@ -437,6 +452,7 @@ defq('array-append', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('array-length', 'lambda x: len(Neval(car(x)))')
 defq('nthcdr', 'lambda x: nthcdr(Neval(car(x)),Neval(cadr(x)))')
 defq('int', 'lambda x: int(Neval(car(x)))')
+defq('dir', 'lambda x: os.listdir()')
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
@@ -611,11 +627,16 @@ lsp("(defun sort (x) (array2list (arraysort (list2array x))))")
 defq('arraysort', 'lambda x: arraysort(Neval(car(x)))')
 def arraysort(x): x.sort(); return x
 
-with open("bootpy.lsp","r") as f:
-    c =f.read()
-f.close
-c="(progn "+c+"))))))"
-lsp(c)
+def loadlisp(name):
+    with open(name,"r") as f:
+       c =f.read()
+    f.close
+    lsp("(progn "+c+"))))))")
+    return name
+    
+defq('load', 'lambda x: loadlisp(Neval(car(x)))')
+
+loadlisp("bootpy.lsp")
 
 lsp("(defun repl () (while t (cr) (pprint (eval (read)))))")
 
