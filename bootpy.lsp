@@ -1,37 +1,14 @@
 
-'((20 / 2 - 2022) (0 : 18 : 10 10))
+'((20 / 2 - 2022) (1 : 5 : 44 85))
 (defq *package* BOOTPY)
 
+(defq eek
+ (nlambda
+  (x)
+  (when (identp x) (set x (nedit (eval x))) x)))
+
 (defq koe
- (((''lambda))
-  y x
-  '-
-  as
-  (or (atom x) (not (identp y)))
-  (progn
-   (prints
-    '*package*
-    'name
-    'assumed
-    'to
-    'be
-    *package*)
-   (cr)
-   (setq x (eval *package*))
-   (setq y
-    (compress (nconc (explode *package*) (cons 46 (explode 'LSP)))))
-   (prints 'filename 'assumed 'to 'be y))
-  (let
-   ((back
-     (compress
-      (reverse
-       (append (explode 'KAB) (member 46 (reverse (explode y))))))))
-   (cr)
-   (prints 'old y '=> back)
-   (unlink back)
-   (rename-file y back))
-  ((y) ('()))
-  ('())
+ (alku
   (list 'quote (list (date) (time)))
   (cr)
   '(print (list 'defq '*package* *package*))
@@ -52,7 +29,8 @@
      (cr))))
   (out 0)
   (close y)
-  asd))
+  (asd)
+  dsd))
 
 (defq iik ())
 
@@ -105,7 +83,12 @@
     (rplaca (nthcdr v x) (read))
     (eeprint x))
    ((member ch '(277 267))
-    (nedit (nth v x))
+    (rplaca
+     (nthcdr v x)
+     (if
+      (arrayp (nth v x))
+      (list2array (nedit (array2list (nth v x))))
+      (nedit (nth v x))))
     (eeprint x))
    ((eqn ch 121)
     (if
@@ -148,36 +131,44 @@
       (cons
        (list (nth v x) (nth (plus v 1) x))
        (nthcdr (plus v 2) x))))
+    (eeprint x))
+   ((eqn ch 112)
+    (erase_page)
+    (pprint x)
+    (cr)
+    (readcc)
     (eeprint x))))
+ (erase_page)
  x)
 
 (defun eeprint25
  (x)
  (sp)
  (sp)
- (if
-  (atom x)
-  (print x)
-  (let
-   ((dec 10))
-   (printc 40)
-   (while
-    (and x (lessp (tab) 60))
-    (cond
-     ((atom x)
-      (printc 46)
-      (sp)
-      (print x)
-      (setq x nil))
-     ((lessp dec 0) (print '&))
-     ((atom (car x))
-      (print (car x))
-      (if (cdr x) (sp)))
-     ((< 1 (depthless dec (car x))) (print (car x)))
-     (t (print '&) (sp)))
-    (setq dec (plus dec -3))
-    (pop x))
-   (printc 41)))
+ (cond
+  ((atom x) (print x))
+  ((arrayp x) (print x))
+  (t
+   (let
+    ((dec 10))
+    (printc 40)
+    (while
+     (and x (lessp (tab) 60))
+     (cond
+      ((atom x)
+       (printc 46)
+       (sp)
+       (print x)
+       (setq x nil))
+      ((lessp dec 0) (print '&))
+      ((atom (car x))
+       (print (car x))
+       (if (cdr x) (sp)))
+      ((< 1 (depthless dec (car x))) (print (car x)))
+      (t (print '&) (sp)))
+     (setq dec (plus dec -3))
+     (pop x))
+    (printc 41))))
  (hex nil))
 
 (defun eeprint
@@ -327,5 +318,5 @@
  (close y))
 
 (defq BOOTPY
- (koe iik depthless nedit eeprint25 eeprint orderp merge1
+ (eek koe iik depthless nedit eeprint25 eeprint orderp merge1
   nmerge1 nmerge split mergesort fib save BOOTPY))
