@@ -1,5 +1,6 @@
 
 (setq edit eek)
+(setq save save-module)
 
 (defun set_cursor
  (v h)

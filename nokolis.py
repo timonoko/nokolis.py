@@ -427,6 +427,7 @@ defq('atom','lambda x: Ntest(atom(Neval(car(x))))')
 defq('not','lambda x: Nnot(Neval(car(x)))')
 defq('print','lambda x: Nprint(Neval(car(x)))')
 defq('quote','lambda x: car(x)')
+defq('function','lambda x: car(x)')
 defq('setq','lambda x: Nset(car(x),Neval(cadr(x)))')
 defq('set','lambda x: Nset(Neval(car(x)),Neval(cadr(x)))')
 defq('defq','lambda x: defq(car(x),cadr(x))')
@@ -603,7 +604,7 @@ lsp(""" (progn
 
 (defmacro let (vars . rest)
  (backquote
-  (quote
+  (function
    (lambda , (if (caar vars) (map car vars) vars) @ rest))
   @(if (caar vars) (map cadr vars))))
  
@@ -649,7 +650,36 @@ lsp(""" (progn
 
 (defun getchar (x n) (nth (difference n 1) (explode x)))
 
-(defmacro when (x . y) (backquote if ,x (progn @ y))
+(defmacro when (x . y) (backquote if ,x (progn @ y)))
+
+(defun macroexpand   (x9 hantaa-vaan)
+   (cond
+    ((atom x9) x9)
+    ((equal (car x9) 'quote) x9)
+    ((equal (car x9) 'lambda)
+     (cons (car x9) (cons (cadr x9) (macroexpand (cddr x9)))))
+    ((and
+      (equal (car x9) 'if)
+      (member (car (cadr x9)) '(null not)))
+     (macroexpand (list 'if (cadr (cadr x9)) (cadddr x9) (caddr x9))))
+    ((and
+      (not hantaa-vaan)
+      (identp (car x9))
+      (member (car (eval (car x9))) '(macro mlambda)))
+     (macroexpand
+      (eval
+       (cons
+        (list
+         'function
+         (cons
+          (if
+           (equal (car (eval (car x9))) 'mlambda)
+           'nlambda
+           'macrotest)
+          (cdr (eval (car x9)))))
+        (cdr x9)))))
+    (t (cons (macroexpand (car x9)) (macroexpand (cdr x9) t))))))
+
 
 )))""")
 
