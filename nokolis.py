@@ -698,6 +698,20 @@ lsp(""" (progn
     (subst old new (car tree))
     (subst old new (cdr tree))))))
 
+ (defmacro case (x  .  y )
+       (cons
+        'cond
+        (map
+         (function
+          (lambda
+           (y)
+           (cond
+            ((equal (car y) 't) y)
+            ((atom (car y))
+             (backquote (equal , x QUOTE (car y)) @ (cdr y)))
+            (t (backquote (member , x QUOTE (car y)) @ (cdr y))))))
+         y)))
+ 
  (defun python (x rivi)
    (setq rivi (explode (pop x)))
    (nconc rivi (list 40))
