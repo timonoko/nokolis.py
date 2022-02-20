@@ -715,6 +715,7 @@ defq('load', 'lambda x: loadlisp(Neval(car(x)))')
 
 loadlisp("bootpy.lsp")
 loadlisp("cursor.lsp")
+loadlisp("edit.lsp")
 
 lsp("(defun repl () (while t (cr) (pprint (eval (read)))))")
 
