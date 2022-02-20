@@ -1,38 +1,52 @@
 
-'((20 / 2 - 2022) (1 : 5 : 44 85))
+'((20 / 2 - 2022) (10 : 5 : 0 69))
 (defq *package* BOOTPY)
 
-(defq eek
- (nlambda
-  (x)
-  (when (identp x) (set x (nedit (eval x))) x)))
+(defun eeinsert
+ (v x y)
+ (if
+  (lessp v 1)
+  (setq x (cons () x))
+  (rplacd
+   (nthcdr (plus v -1) x)
+   (cons () (nthcdr v x))))
+ (if y
+  (rplaca (nthcdr v x) y)
+  (progn
+   (eeprint x)
+   (set_cursor (plus v 2) 4)
+   (rplaca (nthcdr v x) (read))))
+ x)
+
+(defun locate
+ (x y)
+ (if
+  (atom y)
+  nil
+  (if
+   (member x y)
+   (list (sub1 (length (member x (reverse y)))))
+   (let
+    ((z 0) (z2))
+    (while
+     (and y (not z2))
+     (if
+      (not (setq z2 (locate x (pop y))))
+      (setq z (add1 z))))
+    (if z2 (cons z z2))))))
 
 (defq koe
- (alku
-  (list 'quote (list (date) (time)))
-  (cr)
-  '(print (list 'defq '*package* *package*))
-  '(cr)
-  (mapc x
-   (quote
-    (lambda
-     (x)
-     (out 0)
-     (cr)
-     (print x)
-     (out y)
-     (cr)
-     (if
-      (eq *package* 'BOOT)
-      (pprint (list 'defq x (definition-of x)))
-      (ppr-def x (definition-of x)))
-     (cr))))
+ (((cr) defq)
+  (list ('quote 'quote) (list (date) (time)))
+  (happa)
+  (hui ())
+  'defq
+  5 asdasd
   (out 0)
-  (close y)
+  ((close y))
+  (asd)
   (asd)
   dsd))
-
-(defq iik ())
 
 (defun depthless
  (n x)
@@ -45,52 +59,65 @@
    (depthless (depthless n (car x)) (cdr x)))))
 
 (defun nedit
- (x exit v)
+ (x dept goto exit v)
+ (if (null x) (setq x (list 'tyhja)))
+ (if goto (setq v (pop goto)))
+ (if (null dept) (setq dept 0))
+ (if (null arrayp) (defun arrayp () ()))
+ (if (null v) (setq v 0))
  (eeprint x)
- (setq v 0)
  (while
-  (not exit)
-  (set_cursor 2 1)
-  (progn
-   (repeat-times (length x) (sp) (sp) (sp) (sp) (cr))
-   (printc 41)
-   (sp)
-   (sp)
-   (sp))
-  (set_cursor (+ v 2) 1)
-  (print '===>)
-  (cr)
-  (setq ch (readcc))
-  (if (eqn ch 27) (setq ch (readcc)))
-  (if
-   (member ch '(0 91))
-   (setq ch (plus 200 (readcc))))
+  (and (not exit) (not EXIT))
+  (setq THIS (nth v x))
+  (if goto
+   (setq ch 6)
+   (progn
+    (set_cursor 2 1)
+    (progn
+     (repeat-times (length x) (sp) (sp) (sp) (sp) (cr))
+     (printc 41)
+     (sp)
+     (sp)
+     (sp))
+    (set_cursor (+ v 2) 1)
+    (print '===>)
+    (repeat-times (- (length x) v) (cr))
+    (setq ch (readcc))
+    (if (eqn ch 27) (setq ch (readcc)))
+    (if
+     (member ch '(0 91))
+     (setq ch (plus 200 (readcc)))
+     (setq ch (compress (list ch))))))
   (cond
+   ((equal ch 6)
+    (print goto)
+    (if
+     (atom THIS)
+     ()
+     (rplaca (nthcdr v x) (nedit THIS (add1 dept) goto)))
+    (setq goto nil)
+    (eeprint x))
    ((member ch '(275 268)) (setq exit t))
    ((member ch '(280 266))
     (if (lessp v (length x)) (setq v (plus v 1))))
    ((member ch '(272 265))
     (if (greaterp v 0) (setq v (plus v -1))))
-   ((member ch '(13 110))
-    (if
-     (lessp v 1)
-     (setq x (cons () x))
-     (rplacd
-      (nthcdr (plus v -1) x)
-      (cons () (nthcdr v x))))
-    (eeprint x)
-    (set_cursor (plus v 2) 4)
-    (rplaca (nthcdr v x) (read))
-    (eeprint x))
    ((member ch '(277 267))
-    (rplaca
-     (nthcdr v x)
-     (if
-      (arrayp (nth v x))
-      (list2array (nedit (array2list (nth v x))))
-      (nedit (nth v x))))
+    (if
+     (atom THIS)
+     ()
+     (rplaca
+      (nthcdr v x)
+      (if
+       (arrayp (nth v x))
+       (list2array (nedit (array2list (nth v x))))
+       (nedit (nth v x)))))
     (eeprint x))
-   ((eqn ch 121)
+   ((eq ch 'n)
+    (setq x (eeinsert v x))
+    (eeprint x))
+   ((eq ch 'y)
+    (push THIS JEMMA)
     (if
      (eqn v 0)
      (setq x (cdr x))
@@ -98,10 +125,10 @@
       (nthcdr (- v 1) x)
       (nthcdr (+ v 1) x)))
     (eeprint x))
-   ((eqn ch 113)
+   ((eq ch 'q)
     (rplaca (nthcdr v x) (list 'quote (nth v x)))
     (eeprint x))
-   ((eqn ch 114)
+   ((eq ch 'r)
     (if
      (eqn v 0)
      (setq x
@@ -110,10 +137,10 @@
       (nthcdr (plus v -1) x)
       (append (nth v x) (nthcdr (plus v 1) x))))
     (eeprint x))
-   ((eqn ch 97)
+   ((eq ch 'a)
     (rplaca (nthcdr v x) (list (nth v x)))
     (eeprint x))
-   ((eqn ch 98)
+   ((eq ch 'b)
     (if
      (eqn v 0)
      (setq x (cons (car x) x))
@@ -121,7 +148,7 @@
       (nthcdr (- v 1) x)
       (cons (nth v x) (nthcdr v x))))
     (eeprint x))
-   ((eqn ch 119)
+   ((eq ch 'w)
     (if
      (eqn v 0)
      (setq x
@@ -132,10 +159,56 @@
        (list (nth v x) (nth (plus v 1) x))
        (nthcdr (plus v 2) x))))
     (eeprint x))
-   ((eqn ch 112)
+   ((eq ch 'p)
     (erase_page)
     (pprint x)
     (cr)
+    (readcc)
+    (eeprint x))
+   ((eq ch 'l)
+    (set_cursor 25 1)
+    (print 'locate:)
+    (if
+     (setq goto (locate (read) x))
+     (setq v (pop goto))
+     (eprint x))
+    (eeprint x))
+   ((eq ch '+)
+    (setq x (eeinsert v x (pop JEMMA)))
+    (eprint x))
+   ((eq ch 'e)
+    (set_cursor 25 1)
+    (print 'EVAL:)
+    (eeinsert v x (eval (read)))
+    (eeprint x))
+   ((eq ch '-) (setq EXIT t))
+   ((eq ch 'z)
+    (if (identp THIS) (set THIS (nedit (eval THIS))))
+    (setq EXIT nil)
+    (eeprint x))
+   (t
+    (erase_page)
+    (pprint
+     (quote
+      ((numerot = ylos alas sisaan ulos etc)
+       (l S = etsi S)
+       (n S = tunge tahan S)
+       (e S = tunge tahan (eval S))
+       (y = poista tama)
+       (p = nayta kunnolla)
+       (r = poista sulut)
+       (a = lisaa sulut)
+       (w = yhdista kaksi)
+       (s = korvaa tama talla)
+       (b = tama tublana)
+       (v = vaihda 2 keskenaan)
+       (z = editoi tunnuksen arvoa)
+       (c = jatka tata listaa sita seuraavalla)
+       (f = virkista naytto)
+       (k = fl kopio tasta)
+       (q = tahan kojootti)
+       (- = ulos kaikesta)
+       (h = hexa-tulostus JUU/EI))))
     (readcc)
     (eeprint x))))
  (erase_page)
@@ -318,5 +391,5 @@
  (close y))
 
 (defq BOOTPY
- (eek koe iik depthless nedit eeprint25 eeprint orderp merge1
-  nmerge1 nmerge split mergesort fib save BOOTPY))
+ (eeinsert locate koe depthless nedit eeprint25 eeprint orderp
+  merge1 nmerge1 nmerge split mergesort fib save BOOTPY))

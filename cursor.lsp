@@ -2,8 +2,8 @@
 (defq edit
  (nlambda
   (x)
+  (setq EXIT nil)
   (when (identp x) (set x (nedit (eval x))) x)))
-
 
 (defun set_cursor
  (v h)
