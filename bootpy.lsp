@@ -30,13 +30,6 @@
        (eval m))))
     'pretty)
    (list m 'saved)))
- (defq unless
-  (mlambda
-   (x . y)
-   (list
-    'if
-    (list 'not x)
-    (cons 'progn y))))
  (defq koe
   (lambda
    (x)
@@ -72,5 +65,5 @@
     'pretty)
    (list m 'saved)))
  (defq BOOTPY
-  (compile mapp save-module unless koe
+  (compile mapp save-module  koe
     fib save BOOTPY)))

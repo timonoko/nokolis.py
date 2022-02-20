@@ -562,9 +562,8 @@ lsp(""" (progn
 
 (defun nth (x y) (if (arrayp y) (array-nth x y) (car (nthcdr x y))))
 
-
  (defun cond-jatko (((xZ . yZ) . zZ))
-           (list 'if xZ (cons 'progn yZ) (if zZ (cond-jatko zZ))))
+           (list 'if xZ (if (cdr yZ) (cons 'progn yZ) (car yZ)) (if zZ (cond-jatko zZ))))
 
  (defnacro cond (xZ) (cond-jatko xZ)))
 
@@ -652,6 +651,15 @@ lsp(""" (progn
 
 (defmacro when (x . y) (backquote if ,x (progn @ y)))
 
+(defq unless
+  (mlambda
+   (x . y)
+   (list
+    'if
+    (list 'not x)
+    (cons 'progn y))))
+
+
 (defun macroexpand   (x9 hantaa-vaan)
    (cond
     ((atom x9) x9)
@@ -678,8 +686,29 @@ lsp(""" (progn
            'macrotest)
           (cdr (eval (car x9)))))
         (cdr x9)))))
-    (t (cons (macroexpand (car x9)) (macroexpand (cdr x9) t))))))
+    (t (cons (macroexpand (car x9)) (macroexpand (cdr x9) t)))))
 
+(defun subst (old new tree)
+ (cond
+  ((null tree) tree)
+  ((equal old tree) new)
+  ((atom tree) tree)
+  (t
+   (cons
+    (subst old new (car tree))
+    (subst old new (cdr tree))))))
+
+ (defun python (x rivi)
+   (setq rivi (explode (pop x)))
+   (nconc rivi (list 40))
+   (while
+    x
+    (if
+     (atom (car x))
+     (nconc rivi (explode (pop x)))
+     (nconc rivi (backquote 34 @ (explode (car (pop x))) 34)))
+    (if x (nconc rivi (explode ',)) (nconc rivi (list 41))))
+   (python-eval(compress rivi)))
 
 )))""")
 
@@ -715,7 +744,7 @@ defq('load', 'lambda x: loadlisp(Neval(car(x)))')
 
 loadlisp("bootpy.lsp")
 loadlisp("cursor.lsp")
-loadlisp("edit.lsp")
+loadlisp("editor.lsp")
 
 lsp("(defun repl () (while t (cr) (pprint (eval (read)))))")
 
