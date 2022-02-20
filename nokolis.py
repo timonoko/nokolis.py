@@ -653,6 +653,23 @@ lsp("(defun sort (x) (array2list (arraysort (list2array x))))")
 defq('arraysort', 'lambda x: arraysort(Neval(car(x)))')
 def arraysort(x): x.sort(); return x
 
+
+def print_to_file(x,y,pretty):
+    original_stdout = sys.stdout
+    with open(x, 'w') as f:
+        sys.stdout = f
+        print("")
+        if pretty==[]:
+            Nprint(y)
+        else:
+            oblist._id_temp=y
+            lsp("(pprint temp")
+        print("")
+        f.close()
+        sys.stdout = original_stdout
+
+defq('print-to-file', 'lambda x: print_to_file(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
+
 def loadlisp(name):
     with open(name,"r") as f:
        c =f.read()

@@ -1,6 +1,52 @@
 
-'((20 / 2 - 2022) (10 : 5 : 0 69))
+'((20 / 2 - 2022) (12 : 19 : 43 3))
 (defq *package* BOOTPY)
+
+(defun mapp
+ (m%f m%x)
+ (if m%x
+  (cons (m%f (car m%x)) (mapp m%f (cdr m%x)))))
+
+(defun save-module
+ (m)
+ (if (null m) (setq m MODULE))
+ (print-to-file
+  (compress (append (explode m) '(46 76 83 80)))
+  (cons
+   'progn
+   (cons
+    (list 'defq 'MODULE m)
+    (mapp
+     '(lambda (x) (list 'defq x (eval x)))
+     (eval m))))
+  'pretty)
+ (list m 'saved))
+
+(defmacro unless
+ (x . y)
+ (list
+  'if
+  (list 'not x)
+  (cons 'progn y)))
+
+(defq eek
+ (nlambda
+  (x)
+  (setq EXIT ())
+  (when
+   (identp x)
+   (if MODULE
+    (if
+     (not (member x (eval MODULE)))
+     (set MODULE (cons x (eval MODULE))))
+    (progn
+     (setq MODULE 'NEW)
+     (setq NEW (list 'NEW x))))
+   (if
+    (not (member MODULE (eval MODULE)))
+    (set MODULE (cons MODULE (eval MODULE))))
+   (set x (nedit (eval x))))
+  x))
 
 (defun eeinsert
  (v x y)
@@ -39,14 +85,11 @@
  (((cr) defq)
   (list ('quote 'quote) (list (date) (time)))
   (happa)
-  (hui ())
-  'defq
-  5 asdasd
-  (out 0)
-  ((close y))
-  (asd)
-  (asd)
-  dsd))
+  (y 5)
+  (hui () defq)
+  dsd
+  (out 0 (close y))
+  () asdasd))
 
 (defun depthless
  (n x)
@@ -170,8 +213,7 @@
     (print 'locate:)
     (if
      (setq goto (locate (read) x))
-     (setq v (pop goto))
-     (eprint x))
+     (setq v (pop goto)))
     (eeprint x))
    ((eq ch '+)
     (setq x (eeinsert v x (pop JEMMA)))
@@ -185,6 +227,30 @@
    ((eq ch 'z)
     (if (identp THIS) (set THIS (nedit (eval THIS))))
     (setq EXIT nil)
+    (eeprint x))
+   ((eq ch 'c)
+    (if
+     (atom THIS)
+     ()
+     (if
+      (eqn v 0)
+      (setq x
+       (cons (append (car x) (list (cadr x))) (cddr x)))
+      (rplacd
+       (nthcdr (- v 1) x)
+       (cons
+        (append (nth v x) (list (nth (plus v 1) x)))
+        (nthcdr (plus v 2) x)))))
+    (eeprint x))
+   ((eq ch 'v)
+    (setq ch (nth v x))
+    (rplaca (nthcdr v x) (car (nthcdr (add1 v) x)))
+    (rplaca (nthcdr (add1 v) x) ch)
+    (setq v (add1 v))
+    (eeprint x))
+   ((eq ch 'f) (eeprint x))
+   ((eq ch 'k)
+    (setq x (copy x))
     (eeprint x))
    (t
     (erase_page)
@@ -248,6 +314,8 @@
  (x)
  (erase_page)
  (if *MORE* (print '*MORE*) (printc 40))
+ (repeat-times 40 (sp))
+ (print MODULE)
  (cr)
  (for
   (p 0 22)
@@ -335,7 +403,7 @@
 (defun fib
  (x)
  (if
-  (< x 2)
+  (lessp x 2)
   x
   (+ (fib (- x 1)) (fib (- x 2)))))
 
@@ -391,5 +459,6 @@
  (close y))
 
 (defq BOOTPY
- (eeinsert locate koe depthless nedit eeprint25 eeprint orderp
-  merge1 nmerge1 nmerge split mergesort fib save BOOTPY))
+ (mapp save-module unless eek eeinsert locate koe depthless
+  nedit eeprint25 eeprint orderp merge1 nmerge1 nmerge split
+  mergesort fib save BOOTPY))

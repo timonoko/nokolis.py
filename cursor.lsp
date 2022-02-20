@@ -1,9 +1,5 @@
 
-(defq edit
- (nlambda
-  (x)
-  (setq EXIT nil)
-  (when (identp x) (set x (nedit (eval x))) x)))
+(setq edit eek)
 
 (defun set_cursor
  (v h)
@@ -14,3 +10,7 @@
 (defq erase_page (progn (repeat-times 10000 (sp)) (home)))
 
 (defq home (set_cursor 0 0))
+
+(defun copy (x)
+  (if (atom x) x
+    (cons (copy (car x)) (copy (cdr x))))
