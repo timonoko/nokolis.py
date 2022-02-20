@@ -33,10 +33,14 @@ def repl():
        
         
 def oblist_name2(x):
-    x=x.replace('+','Nplus').replace('-','Nminus').replace('*','Ntimes').replace('/','Ndivide').replace('[','Nvhaka')
-    x=x.replace(']','Nohaka').replace('.','Npiste').replace('<','Nless').replace('>','Ngreater').replace('=','Nequal')
-    x=x.replace('`',"Lapo").replace('@',"Miumau").replace('%',"Nperc")
-    return f'_id_{x}'
+    a=[c for c in x]
+    d=""
+    for c in a:
+        if ord(c) in range(ord('a'), ord('z')): d=d+c
+        elif ord(c) in range(ord('A'),ord('Z')): d=d+c
+        elif ord(c) in range(ord('0'),ord('9')): d=d+c
+        else: d=d+str(ord(c))
+    return f'_id_{d}'
 
 def oblist_name(x):
     return f'oblist.{oblist_name2(x)}'
