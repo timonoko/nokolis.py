@@ -27,7 +27,7 @@ def repl():
   except Exception as ex:
     print("Error:",ex)
     print("TRACE=",oblist.func)
-    print("(quit) 2 exit.")
+    print("(quit)?")
     oblist._id_TRACE=(oblist.func)
     repl()
        
@@ -102,11 +102,12 @@ def readtokens(tokens):
         return atomi(token),tokens
 
 def atomi(token):
-    token=str(token)
-    try: return int(token)
-    except:
-        try: return float(token)
-        except: return token
+    try:
+        if float(token)==int(token):
+            return int(token)
+        else:
+            return float(token)
+    except: return token
 
 def car(x):
     if atom(x): return []
@@ -184,6 +185,25 @@ def value_of(x):
        if identp(x): exec(f'{oblist_name(x)}=[]')
        return []
 
+def Nset(x,y):
+    x2=oblist_name(x)
+    if identp(y):
+       try:
+           exec(f"{x2}='{y}'")
+       except:
+           exec(f'{x2}="{y}"')
+    else:
+      try:
+          oblist.temp=y
+          exec(f'{x2}=oblist.temp')
+      except:
+          try:
+              setattr(oblist,oblist_name2(x),y)
+          except:
+              print("CANT ASSIGN:",x,"=",y)
+    return y
+
+"""
 def Nset(x,y):   
     if identp(y):
        try:
@@ -200,7 +220,7 @@ def Nset(x,y):
           except:
               pass
     return y
-
+"""
 def defq(x,y):
     try:
         exec(f'{oblist_name(x)}={y}')
@@ -222,7 +242,7 @@ def Nlist(x):
 def identp(x):
     return type(x)==type("abba")
 def numberp(x):
-    return type(x)==type(1)
+    return (type(x)==type(1))or(type(x)==type(1.1))
         
 def save_vars(x):
     if atom(x):
@@ -350,6 +370,8 @@ def Nnot(x):
 def explode(x):
     if numberp(x):
        return explode(str(x))
+    if numberp(x):
+       return explode(str(x))
     if identp(x):
        return array2list([ord(char) for char in x])
     elif atom(x): return []
@@ -370,10 +392,13 @@ def array2list(x):
 def compress(x):
      if x==[]:
          return ""
-     else:
+     elif numberp(car(x)):
          return chr(x[0])+compress(x[1])
-
-
+     elif atom(car(x)):
+         return chr("?")+compress(x[1])
+     else:
+         return compress(x[0])+compress(x[1])
+     
 def list2array(x):
     if atom(car(x)):
         y=car(x)
@@ -470,6 +495,7 @@ defq('array2list', 'lambda x: array2list(Neval(car(x)))')
 defq('list2array', 'lambda x: list2array(Neval(car(x)))')
 defq('array2str',  'lambda x: "".join(str(Neval(car(x))))')
 defq('python-eval', 'lambda x: eval(Neval(car(x)))')
+defq('python-exec', 'lambda x: exec(Neval(car(x)))')
 defq('quit', 'lambda x: os._exit(1)')
 defq('array-nth', 'lambda x: Neval(cadr(x))[Neval(car(x))]')
 defq('array-nth-set', 'lambda x: arraynthset(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
@@ -711,18 +737,6 @@ lsp(""" (progn
              (backquote (equal , x QUOTE (car y)) @ (cdr y)))
             (t (backquote (member , x QUOTE (car y)) @ (cdr y))))))
          y)))
- 
- (defun python (x rivi)
-   (setq rivi (explode (pop x)))
-   (nconc rivi (list 40))
-   (while
-    x
-    (if
-     (atom (car x))
-     (nconc rivi (explode (pop x)))
-     (nconc rivi (backquote 34 @ (explode (car (pop x))) 34)))
-    (if x (nconc rivi (explode ',)) (nconc rivi (list 41))))
-   (python-eval(compress rivi)))
 
 )))""")
 

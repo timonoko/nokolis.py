@@ -67,6 +67,7 @@
  (defq nedit
   (lambda
    (x dept goto exit v)
+   (setq vasen-sulku (compress (list 40)))
    (if (null x) (setq x (list 'tyhja)))
    (if goto (setq v (pop goto)))
    (if (null dept) (setq dept 0))
@@ -120,7 +121,7 @@
          (list2array (nedit (array2list (nth v x))))
          (nedit (nth v x)))))
       (unless EXIT (eeprint x)))
-     ((eq ch 'n)
+     ((or(eq ch 'n) (eq ch vasen-sulku))
       (setq x (eeinsert v x))
       (eeprint x))
      ((eq ch 'y)
@@ -181,7 +182,7 @@
       (eeprint x))
      ((eq ch '+)
       (setq x (eeinsert v x (pop JEMMA)))
-      (eprint x))
+      (eeprint x))
      ((eq ch 'e)
       (set_cursor 25 1)
       (print 'EVAL:)
