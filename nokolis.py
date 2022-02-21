@@ -69,12 +69,10 @@ def readrest(tokens):
 
 def readarray(tokens):
     if tokens==[]: return [],[]
-    eka,tokens2=readtokens(tokens)
-    if car(eka)=='quote':
-        eka=(cadr(eka)) 
+    eka,tokens2=readtokens(tokens,True)
     if eka==']':
         return [],tokens2
-    elif eka==',':
+    elif eka == ',':
         toka,tokens3=readarray(tokens2)
         return toka,tokens3
     else:
@@ -82,7 +80,7 @@ def readarray(tokens):
         if toka==[] : return [eka],tokens3 
         else: return [eka]+toka,tokens3
             
-def readtokens(tokens):
+def readtokens(tokens,at_array=False):
     if tokens==[]: return [],[]
     token = tokens.pop(0)
     if '(' == token:
@@ -96,6 +94,10 @@ def readtokens(tokens):
     elif '.' == token:
         return token,tokens
     elif "'" == token:
+      if at_array:
+        yksi,tokens2=readtokens(tokens,True)
+        return yksi,tokens2
+      else:  
         yksi,tokens2=readtokens(tokens)
         return ["quote",[yksi]],tokens2
     else:
@@ -493,7 +495,6 @@ defq('compress', 'lambda x: compress(Neval(car(x)))')
 defq('read-str', 'lambda x: input("? ")')
 defq('array2list', 'lambda x: array2list(Neval(car(x)))')
 defq('list2array', 'lambda x: list2array(Neval(car(x)))')
-defq('array2str',  'lambda x: "".join(str(Neval(car(x))))')
 defq('python-eval', 'lambda x: eval(Neval(car(x)))')
 defq('python-exec', 'lambda x: exec(Neval(car(x)))')
 defq('quit', 'lambda x: os._exit(1)')
@@ -604,6 +605,11 @@ lsp(""" (progn
 (defun map (m%f m%x)
   (if m%x
    (cons (m%f (car m%x)) (map m%f (cdr m%x)))))
+
+(defun mapc (m%f m%x)
+  (if m%x
+   (progn (m%f (car m%x)) (map m%f (cdr m%x)) t)))
+
 
 (defmacro backquote ZYKSX (blockq2 ZYKSX))
 
