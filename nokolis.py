@@ -506,6 +506,7 @@ defq('int', 'lambda x: int(Neval(car(x)))')
 defq('dir', 'lambda x: os.listdir()')
 defq('printc', 'lambda x: print(chr(Neval(car(x))),end="")')
 defq('readcc', 'lambda x: ord(readcc())')
+defq('read-from-str', 'lambda x: parse(Neval(car(x)))')
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
@@ -775,6 +776,12 @@ loadlisp("cursor.lsp")
 loadlisp("editor.lsp")
 
 lsp("(defun repl () (while t (cr) (pprint (eval (read)))))")
+
+lsp("""(progn
+        (if 
+         (cdr (python-eval 'sys.argv))
+         (eval (read-from-str (cdr (python-eval 'sys.argv)))))
+        (repl))""")
 
 #secondary repl
 repl()

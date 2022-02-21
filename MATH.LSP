@@ -33,7 +33,7 @@
     (array2list
      (python-eval (compress (list (explode 'dir) 40 (explode 'math) 41)))))
    (map math MATH-ALL)
-   (map math2 '(pow log))
+   (map math2 '(pow log copysign))
    (setq pi (python-eval 'math.pi))
    (setq e (python-eval 'math.e))
    (setq
@@ -42,8 +42,6 @@
      lambda
      (x)
      (python-eval (compress (list (explode 'round) 40 (explode x) 41)))))
-   (setq pow (math2 'pow))
-   (setq pow (math2 'pow))
    MATH-ALL))
  (defq MATH (math2 define-all MATH math))
  (defq
@@ -65,4 +63,5 @@
         (explode 'oblist.)
         (explode (oblist-name-raw 'argu))
         41)))))))
- (define-all)))
+(define-all)
+ )

@@ -51,7 +51,7 @@
     (+ (fib (- x 1)) (fib (- x 2))))))
  (defq save
   (lambda
-   (m)
+   (m command)
    (if (null m) (setq m MODULE))
    (print-to-file
     (compress (append (explode m) '(46 76 83 80)))
@@ -59,10 +59,12 @@
      'progn
      (cons
       (list 'defq 'MODULE m)
-      (mapp
+      (cons
+       (mapp
        '(lambda (x) (list 'defq x (eval x)))
-       (eval m))))
-    'pretty)
+        (eval m))
+       (list command))))
+     'pretty)
    (list m 'saved)))
  (defq BOOTPY
   (compile mapp save-module  koe
