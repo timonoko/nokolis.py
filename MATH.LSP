@@ -2,6 +2,28 @@
 (progn
  (defq MODULE MATH)
  (defq
+  math2
+  (lambda
+   (func)
+   (set
+    func
+    (backquote
+     lambda
+     (argu argu2)
+     (python-eval
+      QUOTE
+      (compress
+       (list
+        (explode 'math.)
+        (explode func)
+        40
+        (explode 'oblist.)
+        (explode (oblist-name-raw 'argu))
+        (explode ',)
+        (explode 'oblist.)
+        (explode (oblist-name-raw 'argu2))
+        41)))))))
+ (defq
   define-all
   (lambda
    ()
@@ -10,15 +32,8 @@
     MATH-ALL
     (array2list
      (python-eval (compress (list (explode 'dir) 40 (explode 'math) 41)))))
-   (map
-    (function
-     (lambda
-      (x)
-      (unless
-       (equal (getchar x 1) 95)
-       (set x (backquote lambda (y) (math QUOTE x y)))
-       x)))
-    MATH-ALL)
+   (map math MATH-ALL)
+   (map math2 '(pow log))
    (setq pi (python-eval 'math.pi))
    (setq e (python-eval 'math.e))
    (setq
@@ -27,15 +42,27 @@
      lambda
      (x)
      (python-eval (compress (list (explode 'round) 40 (explode x) 41)))))
+   (setq pow (math2 'pow))
+   (setq pow (math2 'pow))
    MATH-ALL))
- (defq MATH (define-all MATH math))
+ (defq MATH (math2 define-all MATH math))
  (defq
   math
   (lambda
-   (f x)
-   (python-eval
-    (compress (list (explode 'math.) (explode f) 40 (explode x) 41)))))
-
-(define-all)
- )
-
+   (func)
+   (set
+    func
+    (backquote
+     lambda
+     (argu)
+     (python-eval
+      QUOTE
+      (compress
+       (list
+        (explode 'math.)
+        (explode func)
+        40
+        (explode 'oblist.)
+        (explode (oblist-name-raw 'argu))
+        41)))))))
+ (define-all)))
