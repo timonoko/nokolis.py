@@ -293,13 +293,13 @@
  (print MODULE)
  (cr)
  (for
-  (p 0 22)
+  (p 0 39)
   (when
    (nthcdr p x)
    (tab 3)
    (eeprint25 (nth p x))
    (cr)))
- (if (nthcdr 23 x) (print '*MORE*) (printc 41)))
+ (if (nthcdr 40 x) (print '*MORE*) (printc 41)))
 
 (defq EDITOR (eek eeinsert locate depthless nedit eeprint25 eeprint EDITOR))
 

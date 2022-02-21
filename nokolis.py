@@ -777,9 +777,47 @@ def loadlisp(name):
     
 defq('load', 'lambda x: loadlisp(Neval(car(x)))')
 
+def save_large_array(na,ar):
+    from numpy import save,array
+    nar=array(ar,dtype=object)
+    return save(na,nar)
+defq('save-raw','lambda x: save_large_array(Neval(car(x)),Neval(cadr(x)))')
+
+def load_large_array(na):
+    from numpy import load
+    return load(na+".npy",allow_pickle=True).tolist()
+defq('load-raw','lambda x: load_large_array(Neval(car(x)))')
+
+lsp(""" (defq save-module-raw
+  (lambda
+   (m saved)
+   (if (null m) (setq m MODULE))
+   (mapc
+    (function
+     (lambda
+      (x n)
+      (setq n (compress (list (explode m) (explode '-) (explode x))))
+      (save-raw n (eval x))
+      (push (list x n) saved)))
+    (eval m))
+   (save-raw m saved)
+   saved))))""")
+lsp(""" (defq load-module-raw
+  (lambda
+   (m loaded)
+   (if (null m) (setq m MODULE))
+   (print m)
+   (setq loaded (load-raw m))
+   (mapc
+    (function (lambda (x) (set (car x) (load-raw (cadr x)))))
+    loaded)
+   (list m 'loaded)))""")
+
+
 loadlisp("bootpy.lsp")
 loadlisp("cursor.lsp")
-loadlisp("editor.lsp")
+lsp("(load-module-raw 'EDITOR)")
+lsp("(setq edit eek")
 
 lsp("(defun repl () (while t (cr) (pprint (eval (read)))))")
 

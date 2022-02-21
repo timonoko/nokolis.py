@@ -1,6 +1,8 @@
+
 (progn
  (defq MODULE BOOTPY)
- (defq compile
+ (defq
+  compile
   (lambda
    (x)
    (if
@@ -10,12 +12,13 @@
      (push (cons x (eval x)) *COMPILED*)
      (set x (macroexpand (eval x)))
      (list x 'compiled)))))
- (defq mapp
+ (defq
+  mapp
   (lambda
    (m%f m%x)
-   (if m%x
-    (cons (m%f (car m%x)) (mapp m%f (cdr m%x))))))
- (defq save-module
+   (if m%x (cons (m%f (car m%x)) (mapp m%f (cdr m%x))))))
+ (defq
+  save-module
   (lambda
    (m)
    (if (null m) (setq m MODULE))
@@ -30,7 +33,8 @@
        (eval m))))
     'pretty)
    (list m 'saved)))
- (defq koe
+ (defq
+  koe
   (lambda
    (x)
    ((function
@@ -42,16 +46,18 @@
        (sp)
        (setq y (plus y 1)))))
     1)))
- (defq fib
+ (defq
+  fib
   (lambda
    (x)
    (if
     (lessp x 2)
     x
     (+ (fib (- x 1)) (fib (- x 2))))))
- (defq save
+ (defq
+  save
   (lambda
-   (m command)
+   (m)
    (if (null m) (setq m MODULE))
    (print-to-file
     (compress (append (explode m) '(46 76 83 80)))
@@ -59,13 +65,9 @@
      'progn
      (cons
       (list 'defq 'MODULE m)
-      (cons
-       (mapp
+      (mapp
        '(lambda (x) (list 'defq x (eval x)))
-        (eval m))
-       (list command))))
-     'pretty)
+       (eval m))))
+    'pretty)
    (list m 'saved)))
- (defq BOOTPY
-  (compile mapp save-module  koe
-    fib save BOOTPY)))
+ (defq BOOTPY (compile mapp save-module koe fib save BOOTPY))
