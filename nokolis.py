@@ -834,7 +834,43 @@ def python_exec_file(n):
   exec(data)
 defq('python-exec-file', 'lambda x: python_exec_file(Neval(car(x)))')
 
-    
+def depthless(n,x):
+    if (0 > n):
+        return 0
+    else:
+        if atom(x):
+            return (n - 1)
+        else:
+            return depthless(depthless(n,car(x)),cdr(x))
+def tab(x):
+    if (0 < x):
+            print(" ",end="")
+            tab((x - 1))
+    return 30
+        
+def pprint(x,tabs=1):
+    if (1 < depthless(20,x)):
+        Nprint(x)
+    else:
+        print("(",end="")
+        while x:
+            pprint(car(x),(1 + tabs))
+            if cdr(x):
+                print("")
+                tab(tabs)
+            x=cdr(x)
+        print(")",end="")
+defq('pprint', 'lambda x: pprint(Neval(car(x)))')
+
+defq('member','lambda x:member(Neval(car(x)),Neval(cadr(x)))')
+def member(x,y):
+    if y == []:
+        return []
+    else:
+        if equal(x,car(y)):
+            return y
+        else:
+            return member(x,cdr(y))
 
 loadlisp("bootpy.lsp")
 loadlisp("cursor.lsp")

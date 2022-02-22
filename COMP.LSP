@@ -1,6 +1,7 @@
 
 (progn
  (defq MODULE COMP)
+ (defq CH-NAME ((print Nprint)))
  (defq
   comp-macros
   ((repeat-times
@@ -59,7 +60,56 @@
    (x file)
    (setq DYN-VARS nil)
    (setq LAMBDA-ARGS nil)
-   (if (identp x) (setq x (list 'setq x (eval x))))
+   (when
+    (identp x)
+    (progn
+     (print 'defq)
+     (printc 40)
+     (printc 39)
+     (print x)
+     (printc 39)
+     (print ',)
+     (printc 39)
+     (print 'lambda)
+     (printc 32)
+     (print 'x:)
+     (print x)
+     (print
+      (compress
+       (quote
+        (40
+         78
+         101
+         118
+         97
+         108
+         40
+         99
+         97
+         114
+         40
+         120
+         41
+         41
+         44
+         78
+         101
+         118
+         97
+         108
+         40
+         99
+         97
+         100
+         114
+         40
+         120
+         41
+         41
+         41))))
+     (printc 39)
+     (printc 41))
+    (setq x (list 'setq x (eval x))))
    (if
     file
     (with-out-file file '(comp2 (do-lambda (macroexpand x))))
@@ -76,10 +126,10 @@
      return
      x
      (not (cdr x))
-     (not (member (caar x) '(progn if while))))
+     (not (member (caar x) '(setq progn if while))))
     (print 'return)
     (sp))
-   (comp2 (car x) tabs return)
+   (comp2 (car x) tabs (unless (cdr x) return))
    (if (cdr x) (comp-progn (cdr x) tabs return))))
  (defq
   lambda-args
@@ -93,7 +143,7 @@
      (lambda-args (car x))
      (when (cdr x) (print ',) (lambda-args (cdr x)))))
    (if eka (printc 41))))
- (defq COMP (comp-macros do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
+ (defq COMP (CH-NAME comp-macros do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
  (defq
   comp2
   (lambda
@@ -176,7 +226,11 @@
          (printc 41))
         (comp2 (cadr x) tabs)))
       (t
-       (print (car x))
+       (print
+        (if
+         (assoc (car x) CH-NAME)
+         (cadr (assoc (car x) CH-NAME))
+         (car x)))
        (printc 40)
        (let
         ((rest (cdr x)) (args (cdr (assoc (car x) LAMBDA-ARGS))))
