@@ -765,8 +765,17 @@ def print_to_file(x,y,pretty):
         print("")
         f.close()
         sys.stdout = original_stdout
-
 defq('print-to-file', 'lambda x: print_to_file(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
+
+def with_out_file(x,y):
+    original_stdout = sys.stdout
+    with open(x, 'w') as f:
+        sys.stdout = f
+        Neval(y)
+        print("")
+        f.close()
+        sys.stdout = original_stdout
+defq('with-out-file', 'lambda x: with_out_file(Neval(car(x)),Neval(cadr(x)))')
 
 def loadlisp(name):
     with open(name,"r") as f:
@@ -808,6 +817,11 @@ lsp("""(progn
     (map (function (lambda (x) (cons x (eval x)))) (eval m)))
    (list m 'saved 'raw))))""")
 
+oblist.gensym=0
+def gensym():
+    oblist.gensym=oblist.gensym+1
+    return "gensym"+str(oblist.gensym)
+defq('gensym','lambda x: gensym()')
 
 loadlisp("bootpy.lsp")
 loadlisp("cursor.lsp")

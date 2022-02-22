@@ -2,12 +2,21 @@
 (progn
  (defq MODULE BOOTPY)
  (defq
+  uncompile
+  (lambda
+   (x y)
+   (when
+    (setq y (assoc x *COMPILED*))
+    (set x (cdr y))
+    (pop *COMPILED*)
+    (list x 'uncompiled))))
+ (defq
   compile
   (lambda
    (x)
    (if
     (assoc x *COMPILED*)
-    x
+    ()
     (progn
      (push (cons x (eval x)) *COMPILED*)
      (set x (macroexpand (eval x)))
@@ -29,7 +38,11 @@
      (cons
       (list 'defq 'MODULE m)
       (mapp
-       '(lambda (x) (list 'defq x (eval x)))
+       (quote
+        (lambda
+         (x)
+         (if (assoc x *COMPILED*) (uncompile x))
+         (list 'defq x (eval x))))
        (eval m))))
     'pretty)
    (list m 'saved)))
@@ -51,7 +64,7 @@
   (lambda
    (x)
    (if
-    (lessp x 2)
+    (< x 2)
     x
     (+ (fib (- x 1)) (fib (- x 2))))))
  (defq
@@ -66,8 +79,12 @@
      (cons
       (list 'defq 'MODULE m)
       (mapp
-       '(lambda (x) (list 'defq x (eval x)))
+       (quote
+        (lambda
+         (x)
+         (if (assoc x *COMPILED*) (uncompile x))
+         (list 'defq x (eval x))))
        (eval m))))
     'pretty)
    (list m 'saved)))
- (defq BOOTPY (compile mapp save-module koe fib save BOOTPY))
+ (defq BOOTPY (uncompile compile mapp save-module koe fib save BOOTPY)))

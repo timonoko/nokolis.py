@@ -4,6 +4,7 @@
 (defq eek
   (nlambda
    (THISNAME)
+   (if (assoc THISNAME *COMPILED*) (uncompile THISNAME))
    (setq EXIT ())
    (when
     (identp THISNAME)
