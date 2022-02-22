@@ -117,20 +117,24 @@
         ((numberp (cadr x)) (print (cadr x)))
         ((identp (cadr x)) (printc 34) (print (cadr x)) (printc 34))
         (t (let ((name (gensym))) (set name (cadr x)) (print name)))))
-      ((plus difference times greaterp lessp quotient)
+      ((eq eqn plus difference times greaterp lessp quotient)
        (printc 40)
        (comp2 (cadr x) tabs)
+       (printc 32)
        (print
         (cadr
          (assoc
           (car x)
           (quote
-           ((plus +)
+           ((eqn ==)
+            (eq is)
+            (plus +)
             (difference -)
             (times *)
             (greaterp >)
             (lessp <)
             (quotient /))))))
+       (printc 32)
        (comp2 (caddr x) tabs)
        (printc 41))
       (defq
@@ -159,6 +163,18 @@
         (cddr x)
         (comp2 (list 'cons (cadr x) (cons 'list (cddr x))))
         (comp2 (list 'cons (cadr x) '()))))
+      ((and or)
+       (if
+        (cddr x)
+        (progn
+         (printc 40)
+         (comp2 (cadr x) tabs)
+         (printc 32)
+         (print (car x))
+         (printc 32)
+         (comp2 (cons (car x) (cddr x)))
+         (printc 41))
+        (comp2 (cadr x) tabs)))
       (t
        (print (car x))
        (printc 40)

@@ -823,6 +823,19 @@ def gensym():
     return "gensym"+str(oblist.gensym)
 defq('gensym','lambda x: gensym()')
 
+
+def equal(x,y):
+    return ((x is y) or ((x == y) or (car(x) and (car(y) and (equal(car(x),car(y)) and equal(cdr(x),cdr(y)))))))
+defq('equal', 'lambda x:  Ntest(equal(Neval(car(x)),Neval(cadr(x))))')
+
+def python_exec_file(n):
+  with open(n, 'r') as file:
+    data = "".join(file.read())
+  exec(data)
+defq('python-exec-file', 'lambda x: python_exec_file(Neval(car(x)))')
+
+    
+
 loadlisp("bootpy.lsp")
 loadlisp("cursor.lsp")
 lsp("(load-raw-module 'EDITOR)")
