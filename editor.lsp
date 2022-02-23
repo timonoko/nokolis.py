@@ -170,7 +170,7 @@
       (eeprint x))
      ((eq ch 'p)
       (erase_page)
-      (pprint x)
+      (pprint x 1 True)
       (cr)
       (readcc)
       (eeprint x))
@@ -226,6 +226,9 @@
       (setq toka (read))
       (setq x (subst eka toka x))
       (eeprint x))
+     ((eq ch 'm)
+      (setq x (eeinsert v x (explode(read-str))))
+      (eeprint x))
      (t
       (erase_page)
       (pprint
@@ -248,19 +251,21 @@
          (k = fl kopio tasta)
          (q = tahan kojootti)
          (- = ulos kaikesta)
-         (h = hexa-tulostus JUU/EI))))
+         (m = lisää merkkijono)
+	 (h = hexa-tulostus JUU/EI))))
       (readcc)
       (eeprint x))))
    (erase_page)
    x))
 
-(defun eeprint25
+(defun eeprint251
  (x)
  (sp)
  (sp)
  (cond
   ((atom x) (print x))
   ((arrayp x) (print x))
+  ((and (flat (car x)) (equal 34 (caar x))) (print (car x) True)) 
   (t
    (let
     ((dec 10))
@@ -283,6 +288,33 @@
      (pop x))
     (printc 41))))
  (hex nil))
+
+ (defq
+  eeprint25
+  (lambda
+   (x)
+   (sp)
+   (sp)
+   (cond
+    ((atom x) (print x))
+    ((arrayp x) (print x))
+    ((and (flat x) (equal 34 (car x))) (print x True))
+    (t
+     (let
+      ((dec 10))
+      (printc 40)
+      (while
+       (and x (lessp (tab) 60))
+       (cond
+        ((atom x) (printc 46) (sp) (print x) (setq x nil))
+        ((lessp dec 0) (print '&))
+        ((atom (car x)) (print (car x)) (if (cdr x) (sp)))
+        ((< 1 (depthless dec (car x))) (print (car x)))
+        (t (print '&) (sp)))
+       (setq dec (plus dec -3))
+       (pop x))
+      (printc 41))))
+   (hex nil)))
 
 (defun eeprint
  (x)
