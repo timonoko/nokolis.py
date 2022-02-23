@@ -1,10 +1,11 @@
 
 (progn
  (defq MODULE COMP)
- (defq CH-NAME ((print Nprint)))
+ (defq CH-NAME ((eval Neval) (print Nprint)))
  (defq
   comp-macros
-  ((repeat-times
+  ((printc lambda (x) (backquote print (chr @ x)))
+   (repeat-times
     lambda
     (x)
     (let
@@ -29,7 +30,7 @@
      (prog1
       (comp-lambda
        (list
-        'lambda
+        (quote lambda)
         (cadr x)
         (macroexpand (do-lambda (macroexpand (cons 'progn (cddr x))))))
        0)
@@ -60,60 +61,36 @@
    (x file)
    (setq DYN-VARS nil)
    (setq LAMBDA-ARGS nil)
-   (when
-    (identp x)
-    (progn
-     (print 'defq)
-     (printc 40)
-     (printc 39)
-     (print x)
-     (printc 39)
-     (print ',)
-     (printc 39)
-     (print 'lambda)
-     (printc 32)
-     (print 'x:)
-     (print x)
-     (print
-      (compress
-       (quote
-        (40
-         78
-         101
-         118
-         97
-         108
-         40
-         99
-         97
-         114
-         40
-         120
-         41
-         41
-         44
-         78
-         101
-         118
-         97
-         108
-         40
-         99
-         97
-         100
-         114
-         40
-         120
-         41
-         41
-         41))))
-     (printc 39)
-     (printc 41))
-    (setq x (list 'setq x (eval x))))
+   (setq z (if (identp x) (list 'setq x (eval x)) x))
    (if
     file
-    (with-out-file file '(comp2 (do-lambda (macroexpand x))))
-    (comp2 (do-lambda (macroexpand x))))
+    (with-out-file
+     file
+     (quote
+      (progn
+       (comp2 (do-lambda (macroexpand z)))
+       (cr)
+       (progn
+        (print 'defq)
+        (printc 40)
+        (printc 39)
+        (print x)
+        (printc 39)
+        (print ',)
+        (printc 39)
+        (print 'lambda)
+        (printc 32)
+        (print 'x:)
+        (print x)
+        (print
+         (compress
+          (quote
+           (40 78 101 118 97 108 40 99 97 114 40
+            120 41 41 44 78 101 118 97 108 40 99
+            97 100 114 40 120 41 41 41))))
+        (printc 39)
+        (printc 41)))))
+    (comp2 (do-lambda (macroexpand z))))
    (cr)
    file))
  (defq
@@ -166,7 +143,7 @@
        (cond
         ((numberp (cadr x)) (print (cadr x)))
         ((identp (cadr x)) (printc 34) (print (cadr x)) (printc 34))
-        (t (let ((name (gensym))) (set name (cadr x)) (print name)))))
+        (t (print (str-raw (cadr x))))))
       ((eq eqn plus difference times greaterp lessp quotient)
        (printc 40)
        (comp2 (cadr x) tabs)

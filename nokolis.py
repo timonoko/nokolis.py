@@ -10,6 +10,8 @@ class oblist:
     args=[]
     jemma=[]
     _id_t="t"
+    _id_True="True"
+    _id_T="T"
 
 def repl():
   oblist.func=[]
@@ -18,11 +20,13 @@ def repl():
   try:
     while True:
         rivi=input("> ")
-        if rivi[0]=="@":
-            exec("oblist._id_Miumau="+rivi[1:])
-            Nprint(oblist._id_Miumau)
+        if rivi=="":
+            pass
+        elif rivi[0]=="@":
+            exec("oblist._id_64="+rivi[1:])
+            Nprint(oblist._id_64)
         else:
-            Nprint(Neval(parse(rivi)))
+            pprint(Neval(parse(rivi)))
         print('')
   except Exception as ex:
     print("Error:",ex)
@@ -127,8 +131,14 @@ def cadr(x):
 def cddr(x):
     return cdr(cdr(x))
 
+def cdddr(x):
+    return cdr(cddr(x))
+
 def caddr(x):
     return car(cddr(x))
+
+def cadddr(x):
+    return car(cdddr(x))
 
 def atom(x):
     if x==[]: return True
@@ -205,24 +215,6 @@ def Nset(x,y):
               print("CANT ASSIGN:",x,"=",y)
     return y
 
-"""
-def Nset(x,y):   
-    if identp(y):
-       try:
-           exec(f"{oblist_name(x)}='{y}'")
-       except:
-           exec(f'{oblist_name(x)}="{y}"')
-    else:
-      try:
-          oblist.temp=y
-          exec(f'{oblist_name(x)}=oblist.temp')
-      except:
-          try:
-              setattr(oblist,oblist_name2(x),y)
-          except:
-              pass
-    return y
-"""
 def defq(x,y):
     try:
         exec(f'{oblist_name(x)}={y}')
@@ -847,9 +839,35 @@ def tab(x):
             print(" ",end="")
             tab((x - 1))
     return 30
-        
+
+def flat(x):
+    if x:
+        if atom(car(x)):
+            return flat(cdr(x))
+        else:
+            return False
+    else:
+        return True
+
 def pprint(x,tabs=1):
-    if (1 < depthless(20,x)):
+    if atom(x):
+        Nprint(x)
+    elif flat(x):
+        print("(",end="")
+        n=10
+        while x!=[]:
+            Nprint(car(x))
+            x=cdr(x)
+            if x!=[]:
+               if n>0:
+                   print(" ",end="")
+                   n=n-1
+               else:
+                   print("")
+                   tab(tabs)
+                   n=10
+        print(")",end="")
+    elif (1 < depthless(20,x)):
         Nprint(x)
     else:
         print("(",end="")
@@ -872,6 +890,30 @@ def member(x,y):
         else:
             return member(x,cdr(y))
 
+defq('macroexpand','lambda x:me(Neval(car(x)))') 
+def  me(x9,hantaa_vaan=False):
+    if atom(x9):
+        return x9
+    else:
+        if equal(car(x9),"quote"):
+            return x9
+        else:
+            if equal(car(x9),"lambda"):
+                return cons(car(x9),cons(cadr(x9),me(cddr(x9))))
+            else:
+                if (equal(car(x9),"if") and member(car(cadr(x9)),['null', ['not', []]])):
+                    return me(cons("if",cons(cadr(cadr(x9)),cons(cadddr(x9),cons(caddr(x9),[])))))
+                else:
+                    if (not(hantaa_vaan) and (identp(car(x9)) and member(car(Neval(car(x9))),['macro', ['mlambda', []]]))):
+                        if equal(car(Neval(car(x9))),"mlambda"):
+                            hepo="nlambda"
+                        else:
+                            hepo="macrotest"
+                        return me(Neval(cons(cons("function",cons(cons(hepo,cdr(Neval(car(x9)))),[])),cdr(x9))))
+                    else:
+                        return cons(me(car(x9)),me(cdr(x9),True))
+
+        
 loadlisp("bootpy.lsp")
 loadlisp("cursor.lsp")
 lsp("(load-raw-module 'EDITOR)")
@@ -882,10 +924,9 @@ lsp("(defun repl () (while t (cr) (pprint (eval (read)))))")
 lsp("""(progn
         (if 
          (cdr (python-eval 'sys.argv))
-         (eval (read-from-str (cdr (python-eval 'sys.argv)))))
-        (repl))""")
+         (eval (read-from-str (cdr (python-eval 'sys.argv))))))
+        """)
 
-#secondary repl
 repl()
 
     
