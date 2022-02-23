@@ -1,6 +1,19 @@
 
 (progn
  (defq MODULE COMP)
+ (defq
+  comment-on-compiler
+  (While I have totally perfect Nokolisp-to-Pascal and Nokolisp-to-C compiler , I
+   realized I dont want to such unreadable mess with gensyms and
+   mysterious functions implementing retun-with-value statements. This is deliberately Pythonic , you
+   cannot assign from SETQ or IF , and OR works only
+   in expressions. LET seems to generate LAMBDA and GENSYM-named function ,
+   but that is avoidable))
+ (defq
+  expand4ever
+  (lambda
+   (x y)
+   (if (equal x y) x (expand4ever (do-lambda (macroexpand x)) x))))
  (defq CH-NAME ((eval Neval) (print Nprint)))
  (defq
   comp-macros
@@ -66,9 +79,10 @@
     file
     (with-out-file
      file
-     (quote
-      (progn
-       (comp2 (do-lambda (macroexpand z)))
+     (function
+      (lambda
+       ()
+       (comp2 (expand4ever z))
        (cr)
        (progn
         (print 'defq)
@@ -90,7 +104,7 @@
             97 100 114 40 120 41 41 41))))
         (printc 39)
         (printc 41)))))
-    (comp2 (do-lambda (macroexpand z))))
+    (comp2 (expand4ever z)))
    (cr)
    file))
  (defq
@@ -103,7 +117,7 @@
      return
      x
      (not (cdr x))
-     (not (member (caar x) '(setq progn if while))))
+     (not (member (caar x) '(setq progn if while prog1))))
     (print 'return)
     (sp))
    (comp2 (car x) tabs (unless (cdr x) return))
@@ -120,7 +134,7 @@
      (lambda-args (car x))
      (when (cdr x) (print ',) (lambda-args (cdr x)))))
    (if eka (printc 41))))
- (defq COMP (CH-NAME comp-macros do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
+ (defq COMP (comment-on-compiler expand4ever CH-NAME comp-macros do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
  (defq
   comp2
   (lambda
@@ -173,18 +187,29 @@
        (print ':)
        (comp-progn (cddr x) (+ 4 tabs)))
       (if
-       (print 'if)
-       (sp)
-       (comp2 (cadr x) tabs)
-       (print ':)
-       (comp-progn (list (caddr x)) (+ 4 tabs) return)
-       (when
-        (cadddr x)
-        (cr)
-        (tab tabs)
-        (print 'else:)
-        (comp-progn (list (cadddr x)) (+ 4 tabs) return)))
+       (if
+        (equal (cadr x) 't)
+        (comp-progn (list (caddr x)) tabs return)
+        (progn
+         (print 'if)
+         (sp)
+         (comp2 (cadr x) tabs)
+         (print ':)
+         (comp-progn (list (caddr x)) (+ 4 tabs) return)
+         (when
+          (cadddr x)
+          (cr)
+          (tab tabs)
+          (print 'else:)
+          (comp-progn (list (cadddr x)) (+ 4 tabs) return)))))
       (progn (comp-progn (cdr x) tabs return))
+      (prog1
+       (let
+        ((name (gensym)))
+        (comp2
+         (backquote progn (setq , name , (cadr x)) @ (cddr x) , name)
+         tabs
+         return)))
       (list
        (if
         (cddr x)
