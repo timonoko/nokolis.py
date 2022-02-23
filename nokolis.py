@@ -1,3 +1,4 @@
+
 #! /usr/bin/python3
 
 import math,time,os,sys
@@ -9,19 +10,24 @@ class oblist:
     func=[]
     args=[]
     jemma=[]
+    names=[]
     _id_t="t"
     _id_True="True"
     _id_T="T"
 
+    
 def repl():
   oblist.func=[]
   oblist.args=[]
   oblist.jemma=[]
+  quit=False
   try:
-    while True:
+    while not quit:
         rivi=input("> ")
         if rivi=="":
             pass
+        elif rivi=="quit":
+            quit=True
         elif rivi[0]=="@":
             exec("oblist._id_64="+rivi[1:])
             Nprint(oblist._id_64)
@@ -197,7 +203,12 @@ def value_of(x):
        if identp(x): exec(f'{oblist_name(x)}=[]')
        return []
 
+def add_oblist(x):
+    if identp(x) and not x in oblist.names:
+            oblist.names.append(x)
+   
 def Nset(x,y):
+    add_oblist(x)
     x2=oblist_name(x)
     if identp(y):
        try:
@@ -216,6 +227,7 @@ def Nset(x,y):
     return y
 
 def defq(x,y):
+    add_oblist(x)    
     try:
         exec(f'{oblist_name(x)}={y}')
     except:
@@ -480,7 +492,7 @@ defq('nconc', 'lambda x: Nnconc(Neval(car(x)),Neval(cadr(x)))')
 defq('identp', 'lambda x: Ntest(identp(Neval(car(x))))')
 defq('type', 'lambda x: str(type(Neval(car(x))))')
 defq('str-raw', 'lambda x: str(Neval(car(x)))')
-defq('oblist', 'lambda x: dir(oblist)')
+defq('oblist', 'lambda x: array2list(oblist.names)')
 defq('oblist-name-raw', 'lambda x: str(oblist_name2(Neval(car(x))))')
 defq('explode', 'lambda x: explode(Neval(car(x)))')
 defq('compress', 'lambda x: compress(Neval(car(x)))')
@@ -591,7 +603,6 @@ lsp(""" (progn
 
 lsp(""" (progn 
 
-(print 'hello)
 (defun append  (x9 y9) (if x9 (cons (car x9) (append (cdr x9) y9)) y9))
  
 (defun map (m%f m%x)
@@ -601,7 +612,6 @@ lsp(""" (progn
 (defun mapc (m%f m%x)
   (if m%x
    (progn (m%f (car m%x)) (map m%f (cdr m%x)) t)))
-
 
 (defmacro backquote ZYKSX (blockq2 ZYKSX))
 
@@ -852,6 +862,10 @@ def flat(x):
 def pprint(x,tabs=1):
     if atom(x):
         Nprint(x)
+    elif atom(cdr(x)):
+        Nprint(x)
+    elif len(x) > 2:
+        print(x)
     elif flat(x):
         print("(",end="")
         n=10
@@ -913,7 +927,6 @@ def  me(x9,hantaa_vaan=False):
                     else:
                         return cons(me(car(x9)),me(cdr(x9),True))
 
-        
 loadlisp("bootpy.lsp")
 loadlisp("cursor.lsp")
 lsp("(load-raw-module 'EDITOR)")
