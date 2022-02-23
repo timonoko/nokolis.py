@@ -12,7 +12,8 @@ class oblist:
     jemma=[]
     names=[]
     _id_t="t"
-    _id_True="True"
+    _id_True=True
+    _id_False=False
     _id_T="T"
 
     
@@ -32,7 +33,7 @@ def repl():
             exec("oblist._id_64="+rivi[1:])
             Nprint(oblist._id_64)
         else:
-            pprint(Neval(parse(rivi)))
+            pprint(Neval(parse(rivi)),1,True)
         print('')
   except Exception as ex:
     print("Error:",ex)
@@ -150,17 +151,17 @@ def atom(x):
     if x==[]: return True
     return type(x) != type([1])
 
-def Nprintrest(x):
+def Nprintrest(x,strings):
     if x==[] :
         print(")",end='')
     elif atom(x):
         print(" . ",x,")",end='')
     else:
-        Nprint(car(x))
+        Nprint(car(x),strings)
         if cdr(x)!=[]: print(" ",end='')
-        Nprintrest(cdr(x))
+        Nprintrest(cdr(x),strings)
         
-def Nprint(x):
+def Nprint(x,strings=False):
     if atom(x):
         if x==[]:
             print('()',end='')
@@ -170,10 +171,12 @@ def Nprint(x):
         print(x,end="")
     elif car(x)=='quote':
         print("'",end='')
-        Nprint(car(cdr(x)))
+        Nprint(car(cdr(x)),strings)
+    elif strings and flat(x) and numberp(car(x)) and car(x)==34:
+        print(compress(x),end='"') 
     else:
         print("(",end='')
-        Nprintrest(x)
+        Nprintrest(x,strings)
     return x
 
 def Neval(x):
@@ -401,7 +404,7 @@ def compress(x):
      elif numberp(car(x)):
          return chr(x[0])+compress(x[1])
      elif atom(car(x)):
-         return chr("?")+compress(x[1])
+         return str(car(x))+compress(x[1])
      else:
          return compress(x[0])+compress(x[1])
      
@@ -456,7 +459,7 @@ defq('lessp','lambda x: Ntest(Neval(car(x))<Neval(cadr(x)))')
 defq('greaterp','lambda x: Ntest(Neval(car(x))>Neval(cadr(x)))')
 defq('atom','lambda x: Ntest(atom(Neval(car(x))))')
 defq('not','lambda x: Nnot(Neval(car(x)))')
-defq('print','lambda x: Nprint(Neval(car(x)))')
+defq('print','lambda x: Nprint(Neval(car(x)),Neval(cadr(x)))')
 defq('quote','lambda x: car(x)')
 defq('function','lambda x: car(x)')
 defq('setq','lambda x: Nset(car(x),Neval(cadr(x)))')
@@ -858,15 +861,20 @@ def flat(x):
             return False
     else:
         return True
-
-def pprint(x,tabs=1):
+defq('flat','lambda x: Ntest(flat(Neval(car(x))))')
+    
+def pprint(x,tabs=1,strings=False):
+    if not numberp(tabs): tabs=1
     if atom(x):
-        Nprint(x)
-    elif atom(cdr(x)):
         Nprint(x)
     elif len(x) > 2:
         print(x)
+    elif atom(cdr(x)):
+        Nprint(x)
     elif flat(x):
+      if strings and numberp(car(x)) and car(x)==34:
+        print(compress(x),end='"') 
+      else:    
         print("(",end="")
         n=10
         while x!=[]:
@@ -882,17 +890,17 @@ def pprint(x,tabs=1):
                    n=10
         print(")",end="")
     elif (1 < depthless(20,x)):
-        Nprint(x)
+        Nprint(x,strings)
     else:
         print("(",end="")
         while x:
-            pprint(car(x),(1 + tabs))
+            pprint(car(x), 1+tabs,strings)
             if cdr(x):
                 print("")
                 tab(tabs)
             x=cdr(x)
         print(")",end="")
-defq('pprint', 'lambda x: pprint(Neval(car(x)))')
+defq('pprint', 'lambda x: pprint(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
 
 defq('member','lambda x:member(Neval(car(x)),Neval(cadr(x)))')
 def member(x,y):
