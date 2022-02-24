@@ -951,8 +951,18 @@ def subst(old,new,tree):
     else:
         return tree
 
+defq('copy','lambda x: copy(Neval(car(x)))')
+def copy(x):
+    if atom(x):
+        return x
+    else:
+        return cons(copy(car(x)),copy(cdr(x)))
+
+
+
+
+    
 loadlisp("bootpy.lsp")
-loadlisp("cursor.lsp")
 loadlisp("editor.lsp")
 lsp("(compile-edit)")
 lsp("(setq MODULE 'NEW)")

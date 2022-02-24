@@ -1,7 +1,21 @@
 
 (progn
- (defq MODULE EDITOR)
- (defq compile-edit (lambda () (map compile '(depthless eeprint25 eeprint))))
+
+
+(defun set_cursor
+ (v h)
+ (print
+  (compress
+   (backquote 27 91 @ (explode v) 59 @ (explode h) 72))))
+
+(defq erase_page (progn (repeat-times 10000 (sp)) (home)))
+
+(defq home (set_cursor 0 0))
+
+
+
+  (defq MODULE EDITOR)
+ (defq compile-edit (lambda () (map compile '(depthless eeprint25 eeprint locate))))
  (defq
   edit
   (nlambda
@@ -19,7 +33,7 @@
     (if
      (not (member MODULE (eval MODULE)))
      (set MODULE (cons MODULE (eval MODULE))))
-    (set THISNAME (nedit (eval THISNAME))))
+    (set THISNAME (nedit (copy (eval THISNAME)))))
    THISNAME))
  (defq
   eeinsert
@@ -67,6 +81,56 @@
      (- n 1)
      (depthless (depthless n (car x)) (cdr x))))))
  (defq
+  eeprint25
+  (lambda
+   (x)
+   (sp)
+   (sp)
+   (cond
+    ((numberp x)
+     (print x)
+     (sp)
+     (sp)
+     (sp)
+     (sp)
+     (sp)
+     (if (< 32 x 256) (print (compress (list x)))))
+    ((atom x) (print x))
+    ((arrayp x) (print x))
+    ((and (flat x) (equal 34 (car x))) (print x True))
+    (t
+     (let
+      ((dec 10))
+      (printc 40)
+      (while
+       (and x (lessp (tab) 60))
+       (cond
+        ((atom x) (printc 46) (sp) (print x) (setq x nil))
+        ((lessp dec 0) (print '&))
+        ((atom (car x)) (print (car x)) (if (cdr x) (sp)))
+        ((< 1 (depthless dec (car x))) (print (car x)))
+        (t (print '&) (sp)))
+       (setq dec (plus dec -3))
+       (pop x))
+      (printc 41))))
+   (hex nil)))
+ (defq
+  eeprint
+  (lambda
+   (x)
+   (erase_page)
+   (if *MORE* (print '*MORE*) (printc 40))
+   (repeat-times 40 (sp))
+   (print THISNAME)
+   (sp)
+   (print MODULE)
+   (cr)
+   (for
+    (p 0 39)
+    (when (nthcdr p x) (tab 3) (eeprint25 (nth p x)) (cr)))
+   (if (nthcdr 40 x) (print '*MORE*) (printc 41))))
+
+ (defq
   nedit
   (lambda
    (x dept goto exit v)
@@ -95,6 +159,8 @@
       (set_cursor (+ v 2) 1)
       (print '===>)
       (repeat-times (- (+ 1 (length x)) v) (cr))
+      (repeat-times 60 (print '-))
+      (cr)
       (setq ch (readcc))
       (if (eqn ch 27) (setq ch (readcc)))
       (if
@@ -157,10 +223,10 @@
      ((eq ch 'b)
       (if
        (eqn v 0)
-       (setq x (cons (car x) x))
+       (setq x (cons (copy (car x)) x))
        (rplacd
         (nthcdr (- v 1) x)
-        (cons (nth v x) (nthcdr v x))))
+        (cons (copy (nth v x)) (nthcdr v x))))
       (eeprint x))
      ((eq ch 'w)
       (if
@@ -184,7 +250,7 @@
       (if (setq goto (locate (read) x)) (setq v (pop goto)))
       (eeprint x))
      ((eq ch '+)
-      (setq x (eeinsert v x (pop JEMMA)))
+      (setq x (eeinsert v x (copy (pop JEMMA))))
       (eeprint x))
      ((eq ch 'e)
       (set_cursor 25 1)
@@ -257,53 +323,5 @@
       (readcc)
       (eeprint x))))
    x))
- (defq
-  eeprint25
-  (lambda
-   (x)
-   (sp)
-   (sp)
-   (cond
-    ((numberp x)
-     (print x)
-     (sp)
-     (sp)
-     (sp)
-     (sp)
-     (sp)
-     (if (< 32 x 256) (print (compress (list x)))))
-    ((atom x) (print x))
-    ((arrayp x) (print x))
-    ((and (flat x) (equal 34 (car x))) (print x True))
-    (t
-     (let
-      ((dec 10))
-      (printc 40)
-      (while
-       (and x (lessp (tab) 60))
-       (cond
-        ((atom x) (printc 46) (sp) (print x) (setq x nil))
-        ((lessp dec 0) (print '&))
-        ((atom (car x)) (print (car x)) (if (cdr x) (sp)))
-        ((< 1 (depthless dec (car x))) (print (car x)))
-        (t (print '&) (sp)))
-       (setq dec (plus dec -3))
-       (pop x))
-      (printc 41))))
-   (hex nil)))
- (defq
-  eeprint
-  (lambda
-   (x)
-   (erase_page)
-   (if *MORE* (print '*MORE*) (printc 40))
-   (repeat-times 40 (sp))
-   (print THISNAME)
-   (sp)
-   (print MODULE)
-   (cr)
-   (for
-    (p 0 39)
-    (when (nthcdr p x) (tab 3) (eeprint25 (nth p x)) (cr)))
-   (if (nthcdr 40 x) (print '*MORE*) (printc 41))))
- (defq EDITOR (compile-edit edit eeinsert locate depthless nedit eeprint25 eeprint EDITOR)))
+
+ (defq EDITOR (compile-edit edit eeinsert locate depthless nedit eeprint25 eeprint set_cursor erase_page  home EDITOR)))
