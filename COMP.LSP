@@ -2,6 +2,32 @@
 (progn
  (defq MODULE COMP)
  (defq
+  link-str
+  (lambda
+   (x y pr)
+   (setq y (eval x))
+   (defq pr (nlambda (x) (print (compress (cdr x)))))
+   (pr (34 100 101 102 113 40 39))
+   (print x)
+   (pr (34 39 44 39 108 97 109 98 100 97 32 120 58 32))
+   (print x)
+   (printc 40)
+   (if
+    (car (cadr y))
+    (pr (34 78 101 118 97 108 40 99 97 114 40 120 41 41)))
+   (if
+    (cdr (cadr y))
+    (pr
+     (34 , 78 101 118 97 108 40 99 97 d
+      114 40 120 41 41)))
+   (if
+    (cddr (cadr y))
+    (pr
+     (34 , 78 101 118 97 108 40 99 97 d
+      d 114 40 120 41 41)))
+   (pr (34 41 39 41))
+   True))
+ (defq
   comment-on-compiler
   (While I have totally perfect Nokolisp-to-Pascal and Nokolisp-to-C compiler , I
    realized I dont want to such unreadable mess with gensyms and
@@ -77,33 +103,7 @@
    (setq z (if (identp x) (list 'setq x (eval x)) x))
    (if
     file
-    (with-out-file
-     file
-     (function
-      (lambda
-       ()
-       (comp2 (expand4ever z))
-       (cr)
-       (progn
-        (print 'defq)
-        (printc 40)
-        (printc 39)
-        (print x)
-        (printc 39)
-        (print ',)
-        (printc 39)
-        (print 'lambda)
-        (printc 32)
-        (print 'x:)
-        (print x)
-        (print
-         (compress
-          (quote
-           (40 78 101 118 97 108 40 99 97 114 40
-            120 41 41 44 78 101 118 97 108 40 99
-            97 100 114 40 120 41 41 41))))
-        (printc 39)
-        (printc 41)))))
+    (with-out-file file (function (lambda () (comp2 (expand4ever z)) (cr) (link-str x))))
     (comp2 (expand4ever z)))
    (cr)
    file))
@@ -134,7 +134,7 @@
      (lambda-args (car x))
      (when (cdr x) (print ',) (lambda-args (cdr x)))))
    (if eka (printc 41))))
- (defq COMP (comment-on-compiler expand4ever CH-NAME comp-macros do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
+ (defq COMP (link-str comment-on-compiler expand4ever CH-NAME comp-macros do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
  (defq
   comp2
   (lambda

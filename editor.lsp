@@ -76,6 +76,7 @@
    (if (null dept) (setq dept 0))
    (if (null arrayp) (defun arrayp () ()))
    (if (null v) (setq v 0))
+   (erase_page)
    (eeprint x)
    (while
     (and (not exit) (not EXIT))
@@ -255,7 +256,6 @@
          (h = hexa-tulostus JUU/EI))))
       (readcc)
       (eeprint x))))
-   (erase_page)
    x))
  (defq
   eeprint25

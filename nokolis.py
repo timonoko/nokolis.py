@@ -937,6 +937,20 @@ def  me(x9,hantaa_vaan=False):
                     else:
                         return cons(me(car(x9)),me(cdr(x9),True))
 
+defq('subst','lambda x: subst(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')                    
+def subst(old,new,tree):
+    if tree:
+        if equal(old,tree):
+            return new
+        else:
+            if atom(tree):
+                return tree
+            else:
+                
+                return cons(subst(old,new,car(tree)),subst(old,new,cdr(tree)))
+    else:
+        return tree
+
 loadlisp("bootpy.lsp")
 loadlisp("cursor.lsp")
 loadlisp("editor.lsp")
