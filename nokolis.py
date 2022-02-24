@@ -535,9 +535,10 @@ lsp(""" (progn
            (list ope (list ope x y) (arith-macroes z ope))
            (if y (list ope x y) x)))
  (defnacro + (x) (arith-macroes x 'plus))
- (defnacro - (x) (arith-macroes x 'difference))
  (defnacro * (x) (arith-macroes x 'times))
- (defnacro / (x) (arith-macroes x 'quotient))
+ 
+ (defmacro / (x y) (list 'quotient x y))
+ (defmacro - (x y) (list 'difference x y))
 
  (defun comp-macroes ((x y . z) ope)
          (if z 
