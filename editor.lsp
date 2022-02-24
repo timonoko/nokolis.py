@@ -49,6 +49,7 @@
     (progn
      (eeprint x)
      (set_cursor (plus v 2) 4)
+     (printc 9)
      (rplaca (nthcdr v x) (read))))
    x))
  (defq
@@ -84,16 +85,11 @@
   eeprint25
   (lambda
    (x)
-   (sp)
-   (sp)
+   (printc 9)
    (cond
     ((numberp x)
      (print x)
-     (sp)
-     (sp)
-     (sp)
-     (sp)
-     (sp)
+     (printc 9)
      (if (< 32 x 256) (print (compress (list x)))))
     ((atom x) (print x))
     ((arrayp x) (print x))
@@ -119,7 +115,7 @@
   (lambda
    (x)
    (erase_page)
-   (if *MORE* (print '*MORE*) (printc 40))
+   (printc 40)
    (repeat-times 40 (sp))
    (print THISNAME)
    (sp)
@@ -127,8 +123,8 @@
    (cr)
    (for
     (p 0 39)
-    (when (nthcdr p x) (tab 3) (eeprint25 (nth p x)) (cr)))
-   (if (nthcdr 40 x) (print '*MORE*) (printc 41))))
+    (when (nthcdr p x) (eeprint25 (nth p x)) (cr)))
+   (printc 41)))
 
  (defq
   nedit
@@ -151,12 +147,12 @@
      (progn
       (set_cursor 2 1)
       (progn
-       (repeat-times (length x) (sp) (sp) (sp) (sp) (cr))
+       (repeat-times (length x) (sp) (sp) (sp) (sp) (sp) (sp) (cr))
        (printc 41)
        (sp)
        (sp)
-       (sp))
-      (set_cursor (+ v 2) 1)
+       (sp) (sp) (sp))
+      (set_cursor (+ v 2) 3)
       (print '===>)
       (repeat-times (- (+ 1 (length x)) v) (cr))
       (repeat-times 60 (print '-))
@@ -240,6 +236,7 @@
       (eeprint x))
      ((eq ch 'p)
       (erase_page)
+      (cr)
       (pprint x 1 True)
       (cr)
       (readcc)

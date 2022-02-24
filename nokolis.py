@@ -24,7 +24,7 @@ def repl():
   quit=False
   try:
     while not quit:
-        rivi=input("> ")
+        rivi=input(">> ")
         if rivi=="":
             pass
         elif rivi=="quit":
@@ -42,16 +42,20 @@ def repl():
     oblist._id_TRACE=(oblist.func)
     repl()
        
-        
+def add_oblist(x):
+    if identp(x) and not x in oblist.names:
+            oblist.names.append(x)
+    
 def oblist_name2(x):
+    add_oblist(x)
     a=[c for c in x]
-    d=""
+    d="_id_"
     for c in a:
         if ord(c) in range(ord('a'), ord('z')): d=d+c
         elif ord(c) in range(ord('A'),ord('Z')): d=d+c
         elif ord(c) in range(ord('0'),ord('9')): d=d+c
         else: d=d+str(ord(c))
-    return f'_id_{d}'
+    return d
 
 def oblist_name(x):
     return f'oblist.{oblist_name2(x)}'
@@ -206,9 +210,6 @@ def value_of(x):
        if identp(x): exec(f'{oblist_name(x)}=[]')
        return []
 
-def add_oblist(x):
-    if identp(x) and not x in oblist.names:
-            oblist.names.append(x)
    
 def Nset(x,y):
     add_oblist(x)
