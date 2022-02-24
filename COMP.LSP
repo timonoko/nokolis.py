@@ -2,6 +2,17 @@
 (progn
  (defq MODULE COMP)
  (defq
+  esim
+  (lambda
+   (z v)
+   (let
+    ((a 45))
+    (for
+     (x 1 5)
+     (for
+      (y 5 9)
+      (if (= z y) (print 'hui) (print 'hai)))))))
+ (defq
   link-str
   (lambda
    (x y pr)
@@ -35,11 +46,7 @@
    cannot assign from SETQ or IF , and OR works only
    in expressions. LET seems to generate LAMBDA and GENSYM-named function ,
    but that is avoidable))
- (defq
-  expand4ever
-  (lambda
-   (x y)
-   (if (equal x y) x (expand4ever (do-lambda (macroexpand x)) x))))
+ (defq expand4ever (lambda (x) (do-lambda (macroexpand x) 0)))
  (defq CH-NAME ((eval Neval) (print Nprint)))
  (defq
   comp-macros
@@ -59,51 +66,50 @@
  (defq
   do-lambda
   (lambda
-   (x y)
+   (x tabs y)
+   (unless tabs (setq tabs 16))
    (cond
     ((atom x) x)
     ((equal (car x) 'quote) x)
-    ((equal (car x) 'function) (do-lambda (cadr x)))
+    ((equal (car x) 'function) (do-lambda (cadr x) tabs))
     ((equal (car x) 'lambda)
-     (push (append (cadr x) (car DYN-VARS)) DYN-VARS)
-     (prog1
-      (comp-lambda
-       (list
-        (quote lambda)
-        (cadr x)
-        (macroexpand (do-lambda (macroexpand (cons 'progn (cddr x))))))
-       0)
-      (pop DYN-VARS)))
+     (comp-lambda
+      (list 'lambda (cadr x) (cons 'progn (cddr x)))
+      tabs))
     ((setq y (assoc (car x) comp-macros))
-     (do-lambda (macroexpand (do-lambda ((cdr y) (cdr x))))))
-    (t (cons (do-lambda (car x)) (do-lambda (cdr x)))))))
+     (do-lambda (macroexpand (do-lambda ((cdr y) (cdr x)) tabs)) tabs))
+    (t (cons (do-lambda (car x) tabs) (do-lambda (cdr x) tabs))))))
  (defq
   comp-lambda
   (lambda
    (x tabs)
+   (unless tabs (setq tabs 8))
    (cr)
+   (tab tabs)
    (print 'def)
    (sp)
    (let
-    ((name (gensym)) (new-args (car DYN-VARS)))
+    ((name (gensym)) (new-args (cadr x)))
     (print name)
     (push (cons name new-args) LAMBDA-ARGS)
     (lambda-args new-args t)
     (print ':)
-    (comp-progn (cddr x) 4 'return)
-    (cr)
-    (cr)
+    (comp-progn
+     (macroexpand (do-lambda (cddr x) (+ 4 tabs)))
+     (+ tabs 4)
+     (quote return))
     name)))
  (defq
   comp
   (lambda
    (x file)
-   (setq DYN-VARS nil)
    (setq LAMBDA-ARGS nil)
    (setq z (if (identp x) (list 'setq x (eval x)) x))
    (if
     file
-    (with-out-file file (function (lambda () (comp2 (expand4ever z)) (cr) (link-str x))))
+    (with-out-file
+     file
+     (function (lambda () (comp2 (expand4ever z) 0) (cr) (link-str x))))
     (comp2 (expand4ever z)))
    (cr)
    file))
@@ -111,7 +117,7 @@
   comp-progn
   (lambda
    (x tabs return)
-   (unless (equal (caar x) 'progn) (cr) (tab tabs))
+   (unless (member (caar x) '(setq progn)) (cr) (tab tabs))
    (when
     (and
      return
@@ -134,7 +140,7 @@
      (lambda-args (car x))
      (when (cdr x) (print ',) (lambda-args (cdr x)))))
    (if eka (printc 41))))
- (defq COMP (link-str comment-on-compiler expand4ever CH-NAME comp-macros do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
+ (defq COMP (esim link-str comment-on-compiler expand4ever CH-NAME comp-macros do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
  (defq
   comp2
   (lambda
@@ -148,9 +154,11 @@
      (case
       (car x)
       (setq
+       (cr)
+       (tab tabs)
        (print (cadr x))
        (print '=)
-       (comp2 (caddr x) tabs)
+       (comp2 (caddr x) (+ 4 tabs))
        (car x))
       (function (comp2 (cadr x) tabs))
       (quote
