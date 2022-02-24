@@ -847,6 +847,8 @@ def depthless(n,x):
             return (n - 1)
         else:
             return depthless(depthless(n,car(x)),cdr(x))
+defq('depthless2','lambda x: Ntest(depthless(Neval(car(x)),Neval(cadr(x))))')
+
 def tab(x):
     if (0 < x):
             print(" ",end="")
@@ -937,8 +939,10 @@ def  me(x9,hantaa_vaan=False):
 
 loadlisp("bootpy.lsp")
 loadlisp("cursor.lsp")
-lsp("(load-raw-module 'EDITOR)")
-lsp("(setq edit eek")
+loadlisp("editor.lsp")
+lsp("(compile-edit)")
+lsp("(setq MODULE 'NEW)")
+
 
 lsp("(defun repl () (while t (cr) (pprint (eval (read)))))")
 

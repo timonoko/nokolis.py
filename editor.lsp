@@ -1,44 +1,44 @@
 
 (progn
-
-(defq eek
+ (defq MODULE EDITOR)
+ (defq compile-edit (lambda () (map compile '(depthless eeprint25 eeprint))))
+ (defq
+  edit
   (nlambda
    (THISNAME)
    (if (assoc THISNAME *COMPILED*) (uncompile THISNAME))
    (setq EXIT ())
    (when
     (identp THISNAME)
-    (if MODULE
+    (if
+     MODULE
      (if
       (not (member THISNAME (eval MODULE)))
       (set MODULE (cons THISNAME (eval MODULE))))
-     (progn
-      (setq MODULE 'NEW)
-      (setq NEW (list 'NEW THISNAME))))
+     (progn (setq MODULE 'NEW) (setq NEW (list 'NEW THISNAME))))
     (if
      (not (member MODULE (eval MODULE)))
      (set MODULE (cons MODULE (eval MODULE))))
     (set THISNAME (nedit (eval THISNAME))))
    THISNAME))
-
-(defq eeinsert
+ (defq
+  eeinsert
   (lambda
    (v x y)
    (if
     (lessp v 1)
     (setq x (cons () x))
-    (rplacd
-     (nthcdr (plus v -1) x)
-     (cons () (nthcdr v x))))
-   (if y
+    (rplacd (nthcdr (plus v -1) x) (cons () (nthcdr v x))))
+   (if
+    y
     (rplaca (nthcdr v x) y)
     (progn
      (eeprint x)
      (set_cursor (plus v 2) 4)
      (rplaca (nthcdr v x) (read))))
    x))
-
-(defq locate
+ (defq
+  locate
   (lambda
    (x y)
    (if
@@ -55,7 +55,8 @@
         (not (setq z2 (locate x (pop y))))
         (setq z (add1 z))))
       (if z2 (cons z z2)))))))
- (defq depthless
+ (defq
+  depthless
   (lambda
    (n x)
    (if
@@ -65,7 +66,8 @@
      (atom x)
      (- n 1)
      (depthless (depthless n (car x)) (cdr x))))))
- (defq nedit
+ (defq
+  nedit
   (lambda
    (x dept goto exit v)
    (setq vasen-sulku (compress (list 40)))
@@ -78,7 +80,8 @@
    (while
     (and (not exit) (not EXIT))
     (setq THIS (nth v x))
-    (if goto
+    (if
+     goto
      (setq ch 6)
      (progn
       (set_cursor 2 1)
@@ -113,16 +116,20 @@
       (if (greaterp v 0) (setq v (plus v -1))))
      ((member ch '(277 267))
       (if
-       (atom THIS)
+       (and (atom THIS) (not (identp THIS)))
        ()
        (rplaca
         (nthcdr v x)
         (if
-         (arrayp (nth v x))
-         (list2array (nedit (array2list (nth v x))))
-         (nedit (nth v x)))))
+         (identp THIS)
+         (compress (nedit (explode THIS)))
+         (if
+          (arrayp (nth v x))
+          (list2array (nedit (array2list (nth v x))))
+          (nedit (nth v x))
+          ()))))
       (unless EXIT (eeprint x)))
-     ((or(eq ch 'n) (eq ch vasen-sulku))
+     ((or (eq ch 'n) (eq ch vasen-sulku))
       (setq x (eeinsert v x))
       (eeprint x))
      ((eq ch 'y)
@@ -130,9 +137,7 @@
       (if
        (eqn v 0)
        (setq x (cdr x))
-       (rplacd
-        (nthcdr (- v 1) x)
-        (nthcdr (+ v 1) x)))
+       (rplacd (nthcdr (- v 1) x) (nthcdr (+ v 1) x)))
       (eeprint x))
      ((eq ch 'q)
       (rplaca (nthcdr v x) (list 'quote (nth v x)))
@@ -140,8 +145,7 @@
      ((eq ch 'r)
       (if
        (eqn v 0)
-       (setq x
-        (append (nth v x) (nthcdr (plus v 1) x)))
+       (setq x (append (nth v x) (nthcdr (plus v 1) x)))
        (rplacd
         (nthcdr (plus v -1) x)
         (append (nth v x) (nthcdr (plus v 1) x))))
@@ -160,8 +164,7 @@
      ((eq ch 'w)
       (if
        (eqn v 0)
-       (setq x
-        (cons (list (car x) (cadr x)) (cddr x)))
+       (setq x (cons (list (car x) (cadr x)) (cddr x)))
        (rplacd
         (nthcdr (- v 1) x)
         (cons
@@ -177,9 +180,7 @@
      ((eq ch 'l)
       (set_cursor 25 1)
       (print 'locate:)
-      (if
-       (setq goto (locate (read) x))
-       (setq v (pop goto)))
+      (if (setq goto (locate (read) x)) (setq v (pop goto)))
       (eeprint x))
      ((eq ch '+)
       (setq x (eeinsert v x (pop JEMMA)))
@@ -191,7 +192,9 @@
       (eeprint x))
      ((eq ch '-) (setq EXIT t))
      ((eq ch 'z)
-      (if (identp THIS) (eval (list 'eek THIS)))
+      (if
+       (and (identp THIS) (not (equal (type (eval THIS)) (type car))))
+       (eval (list 'edit THIS)))
       (setq EXIT nil)
       (eeprint x))
      ((eq ch 'c)
@@ -200,8 +203,7 @@
        ()
        (if
         (eqn v 0)
-        (setq x
-         (cons (append (car x) (list (cadr x))) (cddr x)))
+        (setq x (cons (append (car x) (list (cadr x))) (cddr x)))
         (rplacd
          (nthcdr (- v 1) x)
          (cons
@@ -215,9 +217,7 @@
       (setq v (add1 v))
       (eeprint x))
      ((eq ch 'f) (eeprint x))
-     ((eq ch 'k)
-      (setq x (copy x))
-      (eeprint x))
+     ((eq ch 'k) (setq x (copy x)) (eeprint x))
      ((eq ch 's)
       (set_curso 25 1)
       (print 'SUBST:)
@@ -227,7 +227,7 @@
       (setq x (subst eka toka x))
       (eeprint x))
      ((eq ch 'm)
-      (setq x (eeinsert v x (explode(read-str))))
+      (setq x (eeinsert v x (explode (read-str))))
       (eeprint x))
      (t
       (erase_page)
@@ -252,43 +252,11 @@
          (q = tahan kojootti)
          (- = ulos kaikesta)
          (m = lisää merkkijono)
-	 (h = hexa-tulostus JUU/EI))))
+         (h = hexa-tulostus JUU/EI))))
       (readcc)
       (eeprint x))))
    (erase_page)
    x))
-
-(defun eeprint251
- (x)
- (sp)
- (sp)
- (cond
-  ((atom x) (print x))
-  ((arrayp x) (print x))
-  ((and (flat (car x)) (equal 34 (caar x))) (print (car x) True)) 
-  (t
-   (let
-    ((dec 10))
-    (printc 40)
-    (while
-     (and x (lessp (tab) 60))
-     (cond
-      ((atom x)
-       (printc 46)
-       (sp)
-       (print x)
-       (setq x nil))
-      ((lessp dec 0) (print '&))
-      ((atom (car x))
-       (print (car x))
-       (if (cdr x) (sp)))
-      ((< 1 (depthless dec (car x))) (print (car x)))
-      (t (print '&) (sp)))
-     (setq dec (plus dec -3))
-     (pop x))
-    (printc 41))))
- (hex nil))
-
  (defq
   eeprint25
   (lambda
@@ -296,6 +264,14 @@
    (sp)
    (sp)
    (cond
+    ((numberp x)
+     (print x)
+     (sp)
+     (sp)
+     (sp)
+     (sp)
+     (sp)
+     (if (< 32 x 256) (print (compress (list x)))))
     ((atom x) (print x))
     ((arrayp x) (print x))
     ((and (flat x) (equal 34 (car x))) (print x True))
@@ -315,28 +291,19 @@
        (pop x))
       (printc 41))))
    (hex nil)))
-
-(defun eeprint
- (x)
- (erase_page)
- (if *MORE* (print '*MORE*) (printc 40))
- (repeat-times 40 (sp))
- (print THISNAME)
- (sp)
- (print MODULE)
- (cr)
- (for
-  (p 0 39)
-  (when
-   (nthcdr p x)
-   (tab 3)
-   (eeprint25 (nth p x))
-   (cr)))
- (if (nthcdr 40 x) (print '*MORE*) (printc 41)))
-
-(defq EDITOR (eek eeinsert locate depthless nedit eeprint25 eeprint EDITOR))
-
-(map compile EDITOR)
-
-(setq edit eek)
-)))
+ (defq
+  eeprint
+  (lambda
+   (x)
+   (erase_page)
+   (if *MORE* (print '*MORE*) (printc 40))
+   (repeat-times 40 (sp))
+   (print THISNAME)
+   (sp)
+   (print MODULE)
+   (cr)
+   (for
+    (p 0 39)
+    (when (nthcdr p x) (tab 3) (eeprint25 (nth p x)) (cr)))
+   (if (nthcdr 40 x) (print '*MORE*) (printc 41))))
+ (defq EDITOR (compile-edit edit eeinsert locate depthless nedit eeprint25 eeprint EDITOR)))
