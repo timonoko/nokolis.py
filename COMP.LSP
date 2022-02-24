@@ -1,6 +1,8 @@
 
 (progn
  (defq MODULE COMP)
+ (defq want_value (lambda (x) (backquote ((function (lambda () , x))))))
+ (defq STATEMENTS (if setq))
  (defq
   esim
   (lambda
@@ -11,7 +13,9 @@
      (x 1 5)
      (for
       (y 5 9)
-      (if (= z y) (print 'hui) (print 'hai)))))))
+      (setq
+       hupa
+       (if (= z y) (print 'hui) (print 'hai))))))))
  (defq
   link-str
   (lambda
@@ -85,6 +89,7 @@
    (x tabs)
    (unless tabs (setq tabs 8))
    (cr)
+   (cr)
    (tab tabs)
    (print 'def)
    (sp)
@@ -98,6 +103,8 @@
      (macroexpand (do-lambda (cddr x) (+ 4 tabs)))
      (+ tabs 4)
      (quote return))
+    (cr)
+    (cr)
     name)))
  (defq
   comp
@@ -132,15 +139,16 @@
   lambda-args
   (lambda
    (x eka)
-   (if eka (printc 40))
    (if
-    (atom x)
-    (print x)
-    (progn
-     (lambda-args (car x))
-     (when (cdr x) (print ',) (lambda-args (cdr x)))))
-   (if eka (printc 41))))
- (defq COMP (esim link-str comment-on-compiler expand4ever CH-NAME comp-macros do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
+    eka
+    (progn (printc 40) (lambda-args x) (printc 41))
+    (if
+     x
+     (progn (print (pop x)) (if x (print ',)) (lambda-args x))))))
+ (defq
+  COMP
+  (want_value STATEMENTS esim link-str comment-on-compiler expand4ever CH-NAME comp-macros do-lambda comp-lambda comp
+   comp-progn lambda-args COMP comp2))
  (defq
   comp2
   (lambda
@@ -154,12 +162,20 @@
      (case
       (car x)
       (setq
-       (cr)
-       (tab tabs)
-       (print (cadr x))
-       (print '=)
-       (comp2 (caddr x) (+ 4 tabs))
-       (car x))
+       (if
+        (member (car (caddr x)) STATEMENTS)
+        (comp2
+         (do-lambda
+          (backquote setq , (cadr x) ((function (lambda () , (caddr x)))))
+          tabs)
+         tabs)
+        (progn
+         (cr)
+         (tab tabs)
+         (print (cadr x))
+         (print '=)
+         (comp2 (caddr x) (+ 4 tabs))
+         (car x))))
       (function (comp2 (cadr x) tabs))
       (quote
        (cond
