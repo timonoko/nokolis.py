@@ -1,4 +1,3 @@
-
 #! /usr/bin/python3
 
 import math,time,os,sys
@@ -41,13 +40,22 @@ def repl():
     print("(quit)?")
     oblist._id_TRACE=(oblist.func)
     repl()
-       
+
+import readline
+readline.parse_and_bind("tab: complete")
+    
+
+    
 def add_oblist(x):
     if identp(x) and not x in oblist.names:
-            oblist.names.append(x)
+        oblist.names.append(x)
+        def complete(text,state):
+            volcab = oblist.names
+            results = [x for x in volcab if x.startswith(text)] + [None]
+            return results[state]
+        readline.set_completer(complete)
     
 def oblist_name2(x):
-    add_oblist(x)
     a=[c for c in x]
     d="_id_"
     for c in a:
@@ -124,7 +132,9 @@ def atomi(token):
             return int(token)
         else:
             return float(token)
-    except: return token
+    except:
+            add_oblist(token)
+            return token
 
 def car(x):
     if atom(x): return []
@@ -212,7 +222,6 @@ def value_of(x):
 
    
 def Nset(x,y):
-    add_oblist(x)
     x2=oblist_name(x)
     if identp(y):
        try:
@@ -399,15 +408,21 @@ def array2list(x):
   else:
     return []
 
-def compress(x):
+def compr2(x):
      if x==[]:
          return ""
      elif numberp(car(x)):
-         return chr(x[0])+compress(x[1])
+         return chr(x[0])+compr2(x[1])
      elif atom(car(x)):
-         return str(car(x))+compress(x[1])
+         return str(car(x))+compr2(x[1])
      else:
-         return compress(x[0])+compress(x[1])
+         y=compr2(x[0])+compr2(x[1])
+         return y
+
+def compress(x):
+    y=compr2(x)
+    add_oblist(y)
+    return y
      
 def list2array(x):
     if atom(car(x)):
