@@ -43,7 +43,8 @@ def repl():
 
 import readline
 readline.parse_and_bind("tab: complete")
-    
+string = readline.get_completer_delims().replace('-', '')
+readline.set_completer_delims(string)
 
     
 def add_oblist(x):
@@ -404,6 +405,8 @@ def array2list(x):
         y=array2list(x[0])
     else:
         y=x[0]
+        if identp(x[0]):
+          add_oblist(x[0])
     return [y,array2list(x[1:])]
   else:
     return []
@@ -800,6 +803,7 @@ def with_out_file(x,y):
 defq('with-out-file', 'lambda x: with_out_file(Neval(car(x)),Neval(cadr(x)))')
 
 def loadlisp(name):
+    array2list(os.listdir())
     with open(name,"r") as f:
        c =f.read()
     f.close
@@ -975,10 +979,17 @@ def copy(x):
     else:
         return cons(copy(car(x)),copy(cdr(x)))
 
+# (mappy explode '(a b)) == (map explode '(a b)) 
+def mappy(f,x):
+    if x==[]: return []
+    else: return cons(f(car(x)),mappy(f,cdr(x)))
+defq('mappy','lambda x: mappy(eval(car(x)),Neval(cadr(x)))')  
+
+def apppy(f,x):return f(x)
+defq('apppy','lambda x: apppy(eval(car(x)),Neval(cadr(x)))')  
+lsp("(defmacro apply (f x) (list f x))")
 
 
-
-    
 loadlisp("bootpy.lsp")
 loadlisp("editor.lsp")
 lsp("(compile-edit)")
@@ -993,7 +1004,7 @@ lsp("""(progn
          (eval (read-from-str (cdr (python-eval 'sys.argv))))))
         """)
 
-repl()
+#repl()
 
     
 
