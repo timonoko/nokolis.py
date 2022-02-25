@@ -75,7 +75,6 @@
   COMP-MACROS
   ((cr '(progn (printc 13) (printc 10)))
    (sp '(printc 32))
-   (printc (lambda (x) (backquote print (chr @ x))))
    (repeat-times
     (lambda
      (x)

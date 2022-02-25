@@ -464,8 +464,10 @@ class _GetchUnix:
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
-
 readcc=_GetchUnix()
+
+def printc(x):
+    print(chr(x),end="")
      
 defq('plus', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('difference','lambda x: Neval(car(x))-Neval(cadr(x))')
@@ -534,6 +536,7 @@ defq('dir', 'lambda x: os.listdir()')
 defq('printc', 'lambda x: print(chr(Neval(car(x))),end="")')
 defq('readcc', 'lambda x: ord(readcc())')
 defq('read-from-str', 'lambda x: parse(Neval(car(x)))')
+
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
