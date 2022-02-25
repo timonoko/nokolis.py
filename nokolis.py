@@ -985,6 +985,13 @@ def mappy(f,x):
     else: return cons(f(car(x)),mappy(f,cdr(x)))
 defq('mappy','lambda x: mappy(eval(car(x)),Neval(cadr(x)))')  
 
+def mapcpy(f,x):
+    if x==[]: pass
+    else:
+        f(car(x))
+        mapcpy(f,cdr(x))
+defq('mapcpy','lambda x: mapcpy(eval(car(x)),Neval(cadr(x)))')  
+
 def apppy(f,x):return f(x)
 defq('apppy','lambda x: apppy(eval(car(x)),Neval(cadr(x)))')  
 lsp("(defmacro apply (f x) (list f x))")
