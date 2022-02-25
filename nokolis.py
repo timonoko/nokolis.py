@@ -773,6 +773,12 @@ lsp(""" (progn
             (t (backquote (member , x QUOTE (car y)) @ (cdr y))))))
          y)))
 
+ (defq foreach
+  (mlambda
+   (x . y)
+   (backquote mapc (function (lambda (, (car x)) @ y)) , (cadr x))))
+
+
 )))""")
 
 lsp("(defun sort (x) (array2list (arraysort (list2array x))))")
@@ -999,7 +1005,27 @@ def apppy(f,x):return f(x)
 defq('apppy','lambda x: apppy(eval(car(x)),Neval(cadr(x)))')  
 lsp("(defmacro apply (f x) (list f x))")
 
+defq('blockq3','lambda x: blockq2(Neval(car(x)))')
+def blockq2(XYPY):
+    if atom(XYPY):
+        return XYPY
+    else:
+        if (car(XYPY) is ","):
+            return cons("cons",cons(cadr(XYPY),cons(blockq2(cddr(XYPY)),[])))
+        else:
+            if (car(XYPY) is "@"):
+                return cons("append",cons(cadr(XYPY),cons(blockq2(cddr(XYPY)),[])))
+            else:
+                if equal(car(XYPY),"QUOTE"):
+                    return cons("cons",cons(cons("list",cons(['quote', ['quote', []]],cons(cadr(XYPY),[]))),cons(blockq2(cddr(XYPY)),[])))
+                else:
+                    if atom(car(XYPY)):
+                        return cons("cons",cons(cons("quote",cons(car(XYPY),[])),cons(blockq2(cdr(XYPY)),[])))
+                    else:
+                        return cons("cons",cons(blockq2(car(XYPY)),cons(blockq2(cdr(XYPY)),[])))
 
+lsp("(defmacro backquote ZYKSX (blockq3 ZYKSX))")
+                    
 loadlisp("bootpy.lsp")
 loadlisp("editor.lsp")
 lsp("(compile-edit)")
