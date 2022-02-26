@@ -13,11 +13,7 @@
      (cr)))))
  (defq
   esimerkki
-  (lambda
-   ()
-   (setq dee ())
-   (for (x 1 10) (push x dee))
-   (mapc (function (lambda (x) (print (+ x 1)) (cr) False)) dee)))
+  (lambda () (foreach (x '(1 2 3)) (print x) (cr))))
  (defq
   ch-name
   (lambda
@@ -65,7 +61,8 @@
  (defq expand4ever (lambda (x) (do-lambda (macroexpand (ch-name x)) 0)))
  (defq
   CH-NAME
-  ((for python_for)
+  ((foreach python-foreach)
+   (for python_for)
    (eval Neval)
    (mapp mappy)
    (map mappy)
@@ -73,7 +70,19 @@
    (print Nprint)))
  (defq
   COMP-MACROS
-  ((cr '(progn (printc 13) (printc 10)))
+  ((prog1
+    (lambda
+     (x)
+     (setq y (gensym))
+     (backquote progn (setq , y , (car x)) @ (cdr x) , y)))
+   (arrayp
+    (lambda
+     (x)
+     (backquote
+      and
+      (eqn (type @ x) (type '(1)))
+      (< 2 (len @ x)))))
+   (cr '(progn (printc 13) (printc 10)))
    (sp '(printc 32))
    (repeat-times
     (lambda
@@ -155,13 +164,14 @@
   comp-progn
   (lambda
    (x tabs return)
-   (unless (member (caar x) '(setq progn)) (cr) (tab tabs))
+   (unless (member (caar x) '(setq progn prog1)) (cr) (tab tabs))
    (when
     (and
      return
      x
      (not (cdr x))
-     (not (member (caar x) '(setq progn if while prog1))))
+     (not
+      (member (caar x) '(foreach elif python-foreach python_for for setq progn if while prog1))))
     (print 'return)
     (sp))
    (comp2 (car x) tabs (unless (cdr x) return))
@@ -198,7 +208,8 @@
       (comp2
        (macroexpand
         (eval (backquote QUOTE (cadr (assoc (car x) COMP-MACROS)) QUOTE (cdr x))))
-       tabs)
+       tabs
+       return)
       (case
        (car x)
        (setq
@@ -243,29 +254,37 @@
         (comp2 (caddr x) tabs)
         (printc 41))
        (defq
-        (comp2 (list 'setq (cadr x) (list 'function (caddr x)))))
+        (comp2
+         (list 'setq (cadr x) (list 'function (caddr x)))
+         tabs
+         return))
        (while
         (print 'while)
         (sp)
         (comp2 (cadr x) tabs)
         (print ':)
         (comp-progn (cddr x) (+ 4 tabs)))
-       (if
+       ((if elif)
         (if
          (equal (cadr x) 't)
-         (comp-progn (list (caddr x)) tabs return)
+         (comp2 (cons (car x) (list 'True (caddr x))) tabs return)
          (progn
-          (print 'if)
+          (print (car x))
           (sp)
           (comp2 (cadr x) tabs)
           (print ':)
           (comp-progn (list (caddr x)) (+ 4 tabs) return)
           (when
            (cadddr x)
-           (cr)
-           (tab tabs)
-           (print 'else:)
-           (comp-progn (list (cadddr x)) (+ 4 tabs) return)))))
+           (setq x (cadddr x))
+           (if
+            (equal 'if (car x))
+            (comp-progn (list (cons 'elif (cdr x))) tabs return)
+            (progn
+             (cr)
+             (tab tabs)
+             (print 'else:)
+             (comp-progn (list x) (+ 4 tabs) return)))))))
        (progn (comp-progn (cdr x) tabs return))
        (prog1
         (let
@@ -307,6 +326,19 @@
          (cdddr (cadr x))
          (print ',)
          (comp2 (cadddr (cadr x)) tabs))
+        (printc 41)
+        (print ':)
+        (comp-progn (macroexpand (cddr x)) (+ 4 tabs)))
+       (python-foreach
+        (print 'for)
+        (sp)
+        (print (car (cadr x)))
+        (sp)
+        (print 'in)
+        (sp)
+        (print 'list2array)
+        (printc 40)
+        (comp2 (cadr (cadr x)) tabs)
         (printc 41)
         (print ':)
         (comp-progn (macroexpand (cddr x)) (+ 4 tabs)))

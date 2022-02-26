@@ -5,17 +5,24 @@ import resource
 resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
 sys.setrecursionlimit(10**6)
 
+t="t"
+T="T"
+nil=[]
+NIL=[]
+
 class oblist:
     func=[]
     args=[]
     jemma=[]
     names=[]
-    _id_t="t"
     _id_True=True
     _id_False=False
+    _id_t="t"
     _id_T="T"
+    _id_nil=[]
+    _id_NIL=[]
 
-    
+
 def repl():
   oblist.func=[]
   oblist.args=[]
@@ -944,28 +951,25 @@ def member(x,y):
         else:
             return member(x,cdr(y))
 
-defq('macroexpand','lambda x:me(Neval(car(x)))') 
-def  me(x9,hantaa_vaan=False):
+def macroexpand(x9,hv=()):
     if atom(x9):
         return x9
-    else:
-        if equal(car(x9),"quote"):
-            return x9
+    elif equal(car(x9),"quote"):
+        return x9
+    elif equal(car(x9),"lambda"):
+        return cons(car(x9),cons(cadr(x9),macroexpand(cddr(x9))))
+    elif (equal(car(x9),"if") and member(car(cadr(x9)),['null', ['not', []]])):
+        return macroexpand(cons("if",cons(cadr(cadr(x9)),cons(cadddr(x9),cons(caddr(x9),[])))))
+    elif (not(hv) and (identp(car(x9)) and member(car(Neval(car(x9))),['macro', ['mlambda', []]]))):
+        if equal(car(Neval(car(x9))),"mlambda"):
+            iik="nlambda"
         else:
-            if equal(car(x9),"lambda"):
-                return cons(car(x9),cons(cadr(x9),me(cddr(x9))))
-            else:
-                if (equal(car(x9),"if") and member(car(cadr(x9)),['null', ['not', []]])):
-                    return me(cons("if",cons(cadr(cadr(x9)),cons(cadddr(x9),cons(caddr(x9),[])))))
-                else:
-                    if (not(hantaa_vaan) and (identp(car(x9)) and member(car(Neval(car(x9))),['macro', ['mlambda', []]]))):
-                        if equal(car(Neval(car(x9))),"mlambda"):
-                            hepo="nlambda"
-                        else:
-                            hepo="macrotest"
-                        return me(Neval(cons(cons("function",cons(cons(hepo,cdr(Neval(car(x9)))),[])),cdr(x9))))
-                    else:
-                        return cons(me(car(x9)),me(cdr(x9),True))
+            iik="macrotest"
+        return macroexpand(Neval(cons(cons("function",cons(cons(iik,cdr(Neval(car(x9)))),[])),cdr(x9))))
+    elif True:
+        return cons(macroexpand(car(x9)),macroexpand(cdr(x9),t))
+defq('macroexpand','lambda x: macroexpand(Neval(car(x)),Neval(cadr(x)))')
+
 
 defq('subst','lambda x: subst(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')                    
 def subst(old,new,tree):
@@ -1009,26 +1013,66 @@ defq('blockq3','lambda x: blockq2(Neval(car(x)))')
 def blockq2(XYPY):
     if atom(XYPY):
         return XYPY
-    else:
-        if (car(XYPY) is ","):
-            return cons("cons",cons(cadr(XYPY),cons(blockq2(cddr(XYPY)),[])))
-        else:
-            if (car(XYPY) is "@"):
-                return cons("append",cons(cadr(XYPY),cons(blockq2(cddr(XYPY)),[])))
-            else:
-                if equal(car(XYPY),"QUOTE"):
-                    return cons("cons",cons(cons("list",cons(['quote', ['quote', []]],cons(cadr(XYPY),[]))),cons(blockq2(cddr(XYPY)),[])))
-                else:
-                    if atom(car(XYPY)):
-                        return cons("cons",cons(cons("quote",cons(car(XYPY),[])),cons(blockq2(cdr(XYPY)),[])))
-                    else:
-                        return cons("cons",cons(blockq2(car(XYPY)),cons(blockq2(cdr(XYPY)),[])))
-
+    elif (car(XYPY) is ","):
+        return cons("cons",cons(cadr(XYPY),cons(blockq2(cddr(XYPY)),[])))
+    elif (car(XYPY) is "@"):
+        return cons("append",cons(cadr(XYPY),cons(blockq2(cddr(XYPY)),[])))
+    elif equal(car(XYPY),"QUOTE"):
+        return cons("cons",cons(cons("list",cons(['quote', ['quote', []]],cons(cadr(XYPY),[]))),cons(blockq2(cddr(XYPY)),[])))
+    elif atom(car(XYPY)):
+        return cons("cons",cons(cons("quote",cons(car(XYPY),[])),cons(blockq2(cdr(XYPY)),[])))
+    elif True:
+        return cons("cons",cons(blockq2(car(XYPY)),cons(blockq2(cdr(XYPY)),[])))
 lsp("(defmacro backquote ZYKSX (blockq3 ZYKSX))")
-                    
+
+def gensym7(x,dec):
+    printc(9)
+    if numberp(x):
+        Nprint(x)
+        printc(9)
+        if ((32 < x) and (x < 256)):
+            return Nprint(compress(cons(x,[])))
+    elif atom(x):
+        return Nprint(x)
+    elif ((type(x) == type([1, []])) and (2 < len(x))):
+        return Nprint(x)
+    elif (flat(x) and equal(34,car(x))):
+        return Nprint(x,True)
+    elif True:
+        dec=10
+        printc(40)
+        while x:
+            if atom(x):
+                printc(46)
+                printc(32)
+                Nprint(x)
+                x=nil
+            elif (dec < 0):
+                Nprint("&")
+            elif atom(car(x)):
+                Nprint(car(x))
+                if cdr(x):
+                    printc(32)
+            elif (1 < depthless(dec,car(x))):
+                Nprint(car(x))
+            elif True:
+                Nprint("&")
+                printc(32)
+            dec=(dec + -3)
+            gensym8=car(x)
+            x=cdr(x)
+            gensym8
+        return printc(41)
+
+eeprint25=gensym7
+
 loadlisp("bootpy.lsp")
 loadlisp("editor.lsp")
+lsp("(setq eeprint251 eeprint25)")
 lsp("(compile-edit)")
+defq('eeprint25','lambda x: eeprint25(Neval(car(x)),Neval(cadr(x)))')
+
+
 lsp("(setq MODULE 'NEW)")
 
 

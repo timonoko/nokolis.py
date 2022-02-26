@@ -1,20 +1,6 @@
 
 (progn
-
-
-(defun set_cursor
- (v h)
- (print
-  (compress
-   (backquote 27 91 @ (explode v) 59 @ (explode h) 72))))
-
-(defq erase_page (progn (repeat-times 10000 (sp)) (home)))
-
-(defq home (set_cursor 0 0))
-
-
-
-  (defq MODULE EDITOR)
+ (defq MODULE EDITOR)
  (defq compile-edit (lambda () (map compile '(depthless eeprint25 eeprint locate))))
  (defq
   edit
@@ -62,14 +48,18 @@
     (if
      (member x y)
      (list (sub1 (length (member x (reverse y)))))
-     (let
-      ((z 0) (z2))
-      (while
-       (and y (not z2))
-       (if
-        (not (setq z2 (locate x (pop y))))
-        (setq z (add1 z))))
-      (if z2 (cons z z2)))))))
+     ((function
+       (lambda
+        (z z2)
+        (while
+         (and y (not z2))
+         (if
+          (setq z2 (locate x (prog1 (car y) (setq y (cdr y)))))
+          ()
+          (setq z (add1 z))))
+        (if z2 (cons z z2))))
+      0
+      ())))))
  (defq
   depthless
   (lambda
@@ -81,51 +71,6 @@
      (atom x)
      (- n 1)
      (depthless (depthless n (car x)) (cdr x))))))
- (defq
-  eeprint25
-  (lambda
-   (x)
-   (printc 9)
-   (cond
-    ((numberp x)
-     (print x)
-     (printc 9)
-     (if (< 32 x 256) (print (compress (list x)))))
-    ((atom x) (print x))
-    ((arrayp x) (print x))
-    ((and (flat x) (equal 34 (car x))) (print x True))
-    (t
-     (let
-      ((dec 10))
-      (printc 40)
-      (while
-       (and x (lessp (tab) 60))
-       (cond
-        ((atom x) (printc 46) (sp) (print x) (setq x nil))
-        ((lessp dec 0) (print '&))
-        ((atom (car x)) (print (car x)) (if (cdr x) (sp)))
-        ((< 1 (depthless dec (car x))) (print (car x)))
-        (t (print '&) (sp)))
-       (setq dec (plus dec -3))
-       (pop x))
-      (printc 41))))
-   (hex nil)))
- (defq
-  eeprint
-  (lambda
-   (x)
-   (erase_page)
-   (printc 40)
-   (repeat-times 40 (sp))
-   (print THISNAME)
-   (sp)
-   (print MODULE)
-   (cr)
-   (for
-    (p 0 39)
-    (when (nthcdr p x) (eeprint25 (nth p x)) (cr)))
-   (printc 41)))
-
  (defq
   nedit
   (lambda
@@ -147,11 +92,21 @@
      (progn
       (set_cursor 2 1)
       (progn
-       (repeat-times (length x) (sp) (sp) (sp) (sp) (sp) (sp) (cr))
+       (repeat-times
+        (length x)
+        (sp)
+        (sp)
+        (sp)
+        (sp)
+        (sp)
+        (sp)
+        (cr))
        (printc 41)
        (sp)
        (sp)
-       (sp) (sp) (sp))
+       (sp)
+       (sp)
+       (sp))
       (set_cursor (+ v 2) 3)
       (print '===>)
       (repeat-times (- (+ 1 (length x)) v) (cr))
@@ -320,5 +275,58 @@
       (readcc)
       (eeprint x))))
    x))
-
- (defq EDITOR (compile-edit edit eeinsert locate depthless nedit eeprint25 eeprint set_cursor erase_page  home EDITOR)))
+ (defq
+  eeprint25
+  (lambda
+   (x dec)
+   (printc 9)
+   (cond
+    ((numberp x)
+     (print x)
+     (printc 9)
+     (if (< 32 x 256) (print (compress (list x)))))
+    ((atom x) (print x))
+    ((arrayp x) (print x))
+    ((and (flat x) (equal 34 (car x))) (print x True))
+    (t
+     (setq dec 10)
+     (printc 40)
+     (while
+       x 
+      (cond
+       ((atom x) (printc 46) (sp) (print x) (setq x nil))
+       ((lessp dec 0) (print '&))
+       ((atom (car x)) (print (car x)) (if (cdr x) (sp)))
+       ((< 1 (depthless dec (car x))) (print (car x)))
+       (t (print '&) (sp)))
+      (setq dec (plus dec -3))
+      (pop x))
+     (printc 41)))))
+ (defq
+  eeprint
+  (lambda
+   (x)
+   (erase_page)
+   (printc 40)
+   (repeat-times 40 (sp))
+   (print THISNAME)
+   (sp)
+   (print MODULE)
+   (cr)
+   ((function
+     (lambda
+      (p)
+      (repeat-times
+       (quotient (difference (plus 39 1) 0) 1)
+       (if (nthcdr p x) (progn (eeprint25 (nth p x)) (cr)))
+       (setq p (plus p 1)))))
+    0)
+   (printc 41)))
+ (defq
+  set_cursor
+  (lambda
+   (v h)
+   (print (compress (backquote 27 91 @ (explode v) 59 @ (explode h) 72)))))
+ (defq erase_page (progn (repeat-times 10000 (sp)) (home)))
+ (defq home (set_cursor 0 0))
+ (defq EDITOR (compile-edit edit eeinsert locate depthless nedit eeprint25 eeprint set_cursor erase_page home EDITOR)))
