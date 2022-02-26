@@ -322,7 +322,7 @@ def Nlambda(vars,args,y):
     restore_vars(vars)
     return tulos
 
-def Nmacroexpand(vars,args,y):
+def Nexpand(vars,args,y):
     z=args
     save_vars(vars)
     assign_vars(vars,z)
@@ -331,7 +331,7 @@ def Nmacroexpand(vars,args,y):
     return tulos
 
 def Nmacro(vars,args,y):
-    return Neval(Nmacroexpand(vars,args,y))
+    return Neval(Nexpand(vars,args,y))
 
 def Nif(x,y,z):
     if Neval(x)!=[]:
@@ -376,22 +376,22 @@ def Nrepeat_times(x,y):
         x=x-1
     return z
 
-def Nrplaca(x,y):
+def rplaca(x,y):
     x[0]=y
     return x
 
-def Nrplacd(x2,y2):
+def rplacd(x2,y2):
     x2[1]=y2
     return x2
 
-def Nlast(x):
+def last(x):
     if cdr(x)==[]:
         return x
     else:
-        return Nlast(cdr(x))
+        return last(cdr(x))
 
 def nconc(x,y):
-    Nrplacd(Nlast(x),y)
+    rplacd(last(x),y)
     return x
 
 def Nnot(x):
@@ -509,8 +509,8 @@ defq('progn', 'lambda x: Nprogn(x)')
 defq('prog1', 'lambda x: Nprog1(x)')
 defq('macro', 'lambda x: Nmacro(car(car(x)),oblist.args[-1],cdr(x))')
 defq('mlambda', 'lambda x: Nmacro(car(x),oblist.args[-1],cdr(x))')
-defq('macrotest', 'lambda x: Nmacroexpand(car(car(x)),oblist.args[-1],cdr(x))')
-defq('nlambda', 'lambda x: Nmacroexpand(car(x),oblist.args[-1],cdr(x))')
+defq('macrotest', 'lambda x: Nexpand(car(car(x)),oblist.args[-1],cdr(x))')
+defq('nlambda', 'lambda x: Nexpand(car(x),oblist.args[-1],cdr(x))')
 defq('if', 'lambda x: Nif(car(x),cadr(x),caddr(x))')
 defq('and', 'lambda x: Nand(x)')
 defq('or', 'lambda x: Nor(x)')
@@ -522,9 +522,9 @@ defq('while', 'lambda x: Nwhile(car(x),cdr(x))')
 defq('eval', 'lambda x: Neval(Neval(car(x)))')
 defq('repeat-times', 'lambda x: Nrepeat_times(Neval(car(x)),cdr(x))')
 defq('read', 'lambda x: parse(input("> "))')
-defq('rplaca', 'lambda x: Nrplaca(Neval(car(x)),Neval(cadr(x)))')
-defq('rplacd', 'lambda x: Nrplacd(Neval(car(x)),Neval(cadr(x)))')
-defq('last', 'lambda x: Nlast(Neval(car(x)))')
+defq('rplaca', 'lambda x: rplaca(Neval(car(x)),Neval(cadr(x)))')
+defq('rplacd', 'lambda x: rplacd(Neval(car(x)),Neval(cadr(x)))')
+defq('last', 'lambda x: last(Neval(car(x)))')
 defq('nconc', 'lambda x: nconc(Neval(car(x)),Neval(cadr(x)))')
 defq('identp', 'lambda x: Ntest(identp(Neval(car(x))))')
 defq('type', 'lambda x: str(type(Neval(car(x))))')

@@ -75,6 +75,7 @@
   nedit
   (lambda
    (x dept goto exit v)
+   (setq x (copy x))
    (setq vasen-sulku (compress (list 40)))
    (if (null x) (setq x (list 'tyhja)))
    (if goto (setq v (pop goto)))
@@ -113,13 +114,15 @@
       (repeat-times 60 (print '-))
       (cr)
       (setq ch (readcc))
+      (if (member ch '(111 40 13 32)) (setq ch 110))
       (if (eqn ch 27) (setq ch (readcc)))
       (if
        (member ch '(0 91))
        (setq ch (plus 200 (readcc)))
        (setq ch (compress (list ch))))))
-    (cond
-     ((equal ch 6)
+    (case
+     ch
+     (6
       (print goto)
       (if
        (atom THIS)
@@ -127,12 +130,11 @@
        (rplaca (nthcdr v x) (nedit THIS (add1 dept) goto)))
       (setq goto nil)
       (eeprint x))
-     ((member ch '(275 268)) (setq exit t))
-     ((member ch '(280 266))
+     ((275 268) (setq exit t))
+     ((280 266)
       (if (lessp v (length x)) (setq v (plus v 1))))
-     ((member ch '(272 265))
-      (if (greaterp v 0) (setq v (plus v -1))))
-     ((member ch '(277 267))
+     ((272 265) (if (greaterp v 0) (setq v (plus v -1))))
+     ((277 267)
       (if
        (and (atom THIS) (not (identp THIS)))
        ()
@@ -147,20 +149,18 @@
           (nedit (nth v x))
           ()))))
       (unless EXIT (eeprint x)))
-     ((or (eq ch 'n) (eq ch vasen-sulku))
-      (setq x (eeinsert v x))
-      (eeprint x))
-     ((eq ch 'y)
+     (n (setq x (eeinsert v x)) (eeprint x))
+     (y
       (push THIS JEMMA)
       (if
        (eqn v 0)
        (setq x (cdr x))
        (rplacd (nthcdr (- v 1) x) (nthcdr (+ v 1) x)))
       (eeprint x))
-     ((eq ch 'q)
+     (q
       (rplaca (nthcdr v x) (list 'quote (nth v x)))
       (eeprint x))
-     ((eq ch 'r)
+     (r
       (if
        (eqn v 0)
        (setq x (append (nth v x) (nthcdr (plus v 1) x)))
@@ -168,10 +168,8 @@
         (nthcdr (plus v -1) x)
         (append (nth v x) (nthcdr (plus v 1) x))))
       (eeprint x))
-     ((eq ch 'a)
-      (rplaca (nthcdr v x) (list (nth v x)))
-      (eeprint x))
-     ((eq ch 'b)
+     (a (rplaca (nthcdr v x) (list (nth v x))) (eeprint x))
+     (b
       (if
        (eqn v 0)
        (setq x (cons (copy (car x)) x))
@@ -179,7 +177,7 @@
         (nthcdr (- v 1) x)
         (cons (copy (nth v x)) (nthcdr v x))))
       (eeprint x))
-     ((eq ch 'w)
+     (w
       (if
        (eqn v 0)
        (setq x (cons (list (car x) (cadr x)) (cddr x)))
@@ -189,34 +187,21 @@
          (list (nth v x) (nth (plus v 1) x))
          (nthcdr (plus v 2) x))))
       (eeprint x))
-     ((eq ch 'p)
-      (erase_page)
-      (cr)
-      (pprint x 1 True)
-      (cr)
-      (readcc)
-      (eeprint x))
-     ((eq ch 'l)
-      (set_cursor 25 1)
+     (p (erase_page) (cr) (pprint x 1 True) (cr) (readcc) (eeprint x))
+     (l
       (print 'locate:)
       (if (setq goto (locate (read) x)) (setq v (pop goto)))
       (eeprint x))
-     ((eq ch '+)
-      (setq x (eeinsert v x (copy (pop JEMMA))))
-      (eeprint x))
-     ((eq ch 'e)
-      (set_cursor 25 1)
-      (print 'EVAL:)
-      (eeinsert v x (eval (read)))
-      (eeprint x))
-     ((eq ch '-) (setq EXIT t))
-     ((eq ch 'z)
+     (+ (setq x (eeinsert v x (copy (pop JEMMA)))) (eeprint x))
+     (e (print 'EVAL:) (eeinsert v x (eval (read))) (eeprint x))
+     (- (setq EXIT t))
+     (z
       (if
        (and (identp THIS) (not (equal (type (eval THIS)) (type car))))
        (eval (list 'edit THIS)))
       (setq EXIT nil)
       (eeprint x))
-     ((eq ch 'c)
+     (c
       (if
        (atom THIS)
        ()
@@ -229,25 +214,22 @@
           (append (nth v x) (list (nth (plus v 1) x)))
           (nthcdr (plus v 2) x)))))
       (eeprint x))
-     ((eq ch 'v)
+     (v
       (setq ch (nth v x))
       (rplaca (nthcdr v x) (car (nthcdr (add1 v) x)))
       (rplaca (nthcdr (add1 v) x) ch)
       (setq v (add1 v))
       (eeprint x))
-     ((eq ch 'f) (eeprint x))
-     ((eq ch 'k) (setq x (copy x)) (eeprint x))
-     ((eq ch 's)
-      (set_curso 25 1)
+     (f (eeprint x))
+     (k (setq x (copy x)) (eeprint x))
+     (s
       (print 'SUBST:)
       (setq eka (read))
       (print 'WITH:)
       (setq toka (read))
       (setq x (subst eka toka x))
       (eeprint x))
-     ((eq ch 'm)
-      (setq x (eeinsert v x (explode (read-str))))
-      (eeprint x))
+     (m (setq x (eeinsert v x (explode (read-str)))) (eeprint x))
      (t
       (erase_page)
       (pprint
@@ -292,7 +274,7 @@
      (setq dec 10)
      (printc 40)
      (while
-       x 
+      x
       (cond
        ((atom x) (printc 46) (sp) (print x) (setq x nil))
        ((lessp dec 0) (print '&))
