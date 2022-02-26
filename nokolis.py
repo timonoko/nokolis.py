@@ -43,9 +43,10 @@ def repl():
         print('')
   except Exception as ex:
     print("Error:",ex)
-    print("TRACE=",oblist.func)
-    print("(quit)?")
-    oblist._id_TRACE=(oblist.func)
+    print("Stack=",end=""),
+    Nprint(array2list(oblist.func))
+    print(""),
+    oblist._id_TRACE=oblist.func
     repl()
 
 import readline
@@ -230,6 +231,11 @@ def value_of(x):
 
    
 def Nset(x,y):
+    if x==[]:
+        return y
+    if not identp(x) or x in ['nil',"NIL",'t','T','True','False']:
+        print("CANT ASSIGN:",x,"=",y)
+        return(y)
     x2=oblist_name(x)
     if identp(y):
        try:
@@ -384,7 +390,7 @@ def Nlast(x):
     else:
         return Nlast(cdr(x))
 
-def Nnconc(x,y):
+def nconc(x,y):
     Nrplacd(Nlast(x),y)
     return x
 
@@ -519,7 +525,7 @@ defq('read', 'lambda x: parse(input("> "))')
 defq('rplaca', 'lambda x: Nrplaca(Neval(car(x)),Neval(cadr(x)))')
 defq('rplacd', 'lambda x: Nrplacd(Neval(car(x)),Neval(cadr(x)))')
 defq('last', 'lambda x: Nlast(Neval(car(x)))')
-defq('nconc', 'lambda x: Nnconc(Neval(car(x)),Neval(cadr(x)))')
+defq('nconc', 'lambda x: nconc(Neval(car(x)),Neval(cadr(x)))')
 defq('identp', 'lambda x: Ntest(identp(Neval(car(x))))')
 defq('type', 'lambda x: str(type(Neval(car(x))))')
 defq('str-raw', 'lambda x: str(Neval(car(x)))')
@@ -1025,7 +1031,14 @@ def blockq2(XYPY):
         return cons("cons",cons(blockq2(car(XYPY)),cons(blockq2(cdr(XYPY)),[])))
 lsp("(defmacro backquote ZYKSX (blockq3 ZYKSX))")
 
-def gensym7(x,dec):
+def reverse(x):
+    if cdr(x):
+        return nconc(reverse(cdr(x)),cons(car(x),[]))
+    else:
+        return cons(car(x),[])
+defq('reverse','lambda x: reverse(Neval(car(x)))')
+
+def eeprint25(x,dec):
     printc(9)
     if numberp(x):
         Nprint(x)
@@ -1063,8 +1076,6 @@ def gensym7(x,dec):
             x=cdr(x)
             gensym8
         return printc(41)
-
-eeprint25=gensym7
 
 loadlisp("bootpy.lsp")
 loadlisp("editor.lsp")
