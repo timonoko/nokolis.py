@@ -23,14 +23,15 @@ class oblist:
     _id_NIL=[]
     
 
-def repl():
+def repl(n=0):
   quit=False
   try:
     while not quit:
         oblist.func=[]
         oblist.args=[]
-        oblist.jemma=[]
-        rivi=input(">> ")
+        e=""
+        if n>0: e="Error:"
+        rivi=input(f"{e}{n}> ")
         if rivi=="":
             pass
         elif rivi=="quit":
@@ -47,7 +48,10 @@ def repl():
     Nprint(array2list(oblist.func))
     print(""),
     oblist._id_TRACE=oblist.func
-    repl()
+    print('Error environment until "quit"')
+    repl(n+1)
+    unwind_jemma(oblist.jemma,len(oblist.jemma))
+    repl(n)
 
 import readline
 readline.parse_and_bind("tab: complete")
@@ -282,8 +286,9 @@ def numberp(x):
 def save_vars(x):
     if atom(x):
         if identp(x):
-            try: oblist.jemma.append(eval(oblist_name(x)))
-            except: oblist.jemma.append([])
+            y=oblist_name(x)
+            try: oblist.jemma.append([x,eval(y)])
+            except: oblist.jemma.append([x,[]])
     else:
         save_vars(car(x))
         save_vars(cdr(x))
@@ -291,10 +296,16 @@ def save_vars(x):
 def restore_vars(x):
     if atom(x):
         if identp(x):
-            exec(f'{oblist_name(x)}=oblist.jemma.pop()')
+            Nset(x,oblist.jemma.pop()[1])
     else:
         restore_vars(cdr(x))
         restore_vars(car(x))
+
+def unwind_jemma(alku,maara):
+    for x in range(0,maara):
+        yksi=alku.pop()
+        Nset(yksi[0],yksi[1])
+    alku
 
 def assign_vars(x,y):
     if atom(x):
@@ -558,9 +569,11 @@ def throw(name,data):
 
 defq('catch', 'lambda x: catch(Neval(car(x)),cadr(x))' )
 def catch(name,data):
+    jemma=len(oblist.jemma)
     try:
        return Neval(data) 
     except Exception as inst:
+        oblist.jemma=unwind_jemma(oblist.jemma,len(oblist.jemma)-jemma)
         name2,data2 = inst.args     # unpack args
         if name==name2:
             return data2
