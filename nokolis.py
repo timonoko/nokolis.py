@@ -13,7 +13,7 @@ NIL=[]
 class oblist:
     func=[]
     args=[]
-    jemma=[]
+    enviro=[]
     names=[]
     _id_True=True
     _id_False=False
@@ -50,7 +50,7 @@ def repl(n=0):
     oblist._id_TRACE=oblist.func
     print('Error environment until "quit"')
     repl(n+1)
-    unwind_jemma(oblist.jemma,len(oblist.jemma))
+    unwind_enviro(oblist.enviro,len(oblist.enviro))
     repl(n)
 
 import readline
@@ -287,8 +287,8 @@ def save_vars(x):
     if atom(x):
         if identp(x):
             y=oblist_name(x)
-            try: oblist.jemma.append([x,eval(y)])
-            except: oblist.jemma.append([x,[]])
+            try: oblist.enviro.append([x,eval(y)])
+            except: oblist.enviro.append([x,[]])
     else:
         save_vars(car(x))
         save_vars(cdr(x))
@@ -296,12 +296,12 @@ def save_vars(x):
 def restore_vars(x):
     if atom(x):
         if identp(x):
-            Nset(x,oblist.jemma.pop()[1])
+            Nset(x,oblist.enviro.pop()[1])
     else:
         restore_vars(cdr(x))
         restore_vars(car(x))
 
-def unwind_jemma(alku,maara):
+def unwind_enviro(alku,maara):
     for x in range(0,maara):
         yksi=alku.pop()
         Nset(yksi[0],yksi[1])
@@ -569,11 +569,11 @@ def throw(name,data):
 
 defq('catch', 'lambda x: catch(Neval(car(x)),cadr(x))' )
 def catch(name,data):
-    jemma=len(oblist.jemma)
+    enviro=len(oblist.enviro)
     try:
        return Neval(data) 
     except Exception as inst:
-        oblist.jemma=unwind_jemma(oblist.jemma,len(oblist.jemma)-jemma)
+        oblist.enviro=unwind_enviro(oblist.enviro,len(oblist.enviro)-enviro)
         name2,data2 = inst.args     # unpack args
         if name==name2:
             return data2
