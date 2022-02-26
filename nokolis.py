@@ -21,15 +21,15 @@ class oblist:
     _id_T="T"
     _id_nil=[]
     _id_NIL=[]
-
+    
 
 def repl():
-  oblist.func=[]
-  oblist.args=[]
-  oblist.jemma=[]
   quit=False
   try:
     while not quit:
+        oblist.func=[]
+        oblist.args=[]
+        oblist.jemma=[]
         rivi=input(">> ")
         if rivi=="":
             pass
@@ -550,6 +550,17 @@ defq('printc', 'lambda x: print(chr(Neval(car(x))),end="")')
 defq('readcc', 'lambda x: ord(readcc())')
 defq('read-from-str', 'lambda x: parse(Neval(car(x)))')
 
+defq('throw', 'lambda x: throw(Neval(car(x)))')
+def throw(x):
+      raise Exception(x)
+
+defq('catch', 'lambda x: catch(car(x))' )
+def catch(x):
+    try:
+       return Neval(x) 
+    except Exception as inst:
+        y = inst.args     # unpack args
+        return  y[0]   
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
@@ -1019,9 +1030,9 @@ defq('blockq3','lambda x: blockq2(Neval(car(x)))')
 def blockq2(XYPY):
     if atom(XYPY):
         return XYPY
-    elif (car(XYPY) is ","):
+    elif (car(XYPY) == ","):
         return cons("cons",cons(cadr(XYPY),cons(blockq2(cddr(XYPY)),[])))
-    elif (car(XYPY) is "@"):
+    elif (car(XYPY) == "@"):
         return cons("append",cons(cadr(XYPY),cons(blockq2(cddr(XYPY)),[])))
     elif equal(car(XYPY),"QUOTE"):
         return cons("cons",cons(cons("list",cons(['quote', ['quote', []]],cons(cadr(XYPY),[]))),cons(blockq2(cddr(XYPY)),[])))
