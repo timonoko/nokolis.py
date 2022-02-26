@@ -218,7 +218,9 @@ def Neval(x):
     else:
         oblist.func.append(car(x))
         oblist.args.append(cdr(x))
-        retu=Neval(Neval(car(x)))
+        eka=Neval(car(x))
+        if eka==[]: print(f'Error: {car(x)} == [] ')
+        retu=Neval(eka)
         oblist.func.pop()
         return retu
     
@@ -550,17 +552,21 @@ defq('printc', 'lambda x: print(chr(Neval(car(x))),end="")')
 defq('readcc', 'lambda x: ord(readcc())')
 defq('read-from-str', 'lambda x: parse(Neval(car(x)))')
 
-defq('throw', 'lambda x: throw(Neval(car(x)))')
-def throw(x):
-      raise Exception(x)
+defq('throw', 'lambda x: throw(Neval(car(x)),Neval(cadr(x)))')
+def throw(name,data):
+      raise Exception(name,data)
 
-defq('catch', 'lambda x: catch(car(x))' )
-def catch(x):
+defq('catch', 'lambda x: catch(Neval(car(x)),cadr(x))' )
+def catch(name,data):
     try:
-       return Neval(x) 
+       return Neval(data) 
     except Exception as inst:
-        y = inst.args     # unpack args
-        return  y[0]   
+        name2,data2 = inst.args     # unpack args
+        if name==name2:
+            return data2
+        else:
+            throw(name2,data2)
+            
 
 lsp(""" (progn
  (defq defun (macro (x) (list 'defq (car x) (cons 'lambda (cdr x)))))
