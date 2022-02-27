@@ -595,15 +595,25 @@ lsp(""" (progn
  (defun cadddr (x) (car (cdddr x)))
  (defun caar (x) (car (car x))) 
 
- (defun arith-macroes ((x y . z) ope)
-         (if z 
-           (list ope (list ope x y) (arith-macroes z ope))
-           (if y (list ope x y) x)))
- (defnacro + (x) (arith-macroes x 'plus))
- (defnacro * (x) (arith-macroes x 'times))
- 
- (defmacro / (x y) (list 'quotient x y))
- (defmacro - (x y) (list 'difference x y))
+
+ (defq
+  amacro
+  (lambda
+   (x ope)
+   (if
+    (cdr x)
+    (let
+     ((toka (amacro (cdr x) ope)))
+     (if
+      (and (numberp (car x)) (numberp toka))
+      (eval (list ope (car x) toka))
+      (list ope (car x) toka)))
+    (car x))))
+ (defnacro + (x) (amacro x 'plus))
+ (defnacro * (x) (amacro x 'times))
+ (defnacro / (x) (amacro x 'quotient))
+ (defnacro - (x) (amacro x 'difference))
+
 
  (defun comp-macroes ((x y . z) ope)
          (if z 
@@ -749,7 +759,8 @@ lsp(""" (progn
 
 (setq null not)
 
-(defun numberp(x) (equal (type x) (type 1)))
+(defun numberp(x) (or (equal (type x) (type 1))
+                      (equal (type x) (type 1.1))))
 
 (defun getchar (x n) (nth (difference n 1) (explode x)))
 
@@ -1043,7 +1054,7 @@ defq('mapcpy','lambda x: mapcpy(eval(car(x)),Neval(cadr(x)))')
 
 def apppy(f,x):return f(x)
 defq('apppy','lambda x: apppy(eval(car(x)),Neval(cadr(x)))')  
-lsp("(defmacro apply (f x) (list f x))")
+lsp("(defmacro apply (f x) (cons f x))")
 
 defq('blockq3','lambda x: blockq2(Neval(car(x)))')
 def blockq2(XYPY):

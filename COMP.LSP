@@ -1,6 +1,61 @@
 
 (progn
  (defq MODULE COMP)
+ (defq pnice (nlambda (x) (print (compress (cdr x)))))
+ (defq PYTHON (fib))
+ (defq
+  save-py
+  (lambda
+   (m)
+   (if (null m) (setq m MODULE))
+   (with-out-file
+    (quote TEMPORARY.PY)
+    (quote
+     (progn
+      (progn
+       (pnice (34 108 115 112 40 34 34 34))
+       (cr)
+       (pprint
+        (cons
+         (quote progn)
+         (cons
+          (list 'defq 'MODULE m)
+          (mapp
+           (quote
+            (lambda
+             (x)
+             (if (assoc x _COMPILED_) (uncompile x))
+             (list 'defq x (eval x))))
+           (eval m)))))
+       (cr)
+       (pnice (34 34 34 34 41)))
+      (progn
+       (compile 'comp2)
+       (mapc
+        (function
+         (lambda (x) (cr) (uncompile 'x) (comp x 0) (cr)))
+        PYTHON))
+      (print (compress (cdr '(34 114 101 112 108 40 41))))
+      (cr))))
+   (with-out-file
+    (compress (append (explode m) '(46 98 117 105 108 100)))
+    (quote
+     (progn
+      (print 'cat)
+      (sp)
+      (print 'nokolis.py)
+      (sp)
+      (print 'TEMPORARY.PY)
+      (sp)
+      (print '>)
+      (sp)
+      (print (setq py-file (compress (append (explode m) '(46 112 121)))))
+      (cr)
+      (print 'python3)
+      (sp)
+      (print py-file)
+      (cr))))
+   (list m 'saved)))
  (defq
   esimerkki_copy
   (lambda
@@ -27,28 +82,27 @@
  (defq
   link-str
   (lambda
-   (x y pr)
+   (x y)
    (setq y (eval x))
-   (defq pr (nlambda (x) (print (compress (cdr x)))))
-   (pr (34 100 101 102 113 40 39))
+   (pnice (34 100 101 102 113 40 39))
    (print x)
-   (pr (34 39 44 39 108 97 109 98 100 97 32 120 58 32))
+   (pnice (34 39 44 39 108 97 109 98 100 97 32 120 58 32))
    (print x)
    (printc 40)
    (if
     (car (cadr y))
-    (pr (34 78 101 118 97 108 40 99 97 114 40 120 41 41)))
+    (pnice (34 78 101 118 97 108 40 99 97 114 40 120 41 41)))
    (if
     (cdr (cadr y))
-    (pr
+    (pnice
      (34 , 78 101 118 97 108 40 99 97 d
       114 40 120 41 41)))
    (if
     (cddr (cadr y))
-    (pr
+    (pnice
      (34 , 78 101 118 97 108 40 99 97 d
       d 114 40 120 41 41)))
-   (pr (34 41 39 41))
+   (pnice (34 41 39 41))
    True))
  (defq
   comment-on-compiler
@@ -58,7 +112,7 @@
    cannot assign from SETQ or IF , and OR works only
    in expressions. LET seems to generate LAMBDA and GENSYM-named function ,
    but that is avoidable))
- (defq expand4ever (lambda (x) (do-lambda (macroexpand (ch-name x)) 0)))
+ (defq expand4ever (lambda (x) (do-lambda (macroexpand (ch-name x)) tabs)))
  (defq
   CH-NAME
   ((foreach python-foreach)
@@ -136,29 +190,12 @@
  (defq
   comp
   (lambda
-   (x file)
+   (x tabs)
    (setq LAMBDA-ARGS nil)
    (setq z (if (identp x) (list 'setq x (eval x)) x))
-   (if
-    file
-    (with-out-file
-     file
-     (function
-      (lambda
-       ()
-       (print
-        (compress
-         (cdr
-          (quote
-           (34 102 114 111 109 32 110 111 107 111 108
-            105 115 32 105 109 112 111 114 116 32 42)))))
-       (cr)
-       (comp2 (expand4ever z) 0)
-       (cr)
-       (link-str x)
-       (cr))))
-    (comp2 (expand4ever z)))
+   (comp2 (expand4ever z) tabs)
    (cr)
+   (when (identp x) (link-str x) (cr) (cr))
    file))
  (defq
   comp-progn
@@ -188,8 +225,8 @@
      (progn (print (pop x)) (if x (print ',)) (lambda-args x))))))
  (defq
   COMP
-  (esimerkki_copy esimerkki ch-name want_value STATEMENTS link-str comment-on-compiler expand4ever CH-NAME COMP-MACROS do-lambda
-   comp-lambda comp comp-progn lambda-args COMP comp2))
+  (pnice PYTHON save-py esimerkki_copy esimerkki ch-name want_value STATEMENTS link-str comment-on-compiler expand4ever
+   CH-NAME COMP-MACROS do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
  (defq
   comp2
   (lambda
