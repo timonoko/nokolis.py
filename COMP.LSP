@@ -132,7 +132,8 @@
  (defq expand4ever (lambda (x) (do-lambda (macroexpand (ch-name x)) tabs)))
  (defq
   CH-NAME
-  ((foreach python-foreach)
+  ((let python-let)
+   (foreach python-foreach)
    (for python_for)
    (eval Neval)
    (mapp mappy)
@@ -202,7 +203,6 @@
      (+ tabs 4)
      (quote return))
     (cr)
-    (cr)
     name)))
  (defq
   comp
@@ -218,6 +218,7 @@
   comp-progn
   (lambda
    (x tabs return)
+   (push x CP)
    (unless (member (caar x) '(setq progn prog1)) (cr) (tab tabs))
    (when
     (and
@@ -225,7 +226,9 @@
      x
      (not (cdr x))
      (not
-      (member (caar x) '(foreach elif python-foreach python_for for setq progn if while prog1))))
+      (member
+       (caar x)
+       '(python-let return foreach elif python-foreach python_for for setq progn if while prog1))))
     (print 'return)
     (sp))
    (comp2 (car x) tabs (unless (cdr x) return))
@@ -397,6 +400,11 @@
         (printc 41)
         (print ':)
         (comp-progn (macroexpand (cddr x)) (+ 4 tabs)))
+       (python-let
+        (mapc
+         (function (lambda (x) (comp2 (cons 'setq x) tabs)))
+         (cadr x))
+        (comp-progn (cddr x) tabs return))
        (lambda (print '(mita paskaa)))
        (t
         (print
