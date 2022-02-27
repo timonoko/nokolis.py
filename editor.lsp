@@ -6,7 +6,7 @@
   edit
   (nlambda
    (THISNAME)
-   (if (assoc THISNAME *COMPILED*) (uncompile THISNAME))
+   (uncompile THISNAME)
    (setq EXIT ())
    (when
     (identp THISNAME)

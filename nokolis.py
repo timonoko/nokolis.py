@@ -16,7 +16,7 @@ class oblist:
     enviro=[]
     names=[]
     _id_True=True
-    _id_False=False
+    _id_False=[]
     _id_t="t"
     _id_T="T"
     _id_nil=[]
@@ -602,17 +602,16 @@ lsp(""" (progn
    (x ope)
    (if
     (cdr x)
-    (let
-     ((toka (amacro (cdr x) ope)))
-     (if
-      (and (numberp (car x)) (numberp toka))
-      (eval (list ope (car x) toka))
-      (list ope (car x) toka)))
+    (list ope (car x)
+        (amacro (cdr x)
+          (case ope (difference 'plus) (quotient 'times) (t ope))))
     (car x))))
+
  (defnacro + (x) (amacro x 'plus))
  (defnacro * (x) (amacro x 'times))
  (defnacro / (x) (amacro x 'quotient))
  (defnacro - (x) (amacro x 'difference))
+ (defnacro % (x) (amacro x 'remainder))
 
 
  (defun comp-macroes ((x y . z) ope)
@@ -1120,8 +1119,12 @@ def eeprint25(x,dec):
 
 loadlisp("bootpy.lsp")
 loadlisp("editor.lsp")
+loadlisp("COMP.LSP")
+lsp("(compile 'comp2)")
+
 lsp("(setq eeprint251 eeprint25)")
 lsp("(compile-edit)")
+
 defq('eeprint25','lambda x: eeprint25(Neval(car(x)),Neval(cadr(x)))')
 
 

@@ -1,8 +1,14 @@
 
 (progn
  (defq MODULE COMP)
+ (defq
+  do-globals
+  (lambda (x) (print (if (member x GLOBALS) (full-oblist-name x) x))))
+ (defq
+  full-oblist-name
+  (lambda (x) (compress (nconc (explode 'oblist.) (explode (oblist-name-raw x))))))
  (defq pnice (nlambda (x) (print (compress (cdr x)))))
- (defq PYTHON (fib))
+ (defq PYTHON (- fib))
  (defq
   save-py
   (lambda
@@ -33,7 +39,18 @@
        (compile 'comp2)
        (mapc
         (function
-         (lambda (x) (cr) (uncompile 'x) (comp x 0) (cr)))
+         (lambda
+          (x)
+          (if
+           (equal 'lambda (car (eval x)))
+           (progn (cr) (uncompile 'x) (comp x 0) (cr))
+           (let
+            ((nam (nconc (explode 'oblist.) (oblist-name-raw x))))
+            (push x GLOBALS)
+            (comp2
+             (list 'setq (full-oblist-name x) (list 'quote (eval x)))
+             0)
+            (cr)))))
         PYTHON))
       (print (compress (cdr '(34 114 101 112 108 40 41))))
       (cr))))
@@ -225,8 +242,8 @@
      (progn (print (pop x)) (if x (print ',)) (lambda-args x))))))
  (defq
   COMP
-  (pnice PYTHON save-py esimerkki_copy esimerkki ch-name want_value STATEMENTS link-str comment-on-compiler expand4ever
-   CH-NAME COMP-MACROS do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
+  (do-globals full-oblist-name pnice PYTHON save-py esimerkki_copy esimerkki ch-name want_value STATEMENTS link-str
+   comment-on-compiler expand4ever CH-NAME COMP-MACROS do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
  (defq
   comp2
   (lambda
@@ -237,7 +254,7 @@
     (setq x (cons (cadr (assoc (car x) CH-NAME)) (cdr x))))
    (cond
     ((numberp x) (print x))
-    ((identp x) (print x))
+    ((identp x) (do-globals x))
     ((atom x) (printc 91) (printc 93))
     ((identp (car x))
      (if
@@ -260,7 +277,7 @@
          (progn
           (cr)
           (tab tabs)
-          (print (cadr x))
+          (do-globals (cadr x))
           (print '=)
           (comp2 (caddr x) (+ 4 tabs))
           (car x))))
@@ -270,7 +287,7 @@
          ((numberp (cadr x)) (print (cadr x)))
          ((identp (cadr x)) (printc 34) (print (cadr x)) (printc 34))
          (t (print (str-raw (cadr x))))))
-       ((eq eqn plus difference times greaterp lessp quotient)
+       ((eq eqn plus difference times greaterp lessp quotient remainder)
         (printc 40)
         (comp2 (cadr x) tabs)
         (printc 32)
@@ -286,6 +303,7 @@
              (times *)
              (greaterp >)
              (lessp <)
+             (remainder %)
              (quotient /))))))
         (printc 32)
         (comp2 (caddr x) tabs)
