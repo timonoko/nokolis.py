@@ -9,11 +9,8 @@ But I made real Lisp lists:
 
 -----
 Lambda does now (catch 'return) and "return" == (throw 'return).
-
 Very pythonic:
-
 (defun k (x)
-
      (if (= x 13) (return 'bad))
      (if (= x 14) (return 'good))
      'neutral))
