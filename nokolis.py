@@ -50,7 +50,10 @@ def repl(n=0):
     oblist._id_TRACE=oblist.func
     print('Error environment until "quit"')
     repl(n+1)
-    unwind_enviro(oblist.enviro,len(oblist.enviro))
+    try:
+        oblist.enviro=unwind_enviro(oblist.enviro,len(oblist.enviro))
+    except:
+        oblist.enviro=[]
     repl(n)
 
 import readline
@@ -305,7 +308,7 @@ def unwind_enviro(alku,maara):
     for x in range(0,maara):
         yksi=alku.pop()
         Nset(yksi[0],yksi[1])
-    alku
+    return alku
 
 def assign_vars(x,y):
     if atom(x):
@@ -331,7 +334,7 @@ def Nlambda(vars,args,y):
     z=Nlist(args)
     save_vars(vars)
     assign_vars(vars,z)
-    tulos=Nprogn(y)
+    tulos=catch('return',cons('progn',y))
     restore_vars(vars)
     return tulos
 
@@ -562,6 +565,9 @@ defq('dir', 'lambda x: os.listdir()')
 defq('printc', 'lambda x: print(chr(Neval(car(x))),end="")')
 defq('readcc', 'lambda x: ord(readcc())')
 defq('read-from-str', 'lambda x: parse(Neval(car(x)))')
+defq('return', 'lambda x: throw("return",Neval(car(x)))')
+
+def null(x): return x==[]
 
 defq('throw', 'lambda x: throw(Neval(car(x)),Neval(cadr(x)))')
 def throw(name,data):
@@ -579,6 +585,7 @@ def catch(name,data):
             return data2
         else:
             throw(name2,data2)
+
             
 
 lsp(""" (progn
@@ -649,6 +656,16 @@ lsp(""" (progn
   (nconc (reverse (cdr x)) (list (car x)))
   (list (car x))))
 
+ (defq
+  delete
+  (lambda
+   (x lista)
+   (if
+    lista
+    (if
+     (equal x (car lista))
+     (delete x (cdr lista))
+     (cons (car lista) (delete x (cdr lista)))))))
 
  (defun depthless (n x)
       (if (> 0 n) 0
@@ -1117,6 +1134,11 @@ def eeprint25(x,dec):
             gensym8
         return printc(41)
 
+
+
+lsp("(defun sys.argv() (cdr (array2list (python-eval 'sys.argv))))")
+
+    
 loadlisp("bootpy.lsp")
 loadlisp("editor.lsp")
 loadlisp("COMP.LSP")
@@ -1130,14 +1152,10 @@ defq('eeprint25','lambda x: eeprint25(Neval(car(x)),Neval(cadr(x)))')
 
 lsp("(setq MODULE 'NEW)")
 
+defq('repl','lambda x: repl(Neval(car(x)))')
 
-lsp("(defun repl () (while t (cr) (pprint (eval (read)))))")
 
-lsp("""(progn
-        (if 
-         (cdr (python-eval 'sys.argv))
-         (eval (read-from-str (cdr (python-eval 'sys.argv))))))
-        """)
+#lsp(""" (print (cdr (python-eval 'sys.argv)))   """)
 
 #repl()
 
