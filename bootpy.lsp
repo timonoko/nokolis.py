@@ -6,19 +6,19 @@
   (lambda
    (x y)
    (when
-    (setq y (assoc x *COMPILED*))
+    (setq y (assoc x _COMPILED_))
     (set x (cdr y))
-    (pop *COMPILED*)
+    (pop _COMPILED_)
     (list x 'uncompiled))))
  (defq
   compile
   (lambda
    (x)
    (if
-    (assoc x *COMPILED*)
+    (assoc x _COMPILED_)
     ()
     (progn
-     (push (cons x (eval x)) *COMPILED*)
+     (push (cons x (eval x)) _COMPILED_)
      (set x (macroexpand (eval x)))
      (list x 'compiled)))))
  (defq
@@ -62,7 +62,7 @@
        (quote
         (lambda
          (x)
-         (if (assoc x *COMPILED*) (uncompile x))
+         (if (assoc x _COMPILED_) (uncompile x))
          (list 'defq x (eval x))))
        (eval m))))
     'pretty)
