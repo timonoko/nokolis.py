@@ -7,7 +7,7 @@
  (defq
   full-oblist-name
   (lambda (x) (compress (nconc (explode 'oblist.) (explode (oblist-name-raw x))))))
- (defq pnice (nlambda (x) (print (compress (cdr x)))))
+ (defq print-nice (nlambda (x) (print (compress (cdr x)))))
  (defq PYTHON ())
  (defq
   save-py
@@ -19,7 +19,7 @@
     (quote
      (progn
       (progn
-       (pnice (34 108 115 112 40 34 34 34))
+       (print-nice (34 108 115 112 40 34 34 34))
        (cr)
        (pprint
         (cons
@@ -34,20 +34,20 @@
              (list 'defq x (eval x))))
            (eval m)))))
        (cr)
-       (pnice (34 34 34 34 41)))
+       (print-nice (34 34 34 34 41)))
       (progn
-       (compile 'comp2)
+       (compile 'comyp2)
        (mapc
         (function
          (lambda
           (x)
           (if
            (equal 'lambda (car (eval x)))
-           (progn (cr) (uncompile 'x) (comp x 0) (cr))
+           (progn (cr) (uncompile 'x) (comppp x 0) (cr))
            (let
             ((nam (nconc (explode 'oblist.) (oblist-name-raw x))))
             (push x GLOBALS)
-            (comp2
+            (comyp2
              (list 'setq (full-oblist-name x) (list 'quote (eval x)))
              0)
             (cr)))))
@@ -101,25 +101,25 @@
   (lambda
    (x y)
    (setq y (eval x))
-   (pnice (34 100 101 102 113 40 39))
+   (print-nice (34 100 101 102 113 40 39))
    (print x)
-   (pnice (34 39 44 39 108 97 109 98 100 97 32 120 58 32))
+   (print-nice (34 39 44 39 108 97 109 98 100 97 32 120 58 32))
    (print x)
    (printc 40)
    (if
     (car (cadr y))
-    (pnice (34 78 101 118 97 108 40 99 97 114 40 120 41 41)))
+    (print-nice (34 78 101 118 97 108 40 99 97 114 40 120 41 41)))
    (if
     (cdr (cadr y))
-    (pnice
+    (print-nice
      (34 , 78 101 118 97 108 40 99 97 d
       114 40 120 41 41)))
    (if
     (cddr (cadr y))
-    (pnice
+    (print-nice
      (34 , 78 101 118 97 108 40 99 97 d
       d 114 40 120 41 41)))
-   (pnice (34 41 39 41))
+   (print-nice (34 41 39 41))
    True))
  (defq
   comment-on-compiler
@@ -141,7 +141,7 @@
    (mapc mapcpy)
    (print Nprint)))
  (defq
-  COMP-MACROS
+  COZMP-MACROS
   ((prog1
     (lambda
      (x)
@@ -177,12 +177,12 @@
     ((equal (car x) 'quote) x)
     ((equal (car x) 'function) (do-lambda (cadr x) tabs))
     ((equal (car x) 'lambda)
-     (comp-lambda
+     (cozmp-lambda
       (list 'lambda (cadr x) (cons 'progn (cddr x)))
       tabs))
     (t (cons (do-lambda (car x) tabs) (do-lambda (cdr x) tabs))))))
  (defq
-  comp-lambda
+  cozmp-lambda
   (lambda
    (x tabs)
    (cr)
@@ -196,25 +196,25 @@
     (push (cons name new-args) LAMBDA-ARGS)
     (lambda-args new-args t)
     (print ':)
-    (comp-progn
+    (cozmp-progn
      (macroexpand (do-lambda (cddr x) (+ 4 tabs)))
      (+ tabs 4)
      (quote return))
     (cr)
     name)))
  (defq
-  comp
+  comppp
   (lambda
    (x tabs)
    (unless (numberp tabs) (setq tabs 0))
    (setq LAMBDA-ARGS nil)
    (setq z (if (identp x) (list 'setq x (eval x)) x))
-   (comp2 (expand4ever z) tabs)
+   (comyp2 (expand4ever z) tabs)
    (cr)
    (when (identp x) (link-str x) (cr) (cr))
    file))
  (defq
-  comp-progn
+  cozmp-progn
   (lambda
    (x tabs return)
    (push x CP)
@@ -230,8 +230,8 @@
        '(python-let return foreach elif python-foreach python_for for setq progn if while prog1))))
     (print 'return)
     (sp))
-   (comp2 (car x) tabs (unless (cdr x) return))
-   (if (cdr x) (comp-progn (cdr x) tabs return))))
+   (comyp2 (car x) tabs (unless (cdr x) return))
+   (if (cdr x) (cozmp-progn (cdr x) tabs return))))
  (defq
   lambda-args
   (lambda
@@ -243,15 +243,15 @@
      x
      (progn
       (print (pop x))
-      (pnice (34 61 91 93))
+      (print-nice (34 61 91 93))
       (if x (print ',))
       (lambda-args x))))))
  (defq
   COMP
-  (do-globals full-oblist-name pnice PYTHON save-py esimerkki_copy esimerkki ch-name want_value STATEMENTS link-str
-   comment-on-compiler expand4ever CH-NAME COMP-MACROS do-lambda comp-lambda comp comp-progn lambda-args COMP comp2))
+  (do-globals full-oblist-name print-nice PYTHON save-py esimerkki_copy esimerkki ch-name want_value STATEMENTS link-str
+   comment-on-compiler expand4ever CH-NAME COZMP-MACROS do-lambda cozmp-lambda comppp cozmp-progn lambda-args COMP comyp2))
  (defq
-  comp2
+  comyp2
   (lambda
    (x tabs return)
    (if
@@ -263,10 +263,10 @@
     ((atom x) (printc 91) (printc 93))
     ((identp (car x))
      (if
-      (assoc (car x) COMP-MACROS)
-      (comp2
+      (assoc (car x) COZMP-MACROS)
+      (comyp2
        (macroexpand
-        (eval (backquote QUOTE (cadr (assoc (car x) COMP-MACROS)) QUOTE (cdr x))))
+        (eval (backquote QUOTE (cadr (assoc (car x) COZMP-MACROS)) QUOTE (cdr x))))
        tabs
        return)
       (case
@@ -274,7 +274,7 @@
        (setq
         (if
          (member (car (caddr x)) STATEMENTS)
-         (comp2
+         (comyp2
           (do-lambda
            (backquote setq , (cadr x) ((function (lambda () , (caddr x)))))
            tabs)
@@ -284,9 +284,9 @@
           (tab tabs)
           (do-globals (cadr x))
           (print '=)
-          (comp2 (caddr x) (+ 4 tabs))
+          (comyp2 (caddr x) (+ 4 tabs))
           (car x))))
-       (function (comp2 (cadr x) tabs))
+       (function (comyp2 (cadr x) tabs))
        (quote
         (cond
          ((numberp (cadr x)) (print (cadr x)))
@@ -294,7 +294,7 @@
          (t (print (str-raw (cadr x))))))
        ((eq eqn plus difference times greaterp lessp quotient remainder)
         (printc 40)
-        (comp2 (cadr x) tabs)
+        (comyp2 (cadr x) tabs)
         (printc 32)
         (print
          (cadr
@@ -311,65 +311,65 @@
              (remainder %)
              (quotient /))))))
         (printc 32)
-        (comp2 (caddr x) tabs)
+        (comyp2 (caddr x) tabs)
         (printc 41))
        (defq
-        (comp2
+        (comyp2
          (list 'setq (cadr x) (list 'function (caddr x)))
          tabs
          return))
        (while
         (print 'while)
         (sp)
-        (comp2 (cadr x) tabs)
+        (comyp2 (cadr x) tabs)
         (print ':)
-        (comp-progn (cddr x) (+ 4 tabs)))
+        (cozmp-progn (cddr x) (+ 4 tabs)))
        ((if elif)
         (if
          (equal (cadr x) 't)
-         (comp2 (cons (car x) (list 'True (caddr x))) tabs return)
+         (comyp2 (cons (car x) (list 'True (caddr x))) tabs return)
          (progn
           (print (car x))
           (sp)
-          (comp2 (cadr x) tabs)
+          (comyp2 (cadr x) tabs)
           (print ':)
-          (comp-progn (list (caddr x)) (+ 4 tabs) return)
+          (cozmp-progn (list (caddr x)) (+ 4 tabs) return)
           (when
            (cadddr x)
            (setq x (cadddr x))
            (if
             (equal 'if (car x))
-            (comp-progn (list (cons 'elif (cdr x))) tabs return)
+            (cozmp-progn (list (cons 'elif (cdr x))) tabs return)
             (progn
              (cr)
              (tab tabs)
              (print 'else:)
-             (comp-progn (list x) (+ 4 tabs) return)))))))
-       (progn (comp-progn (cdr x) tabs return))
+             (cozmp-progn (list x) (+ 4 tabs) return)))))))
+       (progn (cozmp-progn (cdr x) tabs return))
        (prog1
         (let
          ((name (gensym)))
-         (comp2
+         (comyp2
           (backquote progn (setq , name , (cadr x)) @ (cddr x) , name)
           tabs
           return)))
        (list
         (if
          (cddr x)
-         (comp2 (list 'cons (cadr x) (cons 'list (cddr x))))
-         (comp2 (list 'cons (cadr x) '()))))
+         (comyp2 (list 'cons (cadr x) (cons 'list (cddr x))))
+         (comyp2 (list 'cons (cadr x) '()))))
        ((and or)
         (if
          (cddr x)
          (progn
           (printc 40)
-          (comp2 (cadr x) tabs)
+          (comyp2 (cadr x) tabs)
           (printc 32)
           (print (car x))
           (printc 32)
-          (comp2 (cons (car x) (cddr x)))
+          (comyp2 (cons (car x) (cddr x)))
           (printc 41))
-         (comp2 (cadr x) tabs)))
+         (comyp2 (cadr x) tabs)))
        (python_for
         (print 'for)
         (sp)
@@ -379,16 +379,16 @@
         (sp)
         (print 'range)
         (printc 40)
-        (comp2 (cadr (cadr x)) tabs)
+        (comyp2 (cadr (cadr x)) tabs)
         (print ',)
-        (comp2 (list 'plus 1 (caddr (cadr x))) tabs)
+        (comyp2 (list 'plus 1 (caddr (cadr x))) tabs)
         (when
          (cdddr (cadr x))
          (print ',)
-         (comp2 (cadddr (cadr x)) tabs))
+         (comyp2 (cadddr (cadr x)) tabs))
         (printc 41)
         (print ':)
-        (comp-progn (macroexpand (cddr x)) (+ 4 tabs)))
+        (cozmp-progn (macroexpand (cddr x)) (+ 4 tabs)))
        (python-foreach
         (print 'for)
         (sp)
@@ -398,15 +398,15 @@
         (sp)
         (print 'list2array)
         (printc 40)
-        (comp2 (cadr (cadr x)) tabs)
+        (comyp2 (cadr (cadr x)) tabs)
         (printc 41)
         (print ':)
-        (comp-progn (macroexpand (cddr x)) (+ 4 tabs)))
+        (cozmp-progn (macroexpand (cddr x)) (+ 4 tabs)))
        (python-let
         (mapc
-         (function (lambda (x) (comp2 (cons 'setq x) tabs)))
+         (function (lambda (x) (comyp2 (cons 'setq x) tabs)))
          (cadr x))
-        (comp-progn (cddr x) tabs return))
+        (cozmp-progn (cddr x) tabs return))
        (lambda (print '(mita paskaa)))
        (t
         (print
@@ -420,7 +420,7 @@
          (unless args (setq args rest))
          (while
           args
-          (comp2 (if rest (pop rest) (car args)) tabs)
+          (comyp2 (if rest (pop rest) (car args)) tabs)
           (pop args)
           (if args (print ',))))
         (printc 41)))))))))
