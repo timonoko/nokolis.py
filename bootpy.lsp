@@ -7,8 +7,8 @@
    (x y)
    (when
     (setq y (assoc x _COMPILED_))
+    (setq _COMPILED_ (delete y _COMPILED_))
     (set x (cdr y))
-    (pop _COMPILED_)
     (list x 'uncompiled))))
  (defq
   compile
