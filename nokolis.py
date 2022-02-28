@@ -566,7 +566,12 @@ defq('printc', 'lambda x: print(chr(Neval(car(x))),end="")')
 defq('readcc', 'lambda x: ord(readcc())')
 defq('read-from-str', 'lambda x: parse(Neval(car(x)))')
 defq('return', 'lambda x: throw("return",Neval(car(x)))')
+defq('readc', 'lambda x: readc() ')
 
+def readc():
+    try: return ord(sys.stdin.read(1))
+    except: return -1
+ 
 def null(x): return x==[]
 
 defq('throw', 'lambda x: throw(Neval(car(x)),Neval(cadr(x)))')
@@ -875,11 +880,24 @@ def with_out_file(x,y):
     original_stdout = sys.stdout
     with open(x, 'w') as f:
         sys.stdout = f
-        Neval(y)
+        try: tulos=Neval(y)
+        except: tulos="Some error in with_out_file"
         print("")
         f.close()
-        sys.stdout = original_stdout
+    sys.stdout = original_stdout
+    return tulos
 defq('with-out-file', 'lambda x: with_out_file(Neval(car(x)),Neval(cadr(x)))')
+
+def with_in_file(x,y):
+    original_stdin = sys.stdin
+    with open(x, 'r') as f:
+        sys.stdin = f
+        try: tulos=Neval(y)
+        except: tulos= "Some error in with_in_file"
+        f.close()
+    sys.stdin = original_stdin
+    return tulos
+defq('with-in-file', 'lambda x: with_in_file(Neval(car(x)),Neval(cadr(x)))')
 
 def loadlisp(name):
     array2list(os.listdir())
@@ -1136,9 +1154,9 @@ def eeprint25(x,dec):
                 Nprint("&")
                 printc(32)
             dec=(dec + -3)
-            gensym8=car(x)
+            gensymz8=car(x)
             x=cdr(x)
-            gensym8
+            gensymz8
         return printc(41)
 
 
@@ -1149,7 +1167,7 @@ lsp("(defun sys.argv() (cdr (array2list (python-eval 'sys.argv))))")
 loadlisp("bootpy.lsp")
 loadlisp("editor.lsp")
 loadlisp("COMP.LSP")
-lsp("(compile 'comp2)")
+lsp("(compile 'comyp2)")
 
 lsp("(setq eeprint251 eeprint25)")
 lsp("(compile-edit)")
