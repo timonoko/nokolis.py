@@ -8,7 +8,7 @@
   full-oblist-name
   (lambda (x) (compress (nconc (explode 'oblist.) (explode (oblist-name-raw x))))))
  (defq pnice (nlambda (x) (print (compress (cdr x)))))
- (defq PYTHON (- fib))
+ (defq PYTHON ())
  (defq
   save-py
   (lambda
@@ -172,7 +172,6 @@
   do-lambda
   (lambda
    (x tabs y)
-   (unless tabs (setq tabs 16))
    (cond
     ((atom x) x)
     ((equal (car x) 'quote) x)
@@ -186,7 +185,6 @@
   comp-lambda
   (lambda
    (x tabs)
-   (unless tabs (setq tabs 8))
    (cr)
    (cr)
    (tab tabs)
@@ -208,6 +206,7 @@
   comp
   (lambda
    (x tabs)
+   (unless (numberp tabs) (setq tabs 0))
    (setq LAMBDA-ARGS nil)
    (setq z (if (identp x) (list 'setq x (eval x)) x))
    (comp2 (expand4ever z) tabs)
@@ -251,7 +250,6 @@
   comp2
   (lambda
    (x tabs return)
-   (unless tabs (setq tabs 0))
    (if
     (assoc (car x) CH-NAME)
     (setq x (cons (cadr (assoc (car x) CH-NAME)) (cdr x))))

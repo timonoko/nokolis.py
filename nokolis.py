@@ -1095,6 +1095,13 @@ def reverse(x):
         return cons(car(x),[])
 defq('reverse','lambda x: reverse(Neval(car(x)))')
 
+def append(x9,y9):
+    if x9:
+        return cons(car(x9),append(cdr(x9),y9))
+    else:
+        return y9
+defq('append','lambda x: append(Neval(car(x)),Neval(cadr(x)))')
+
 def eeprint25(x,dec):
     printc(9)
     if numberp(x):
