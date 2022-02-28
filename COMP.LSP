@@ -241,7 +241,11 @@
     (progn (printc 40) (lambda-args x) (printc 41))
     (if
      x
-     (progn (print (pop x)) (if x (print ',)) (lambda-args x))))))
+     (progn
+      (print (pop x))
+      (pnice (34 61 91 93))
+      (if x (print ',))
+      (lambda-args x))))))
  (defq
   COMP
   (do-globals full-oblist-name pnice PYTHON save-py esimerkki_copy esimerkki ch-name want_value STATEMENTS link-str
