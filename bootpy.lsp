@@ -47,24 +47,4 @@
     (< x 2)
     x
     (+ (fib (- x 1)) (fib (- x 2))))))
- (defq
-  save
-  (lambda
-   (m)
-   (if (null m) (setq m MODULE))
-   (print-to-file
-    (compress (append (explode m) '(46 76 83 80)))
-    (cons
-     'progn
-     (cons
-      (list 'defq 'MODULE m)
-      (mapp
-       (quote
-        (lambda
-         (x)
-         (if (assoc x _COMPILED_) (uncompile x))
-         (list 'defq x (eval x))))
-       (eval m))))
-    'pretty)
-   (list m 'saved)))
- (defq BOOTPY (uncompile compile mapp koe fib save BOOTPY)))
+ (defq BOOTPY (uncompile compile mapp koe fib BOOTPY)))

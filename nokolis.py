@@ -25,12 +25,12 @@ class oblist:
 
 def repl(n=0):
   quit=False
-  try:
-    while not quit:
+  while not quit:
+    try:
         oblist.func=[]
         oblist.args=[]
         e=""
-        if n>0: e="Error:"
+        if n>0: e="E"
         rivi=input(f"{e}{n}> ")
         if rivi=="":
             pass
@@ -42,20 +42,29 @@ def repl(n=0):
         else:
             pprint(Neval(parse(rivi)),1,True)
         print('')
-  except Exception as ex:
-    print("Error:",ex)
-    print("Stack=",end=""),
-    Nprint(array2list(oblist.func))
-    print(""),
-    oblist._id_TRACE=oblist.func
-    print('Error environment until "quit"')
-    repl(n+1)
-    try:
-        oblist.enviro=unwind_enviro(oblist.enviro,len(oblist.enviro))
-    except:
-        oblist.enviro=[]
-    repl(n)
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt")
+    except Exception as ex:
+        if oblist.func==[]:
+            quit=True
+        else:
+            print("Error:",ex)
+            print("Stack=",end=""),
+            Nprint(array2list(oblist.func))
+            print(""),
+            oblist._id_TRACE=oblist.func
+            repl(n+1)
+            try:
+                oblist.enviro=unwind_enviro(oblist.enviro,len(oblist.enviro))
+            except:
+                oblist.enviro=[]
+  if n==0:
+     lsp("(setq OBLIST (oblist))")
+     lsp("(save-module-npy 'OBLIST)")
+     print("OBLIST.npy saved.  ")
 
+     
+     
 import readline
 readline.parse_and_bind("tab: complete")
 string = readline.get_completer_delims().replace('-', '')
@@ -91,8 +100,16 @@ def parse(program):
 def tokenize(s):
     return s.replace('(',' ( ').replace(')',' ) ').replace("'"," ' ").replace(","," , ").replace('"',' " ').replace('[',' [ ').replace(']',' ] ').split()
 
+MORE=False
+
+        
 def readrest(tokens):
-    if tokens==[]: return [],[]
+#    if tokens==[]: return [],[]
+    if tokens==[]:
+        if MORE:
+            return readrest(tokenize(input(" ..")))
+        else:
+            return [],[]
     eka,tokens2=readtokens(tokens)
     if eka==')':
         return [],tokens2
@@ -107,7 +124,11 @@ def readrest(tokens):
         else: return [eka,toka],tokens3
 
 def readarray(tokens):
-    if tokens==[]: return [],[]
+    if tokens==[]:
+        if MORE:
+            return readarray(tokenize(input(" ..")))
+        else:
+            return [],[]
     eka,tokens2=readtokens(tokens,True)
     if eka==']':
         return [],tokens2
@@ -271,7 +292,7 @@ def defq(x,y):
     return x
 
 def lsp(x):
-    Neval(parse(x))
+    return Neval(parse(x))
 
 def cons(x,y):
     return [x,y]
@@ -537,7 +558,6 @@ defq('rb', 'lambda x: print(")",end="")')
 defq('while', 'lambda x: Nwhile(car(x),cdr(x))')
 defq('eval', 'lambda x: Neval(Neval(car(x)))')
 defq('repeat-times', 'lambda x: Nrepeat_times(Neval(car(x)),cdr(x))')
-defq('read', 'lambda x: parse(input("> "))')
 defq('rplaca', 'lambda x: rplaca(Neval(car(x)),Neval(cadr(x)))')
 defq('rplacd', 'lambda x: rplacd(Neval(car(x)),Neval(cadr(x)))')
 defq('last', 'lambda x: last(Neval(car(x)))')
@@ -549,7 +569,6 @@ defq('oblist', 'lambda x: array2list(oblist.names)')
 defq('oblist-name-raw', 'lambda x: str(oblist_name2(Neval(car(x))))')
 defq('explode', 'lambda x: explode(Neval(car(x)))')
 defq('compress', 'lambda x: compress(Neval(car(x)))')
-defq('read-str', 'lambda x: input("? ")')
 defq('array2list', 'lambda x: array2list(Neval(car(x)))')
 defq('list2array', 'lambda x: list2array(Neval(car(x)))')
 defq('python-eval', 'lambda x: eval(Neval(car(x)))')
@@ -564,9 +583,19 @@ defq('int', 'lambda x: int(Neval(car(x)))')
 defq('dir', 'lambda x: os.listdir()')
 defq('printc', 'lambda x: print(chr(Neval(car(x))),end="")')
 defq('readcc', 'lambda x: ord(readcc())')
+defq('read-str', 'lambda x: input("? ")')
 defq('read-from-str', 'lambda x: parse(Neval(car(x)))')
 defq('return', 'lambda x: throw("return",Neval(car(x)))')
 defq('readc', 'lambda x: readc() ')
+defq('read', 'lambda x: Nread()')
+defq('readline', 'lambda x: parse(input("> "))')
+
+def Nread():
+     global MORE
+     MORE=True
+     tulos=parse(input("> "))
+     MORE=False
+     return tulos
 
 def readc():
     try: return ord(sys.stdin.read(1))
@@ -899,46 +928,74 @@ def with_in_file(x,y):
     return tulos
 defq('with-in-file', 'lambda x: with_in_file(Neval(car(x)),Neval(cadr(x)))')
 
+def hii(lis):
+    if lis!=[]:
+        x=car(lis)
+        if car(x)=="defq":
+            print(cadr(x),end=" ")
+            Nset(cadr(x),caddr(x))
+        hii(cdr(lis))
+
 def loadlisp(name):
-    array2list(os.listdir())
+    if ".npy" in name: 
+        hii(read_npy(name))
+        return name
     with open(name,"r") as f:
-       c =f.read()
+        c =f.read()
     f.close
-    lsp("(progn "+c+"))))))")
+    Neval(parse(c+")))"))
     return name
-    
+
+array2list(os.listdir())    
 defq('load', 'lambda x: loadlisp(Neval(car(x)))')
 
-def save_large_array(na,ar):
+def write_npy(na,ar):
     from numpy import save,array
     nar=array(ar,dtype=object)
     return save(na,nar)
-defq('save-raw','lambda x: save_large_array(Neval(car(x)),Neval(cadr(x)))')
+defq('write-npy','lambda x: write_npy(Neval(car(x)),Neval(cadr(x)))')
 
-def load_large_array(na):
+def read_npy(na):
     from numpy import load
-    return load(na+".npy",allow_pickle=True).tolist()
-defq('load-raw','lambda x: load_large_array(Neval(car(x)))')
-
+    return load(na,allow_pickle=True).tolist()
+defq('read-npy','lambda x: read_npy(Neval(car(x)))')
 
 lsp("""(progn
+(defun save-formula (m)
+    (cons
+     'progn
+     (cons
+      (list 'defq 'MODULE m)
+      (map
+       (function
+        (lambda
+         (x)
+         (uncompile x)
+         (if (or (equal (type (eval x)) (type car))
+		         (equal (type (eval x)) (type plus))
+		         (member x '(m%f m%x m x )))
+	       NIL
+	      (list 'defq x (eval x)))))
+       (eval m)))))
  (defq
-  load-raw-module
+  save
   (lambda
-   (m loaded)
+   (m)
    (if (null m) (setq m MODULE))
-   (setq loaded (load-raw m))
-   (mapc (function (lambda (x) (set (car x) (cdr x)))) loaded)
-   (list m 'loaded)))
+   (print-to-file
+    (compress (append (explode m) '(46 76 83 80)))
+    (save-formula m)
+    'pretty)
+   (list m 'saved)))
  (defq
-  save-raw-module
+  save-module-npy
   (lambda
-   (m saved)
+   (m)
    (if (null m) (setq m MODULE))
-   (save-raw
+   (write-npy
     m
-    (map (function (lambda (x) (cons x (eval x)))) (eval m)))
-   (list m 'saved 'raw))))""")
+    (save-formula m))
+   (list m 'npy))))""")
 
 oblist.gensym=0
 def gensym():
@@ -1120,6 +1177,14 @@ def append(x9,y9):
         return y9
 defq('append','lambda x: append(Neval(car(x)),Neval(cadr(x)))')
 
+def error_trap(x):
+    try:
+        Neval(x)
+        return []
+    except Exception as ex:
+        return ex
+defq('error-trap','lambda x: error_trap(car(x))')    
+ 
 def eeprint25(x,dec):
     printc(9)
     if numberp(x):

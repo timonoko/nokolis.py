@@ -36,7 +36,7 @@
      (eeprint x)
      (set_cursor (plus v 2) 4)
      (printc 9)
-     (rplaca (nthcdr v x) (read))))
+     (rplaca (nthcdr v x) (readline))))
    x))
  (defq
   locate
@@ -190,10 +190,10 @@
      (p (erase_page) (cr) (pprint x 1 True) (cr) (readcc) (eeprint x))
      (l
       (print 'locate:)
-      (if (setq goto (locate (read) x)) (setq v (pop goto)))
+      (if (setq goto (locate (readline) x)) (setq v (pop goto)))
       (eeprint x))
      (+ (setq x (eeinsert v x (copy (pop JEMMA)))) (eeprint x))
-     (e (print 'EVAL:) (eeinsert v x (eval (read))) (eeprint x))
+     (e (print 'EVAL:) (eeinsert v x (eval (readline))) (eeprint x))
      (- (setq EXIT t))
      (z
       (if
@@ -224,9 +224,9 @@
      (k (setq x (copy x)) (eeprint x))
      (s
       (print 'SUBST:)
-      (setq eka (read))
+      (setq eka (readline))
       (print 'WITH:)
-      (setq toka (read))
+      (setq toka (readline))
       (setq x (subst eka toka x))
       (eeprint x))
      (m (setq x (eeinsert v x (explode (read-str)))) (eeprint x))
