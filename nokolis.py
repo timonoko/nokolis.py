@@ -42,7 +42,7 @@ def repl(n=0):
         print("KeyboardInterrupt")
     except Exception as ex:
         if oblist.func==[]:
-            quit2=True
+            quit=True
         else:
             print("Error:",ex)
             print("Stack=",end=""),
