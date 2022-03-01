@@ -1184,7 +1184,36 @@ def error_trap(x):
     except Exception as ex:
         return ex
 defq('error-trap','lambda x: error_trap(car(x))')    
- 
+
+lsp("""
+(progn
+ (defq
+  uncompile
+  (lambda
+   (x y)
+   (when
+    (setq y (assoc x _COMPILED_))
+    (setq _COMPILED_ (delete y _COMPILED_))
+    (set x (cdr y))
+    (list x 'uncompiled))))
+ (defq
+  compile
+  (lambda
+   (x)
+   (if
+    (assoc x _COMPILED_)
+    ()
+    (progn
+     (push (cons x (eval x)) _COMPILED_)
+     (set x (macroexpand (eval x)))
+     (list x 'compiled)))))
+ (defq
+  mapp
+  (lambda
+   (m%f m%x)
+   (if m%x (cons (m%f (car m%x)) (mapp m%f (cdr m%x))))))))
+""")
+
 def eeprint25(x,dec):
     printc(9)
     if numberp(x):
@@ -1228,8 +1257,6 @@ def eeprint25(x,dec):
 
 lsp("(defun sys.argv() (cdr (array2list (python-eval 'sys.argv))))")
 
-    
-loadlisp("bootpy.lsp")
 loadlisp("editor.lsp")
 loadlisp("COMP.LSP")
 lsp("(compile 'comyp2)")
