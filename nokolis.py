@@ -55,7 +55,7 @@ def repl(n=0):
             except:
                 oblist.enviro=[]
   if n==0:
-     ni="OBLIST"+str(time.localtime().tm_hour)+str(time.localtime().tm_min)+str(time.localtime().tm_sec)
+     ni="OBLIST"+str(time.localtime().tm_hour)+"c"+str(time.localtime().tm_min)+"c"+str(time.localtime().tm_sec)
      print(f"saving {ni}.npy")
      lsp(f"(setq {ni} (oblist))")
      lsp(f"(save-module-npy '{ni})")

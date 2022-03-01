@@ -407,6 +407,25 @@
          (function (lambda (x) (comyp2 (cons 'setq x) tabs)))
          (cadr x))
         (cozmp-progn (cddr x) tabs return))
+       ((car cdr)
+        (comyp2 (cadr x) tabs)
+        (printc 91)
+        (print (case (car x) (car 0) (t 1)))
+        (printc 93))
+       ((cadr caddr cadddr cddr cdddr)
+        (let
+         ((y (cadr x)))
+         (mapc
+          (function
+           (lambda
+            (z)
+            (case
+             z
+             (97 (setq y (list 'car y)))
+             (100 (setq y (list 'cdr y))))))
+          (reverse (explode (car x))))
+         (comyp2 y tabs return)))
+       (return (comyp2 (cadr x) tabs 'return))
        (lambda (print '(mita paskaa)))
        (t
         (print
