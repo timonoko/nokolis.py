@@ -29,24 +29,20 @@ def repl(n=0):
     try:
         oblist.func=[]
         oblist.args=[]
-        e=""
-        if n>0: e="E"
-        rivi=input(f"{e}{n}> ")
+        if n>0: print(f'E{n}',end="")
+        rivi=Nread()
         if rivi=="":
             pass
         elif rivi=="quit":
             quit=True
-        elif rivi[0]=="@":
-            exec("oblist._id_64="+rivi[1:])
-            Nprint(oblist._id_64)
         else:
-            pprint(Neval(parse(rivi)),1,True)
+            pprint(Neval(rivi),3,True)
         print('')
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
     except Exception as ex:
         if oblist.func==[]:
-            quit=True
+            quit2=True
         else:
             print("Error:",ex)
             print("Stack=",end=""),
