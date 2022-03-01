@@ -1,6 +1,27 @@
 
 (progn
  (defq MODULE MATH)
+ (defq PRIMES (31 29 23 19 17 13 11 7 5 2 3))
+ (defq
+  prime
+  (lambda
+   (end)
+   (if (equal PRIMES ()) (setq PRIMES '(2 3)) pass)
+   (for
+    (x 2 end)
+    (setq yes True)
+    (foreach (y PRIMES) (if (= (% x y) 0) (setq yes False)))
+    (if yes (if (member x PRIMES) pass (push x PRIMES))))
+   (car PRIMES)))
+ (defq PYTHON (PRIMES prime fib))
+ (defq
+  fib
+  (lambda
+   (x)
+   (if
+    (< x 2)
+    x
+    (+ (fib (- x 1)) (fib (- x 2))))))
  (defq
   math2
   (lambda
@@ -43,7 +64,7 @@
      (x)
      (python-eval (compress (list (explode 'round) 40 (explode x) 41)))))
    MATH-ALL))
- (defq MATH (math2 define-all MATH math))
+ (defq MATH (PRIMES prime PYTHON fib math2 define-all MATH math))
  (defq
   math
   (lambda
@@ -62,6 +83,4 @@
         40
         (explode 'oblist.)
         (explode (oblist-name-raw 'argu))
-        41)))))))
-(define-all)
- )
+        41))))))))
