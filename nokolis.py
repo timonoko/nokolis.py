@@ -578,7 +578,6 @@ defq('array-append', 'lambda x: Neval(car(x))+Neval(cadr(x))')
 defq('array-length', 'lambda x: len(Neval(car(x)))')
 defq('nthcdr', 'lambda x: nthcdr(Neval(car(x)),Neval(cadr(x)))')
 defq('int', 'lambda x: int(Neval(car(x)))')
-defq('dir', 'lambda x: os.listdir()')
 defq('printc', 'lambda x: print(chr(Neval(car(x))),end="")')
 defq('readcc', 'lambda x: ord(readcc())')
 defq('read-str', 'lambda x: input("? ")')
@@ -907,30 +906,29 @@ def with_out_file(x,y):
     original_stdout = sys.stdout
     with open(x, 'w') as f:
         sys.stdout = f
-        try: tulos=Neval(y)
+        try: tulos=Nprogn(y)
         except: tulos="Some error in with_out_file"
         print("")
         f.close()
     sys.stdout = original_stdout
     return tulos
-defq('with-out-file', 'lambda x: with_out_file(Neval(car(x)),Neval(cadr(x)))')
+defq('with-out-file', 'lambda x: with_out_file(Neval(car(x)),cdr(x))')
 
 def with_in_file(x,y):
     original_stdin = sys.stdin
     with open(x, 'r') as f:
         sys.stdin = f
-        try: tulos=Neval(y)
+        try: tulos=Nprogn(y)
         except: tulos= "Some error in with_in_file"
         f.close()
     sys.stdin = original_stdin
     return tulos
-defq('with-in-file', 'lambda x: with_in_file(Neval(car(x)),Neval(cadr(x)))')
+defq('with-in-file', 'lambda x: with_in_file(Neval(car(x)),cdr(x))')
 
 def hii(lis):
     if lis!=[]:
         x=car(lis)
         if car(x)=="defq":
-            print(cadr(x),end=" ")
             Nset(cadr(x),caddr(x))
         hii(cdr(lis))
 
@@ -1211,6 +1209,22 @@ lsp("""
    (m%f m%x)
    (if m%x (cons (m%f (car m%x)) (mapp m%f (cdr m%x))))))))
 """)
+
+lsp("(defq pristr (nlambda (x) (print (compress (cdr x)))))")
+
+def re_search(x,y):
+    import re
+    tulos=[]
+    for l in y:
+        if re.search(x,l):
+            tulos.append(l)
+    return tulos
+defq('search','lambda x: re_search(Neval(car(x)),Neval(cadr(x)))')
+defq('dir-raw', 'lambda x: os.listdir()')
+lsp("(defun dir (x) (array2list(if x (search x (dir-raw)) (dir-raw))))")
+lsp("(defun continue () (load (car (reverse (sort (dir '^OBLIST))))))")
+defq('os-remove','lambda x: os.remove(Neval(car(x)))')
+lsp("(defun del-file (x) (mapc os-remove (dir x)) (dir))") 
 
 def eeprint25(x,dec):
     printc(9)
