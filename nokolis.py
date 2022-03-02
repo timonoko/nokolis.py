@@ -77,8 +77,13 @@ def add_oblist(x):
             results = [x for x in volcab if x.startswith(text)] + [None]
             return results[state]
         readline.set_completer(complete)
-    
+
+Named_Already={}
 def oblist_name2(x):
+  global Named_Already
+  try:
+    return Named_Already[x]
+  except:
     a=[c for c in x]
     d="_id_"
     for c in a:
@@ -86,6 +91,7 @@ def oblist_name2(x):
         elif ord(c) in range(ord('A'),ord('Z')): d=d+c
         elif ord(c) in range(ord('0'),ord('9')): d=d+c
         else: d=d+str(ord(c))
+    Named_Already[x]=d
     return d
 
 def oblist_name(x):
