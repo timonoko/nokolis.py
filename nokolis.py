@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 
-import math,time,os,sys
+import math,time,os,sys,re
 import resource
 resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
 sys.setrecursionlimit(10**6)
@@ -1177,8 +1177,12 @@ def error_trap(x):
     try:
         return Nprogn(x)
     except Exception as ex:
-        print("Error: ",ex)
-        return []
+        name2,data2 = ex.args     # unpack args
+        if "return"==name2:
+            throw(name2,data2)
+        else:
+            print("Error: ",ex)
+            return []
 defq('error-trap','lambda x: error_trap(x)')    
 
 lsp("""
