@@ -1175,11 +1175,11 @@ defq('append','lambda x: append(Neval(car(x)),Neval(cadr(x)))')
 
 def error_trap(x):
     try:
-        Neval(x)
-        return []
+        return Nprogn(x)
     except Exception as ex:
-        return ex
-defq('error-trap','lambda x: error_trap(car(x))')    
+        print("Error: ",ex)
+        return []
+defq('error-trap','lambda x: error_trap(x)')    
 
 lsp("""
 (progn
@@ -1225,6 +1225,16 @@ lsp("(defun dir (x) (array2list(if x (search x (dir-raw)) (dir-raw))))")
 lsp("(defun continue () (load (car (reverse (sort (dir '^OBLIST))))))")
 defq('os-remove','lambda x: os.remove(Neval(car(x)))')
 lsp("(defun del-file (x) (mapc os-remove (dir x)) (dir))") 
+lsp("""(defq os-
+  (lambda
+   (x y)
+   (python-eval
+    (compress
+     (nconc
+      (explode 'os.)
+      (nconc (explode x) (list 40 (if y (explode y) 32) 41))))))))""")
+lsp("(defun perkele () (del-file '^OBLIST))")
+
 
 def eeprint25(x,dec):
     printc(9)
