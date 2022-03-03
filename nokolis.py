@@ -15,6 +15,7 @@ class oblist:
     args=[]
     enviro=[]
     names=[]
+    Named_Already={}
     _id_True=True
     _id_False=[]
     _id_t="t"
@@ -36,7 +37,7 @@ def repl(n=0):
         elif rivi=="quit":
             quit=True
         else:
-            pprint(Neval(rivi),3,True)
+            pprint(Neval(rivi),1,True)
         print('')
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
@@ -78,20 +79,18 @@ def add_oblist(x):
             return results[state]
         readline.set_completer(complete)
 
-Named_Already={}
 def oblist_name2(x):
-  global Named_Already
   try:
-    return Named_Already[x]
+    return oblist.Named_Already[x]
   except:
     a=[c for c in x]
     d="_id_"
     for c in a:
-        if ord(c) in range(ord('a'), ord('z')): d=d+c
-        elif ord(c) in range(ord('A'),ord('Z')): d=d+c
-        elif ord(c) in range(ord('0'),ord('9')): d=d+c
-        else: d=d+str(ord(c))
-    Named_Already[x]=d
+        if ord(c) in range(ord('a'),1+ord('z')): d=d+c
+        elif ord(c) in range(ord('A'),1+ord('Z')): d=d+c
+        elif ord(c) in range(ord('0'),1+ord('9')): d=d+c
+        else: d=d+"_"+str(ord(c))+"_"
+    oblist.Named_Already[x]=d
     return d
 
 def oblist_name(x):
@@ -452,7 +451,6 @@ def explode(x):
     else:
       return cons(explode(car(x)),explode(cdr(x)))
  
-     
 def array2list(x):
   if x!=[]:
     if type(x[0])==type([1]):
@@ -1047,7 +1045,21 @@ def pprint(x,tabs=1,strings=False):
     if atom(x):
         Nprint(x)
     elif len(x) > 2:
-        print(x)
+        print("[",end="")
+        n=10
+        i=0
+        while i<len(x):
+            pprint(x[i],1+tabs,strings)
+            i=i+1
+            if i < len(x):
+                if n>0:
+                    print(", ",end="")
+                    n=n-1
+                else:
+                    print(",")
+                    tab(tabs)
+                    n=10
+        print("]",end="")
     elif atom(cdr(x)):
         Nprint(x)
     elif flat(x):
@@ -1229,9 +1241,10 @@ def re_search(x,y):
         if re.search(x,l):
             tulos.append(l)
     return tulos
-defq('search','lambda x: re_search(Neval(car(x)),Neval(cadr(x)))')
+defq('search-array','lambda x: re_search(Neval(car(x)),Neval(cadr(x)))')
+lsp("(defun search (x y) (array2list (search-array x (list2array y))))")
 defq('dir-raw', 'lambda x: os.listdir()')
-lsp("(defun dir (x) (array2list(if x (search x (dir-raw)) (dir-raw))))")
+lsp("(defun dir (x) (array2list(if x (search-array x (dir-raw)) (dir-raw))))")
 lsp("(defun continue () (load (car (reverse (sort (dir '^OBLIST))))))")
 defq('os-remove','lambda x: os.remove(Neval(car(x)))')
 lsp("(defun del-file (x) (mapc os-remove (dir x)) (dir))") 
@@ -1245,7 +1258,36 @@ lsp("""(defq os-
       (nconc (explode x) (list 40 (if y (explode y) 32) 41))))))))""")
 lsp("(defun perkele () (del-file '^OBLIST))")
 
+defq("load-image", 'lambda x: Image_open(Neval(car(x)))')
+defq("save-image", 'lambda x: Image_fromarray(Neval(car(x)),Neval(cadr(x)))')
+defq("show-image", 'lambda x: showimage(Neval(car(x)))')
 
+def showimage(x):
+     from PIL import Image
+     from numpy import array
+     ar=array(x)
+     im=Image.fromarray(ar,mode='RGB')
+     print(im.getpixel((1,1)))
+     im.show()
+
+def Image_open(x):
+    from PIL import Image
+    from numpy import asarray
+    im=Image.open(x)
+    ar=asarray(im)
+    return ar.tolist()
+
+def Image_fromarray(f,x):
+     from PIL import Image
+     from numpy import array
+     ar=array(x)
+     if identp(f):
+         im=Image.fromarray(ar,mode='RGB')
+         im.save(f)
+     else:
+         print("Errer: No filename at array2image")
+     return ar
+         
 def eeprint25(x,dec):
     printc(9)
     if numberp(x):
