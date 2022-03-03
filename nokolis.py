@@ -1259,34 +1259,31 @@ lsp("""(defq os-
 lsp("(defun perkele () (del-file '^OBLIST))")
 
 defq("load-image", 'lambda x: Image_open(Neval(car(x)))')
-defq("save-image", 'lambda x: Image_fromarray(Neval(car(x)),Neval(cadr(x)))')
+defq("save-image", 'lambda x: Image_save(Neval(car(x)),Neval(cadr(x)))')
 defq("show-image", 'lambda x: showimage(Neval(car(x)))')
+defq("putpixel", 'lambda x: PutPixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)))')
+defq("getpixel", 'lambda x: GetPixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
 
-def showimage(x):
-     from PIL import Image
-     from numpy import array
-     ar=array(x)
-     im=Image.fromarray(ar,mode='RGB')
-     print(im.getpixel((1,1)))
+from PIL import Image
+
+def showimage(im):
      im.show()
 
 def Image_open(x):
-    from PIL import Image
-    from numpy import asarray
     im=Image.open(x)
-    ar=asarray(im)
-    return ar.tolist()
+    return im
 
-def Image_fromarray(f,x):
-     from PIL import Image
-     from numpy import array
-     ar=array(x)
-     if identp(f):
-         im=Image.fromarray(ar,mode='RGB')
-         im.save(f)
-     else:
-         print("Errer: No filename at array2image")
-     return ar
+def Image_save(f,im):
+    im.save(f)
+    return f
+
+def GetPixel(im,x,y):
+    return im.getpixel((x,y)) 
+    
+def PutPixel(im,x,y,v):
+    v2=(car(v),cadr(v),caddr(v))
+    im.putpixel((x,y),v2)
+    return v
          
 def eeprint25(x,dec):
     printc(9)
