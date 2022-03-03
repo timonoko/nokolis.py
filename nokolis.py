@@ -1266,9 +1266,20 @@ defq("getpixel", 'lambda x: getpixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)
 defq("imagesize", 'lambda x: imagesize(Neval(car(x)))')
 defq("newimage", 'lambda x: newimage(Neval(car(x)),Neval(cadr(x)))')
 defq("killdisplay", 'lambda x: killdisplay()')
+defq("imagetext",'lambda x: imagetext(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)),Neval(car(cdr(cdddr(x)))))')
 
-from PIL import Image
+from PIL import Image,ImageDraw,ImageFont
 
+def imagetext(im,x,y,fsc,text):
+    fnt=car(fsc)
+    size=cadr(fsc)
+    v=caddr(fsc)
+    color=(car(v),cadr(v),caddr(v))
+    fnt = ImageFont.truetype("/usr/share/fonts/truetype/freefont/"+fnt,size)
+    d = ImageDraw.Draw(im)
+    d.text((x,y),text, font=fnt, fill=color)
+    return im
+    
 def showimage(im):
      im.show()
 
