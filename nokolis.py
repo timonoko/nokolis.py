@@ -1264,7 +1264,7 @@ defq("showimage", 'lambda x: showimage(Neval(car(x)))')
 defq("putpixel", 'lambda x: putpixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)))')
 defq("getpixel", 'lambda x: getpixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
 defq("imagesize", 'lambda x: imagesize(Neval(car(x)))')
-defq("newimage", 'lambda x: newimage(Neval(car(x)),Neval(cadr(x)))')
+defq("newimage", 'lambda x: newimage(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
 defq("killdisplay", 'lambda x: killdisplay()')
 defq("imagetext",'lambda x: imagetext(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)),Neval(car(cdr(cdddr(x)))))')
 
@@ -1303,8 +1303,12 @@ def putpixel(im,x,y,v):
 def imagesize(im):
     return im.size
     
-def newimage(x,y):
-    return Image.new('RGB',(x,y))
+def newimage(x,y,v):
+    if v!=[]:
+       c=(car(v),cadr(v),caddr(v))
+    else:
+       c=(0,0,0)
+    return Image.new('RGB',(x,y),c)
 
 def killdisplay():
     os.system("killall display")
