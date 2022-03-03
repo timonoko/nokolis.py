@@ -1258,33 +1258,46 @@ lsp("""(defq os-
       (nconc (explode x) (list 40 (if y (explode y) 32) 41))))))))""")
 lsp("(defun perkele () (del-file '^OBLIST))")
 
-defq("load-image", 'lambda x: Image_open(Neval(car(x)))')
-defq("save-image", 'lambda x: Image_save(Neval(car(x)),Neval(cadr(x)))')
-defq("show-image", 'lambda x: showimage(Neval(car(x)))')
-defq("putpixel", 'lambda x: PutPixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)))')
-defq("getpixel", 'lambda x: GetPixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
+defq("loadimage", 'lambda x: loadimage(Neval(car(x)))')
+defq("saveimage", 'lambda x: saveimage(Neval(car(x)),Neval(cadr(x)))')
+defq("showimage", 'lambda x: showimage(Neval(car(x)))')
+defq("putpixel", 'lambda x: putpixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)))')
+defq("getpixel", 'lambda x: getpixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
+defq("imagesize", 'lambda x: imagesize(Neval(car(x)))')
+defq("newimage", 'lambda x: newimage(Neval(car(x)),Neval(cadr(x)))')
+defq("killdisplay", 'lambda x: killdisplay()')
 
 from PIL import Image
 
 def showimage(im):
      im.show()
 
-def Image_open(x):
+def loadimage(x):
     im=Image.open(x)
     return im
 
-def Image_save(f,im):
+def saveimage(f,im):
     im.save(f)
     return f
 
-def GetPixel(im,x,y):
-    return im.getpixel((x,y)) 
-    
-def PutPixel(im,x,y,v):
+def getpixel(im,x,y):
+    a,b,c=im.getpixel((x,y)) 
+    return cons(a,cons(b,cons(c,[])))
+                    
+def putpixel(im,x,y,v):
     v2=(car(v),cadr(v),caddr(v))
     im.putpixel((x,y),v2)
     return v
-         
+
+def imagesize(im):
+    return im.size
+    
+def newimage(x,y):
+    return Image.new('RGB',(x,y))
+
+def killdisplay():
+    os.system("killall display")
+
 def eeprint25(x,dec):
     printc(9)
     if numberp(x):
