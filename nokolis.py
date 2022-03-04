@@ -297,7 +297,7 @@ def defq(x,y):
 def lsp(x):
     return Neval(parse(x))
 
-def cons(x,y):
+def cons(x,y=[]):
     return [x,y]
 
 def Nlist(x):
@@ -1266,18 +1266,28 @@ defq("getpixel", 'lambda x: getpixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)
 defq("imagesize", 'lambda x: imagesize(Neval(car(x)))')
 defq("newimage", 'lambda x: newimage(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
 defq("killdisplay", 'lambda x: killdisplay()')
-defq("imagetext",'lambda x: imagetext(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)),Neval(car(cdr(cdddr(x)))))')
+defq("imagetext",'lambda x: imagetext(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)))')
+defq("imagedraw",'lambda x: imagedraw(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)))')
 
 from PIL import Image,ImageDraw,ImageFont
 
-def imagetext(im,x,y,fsc,text):
+
+def imagedraw (im,s,e,c):
+    line=(car(s),cadr(s),car(e),cadr(e))
+    color=(car(c),cadr(c),caddr(c))
+    draw = ImageDraw.Draw(im)
+    draw.line(line,color)
+    return im
+
+def imagetext(im,p,fsc,text):
+    pos=(car(p),cadr(p))
     fnt=car(fsc)
     size=cadr(fsc)
     v=caddr(fsc)
     color=(car(v),cadr(v),caddr(v))
     fnt = ImageFont.truetype("/usr/share/fonts/truetype/freefont/"+fnt,size)
     d = ImageDraw.Draw(im)
-    d.text((x,y),text, font=fnt, fill=color)
+    d.text(pos, str(text), font=fnt, fill=color)
     return im
     
 def showimage(im):
@@ -1287,7 +1297,7 @@ def loadimage(x):
     im=Image.open(x)
     return im
 
-def saveimage(f,im):
+def saveimage(im,f):
     im.save(f)
     return f
 
@@ -1301,7 +1311,8 @@ def putpixel(im,x,y,v):
     return v
 
 def imagesize(im):
-    return im.size
+    x,y=im.size
+    return cons(x,cons(y))
     
 def newimage(x,y,v):
     if v!=[]:
@@ -1312,6 +1323,30 @@ def newimage(x,y,v):
 
 def killdisplay():
     os.system("killall display")
+
+lsp(""" (progn
+        (defq RED (255 0 0))
+        (defq GREEN ( 0 255 0))
+        (defq BLUE ( 0 0 255))
+        (defq YELLOW ( 0 255 255))
+        (defq BLACK ( 0 0 0))
+        (defq WHITE ( 255 255 255))
+        (defq FONTTI (FreeSansBold.ttf 20 (0 0 0))) 
+     (defq FONTS (FreeMonoBoldOblique.ttf  FreeMono.ttf
+		  FreeSansOblique.ttf	   FreeSerifBold.ttf
+       FreeMonoBold.ttf	 FreeSansBoldOblique.ttf  FreeSans.ttf
+ 	 FreeSerifItalic.ttf FreeMonoOblique.ttf	 FreeSansBold.ttf
+	  FreeSerifBoldItalic.ttf  FreeSerif.ttf)))) """)
+
+
+def imagepaste(im=[],p=[],uusi=[]):
+    uusi=loadimage(uusi)
+    s=imagesize(uusi)
+    for x in range(0,(1 + (s[0] - 1))):
+        for y in range(0,(1 + (s[1][0] - 1))):
+            putpixel(im,(p[0] + x),(p[1][0] + y),getpixel(uusi,x,y))
+
+defq('imagepaste','lambda x: imagepaste(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
 
 def eeprint25(x,dec):
     printc(9)
