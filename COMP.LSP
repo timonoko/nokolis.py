@@ -16,62 +16,58 @@
    (if (null m) (setq m MODULE))
    (with-out-file
     (quote TEMPORARY.PY)
-    (quote
-     (progn
-      (progn
-       (print-nice (34 108 115 112 40 34 34 34))
-       (cr)
-       (pprint
-        (cons
-         (quote progn)
-         (cons
-          (list 'defq 'MODULE m)
-          (mapp
-           (quote
-            (lambda
-             (x)
-             (if (assoc x _COMPILED_) (uncompile x))
-             (list 'defq x (eval x))))
-           (eval m)))))
-       (cr)
-       (print-nice (34 34 34 34 41)))
-      (progn
-       (compile 'comyp2)
-       (mapc
-        (function
-         (lambda
-          (x)
-          (if
-           (equal 'lambda (car (eval x)))
-           (progn (cr) (uncompile 'x) (comppp x 0) (cr))
-           (let
-            ((nam (nconc (explode 'oblist.) (oblist-name-raw x))))
-            (push x GLOBALS)
-            (comyp2
-             (list 'setq (full-oblist-name x) (list 'quote (eval x)))
-             0)
-            (cr)))))
-        PYTHON))
-      (print (compress (cdr '(34 114 101 112 108 40 41))))
-      (cr))))
+    (progn
+     (print-nice (34 108 115 112 40 34 34 34))
+     (cr)
+     (pprint
+      (cons
+       (quote progn)
+       (cons
+        (list 'defq 'MODULE m)
+        (mapp
+         (quote
+          (lambda
+           (x)
+           (if (assoc x _COMPILED_) (uncompile x))
+           (list 'defq x (eval x))))
+         (eval m)))))
+     (cr)
+     (print-nice (34 34 34 34 41)))
+    (progn
+     (compile 'comyp2)
+     (mapc
+      (function
+       (lambda
+        (x)
+        (if
+         (equal 'lambda (car (eval x)))
+         (progn (cr) (uncompile 'x) (comppp x 0) (cr))
+         (let
+          ((nam (nconc (explode 'oblist.) (oblist-name-raw x))))
+          (push x GLOBALS)
+          (comyp2
+           (list 'setq (full-oblist-name x) (list 'quote (eval x)))
+           0)
+          (cr)))))
+      PYTHON))
+    (print (compress (cdr '(34 114 101 112 108 40 41))))
+    (cr))
    (with-out-file
     (compress (append (explode m) '(46 98 117 105 108 100)))
-    (quote
-     (progn
-      (print 'cat)
-      (sp)
-      (print 'nokolis.py)
-      (sp)
-      (print 'TEMPORARY.PY)
-      (sp)
-      (print '>)
-      (sp)
-      (print (setq py-file (compress (append (explode m) '(46 112 121)))))
-      (cr)
-      (print 'python3)
-      (sp)
-      (print py-file)
-      (cr))))
+    (print 'cat)
+    (sp)
+    (print 'nokolis.py)
+    (sp)
+    (print 'TEMPORARY.PY)
+    (sp)
+    (print '>)
+    (sp)
+    (print (setq py-file (compress (append (explode m) '(46 112 121)))))
+    (cr)
+    (print 'python3)
+    (sp)
+    (print py-file)
+    (cr))
    (list m 'saved)))
  (defq
   esimerkki_copy
@@ -121,14 +117,6 @@
       d 114 40 120 41 41)))
    (print-nice (34 41 39 41))
    True))
- (defq
-  comment-on-compiler
-  (While I have totally perfect Nokolisp-to-Pascal and Nokolisp-to-C compiler , I
-   realized I dont want to such unreadable mess with gensyms and
-   mysterious functions implementing retun-with-value statements. This is deliberately Pythonic , you
-   cannot assign from SETQ or IF , and OR works only
-   in expressions. LET seems to generate LAMBDA and GENSYM-named function ,
-   but that is avoidable))
  (defq expand4ever (lambda (x) (do-lambda (macroexpand (ch-name x)) tabs)))
  (defq
   CH-NAME
@@ -249,7 +237,7 @@
  (defq
   COMP
   (do-globals full-oblist-name print-nice PYTHON save-py esimerkki_copy esimerkki ch-name want_value STATEMENTS link-str
-   comment-on-compiler expand4ever CH-NAME COZMP-MACROS do-lambda cozmp-lambda comppp cozmp-progn lambda-args COMP comyp2))
+   expand4ever CH-NAME COZMP-MACROS do-lambda cozmp-lambda comppp cozmp-progn lambda-args COMP comyp2))
  (defq
   comyp2
   (lambda

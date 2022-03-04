@@ -1,6 +1,8 @@
 #! /usr/bin/python3
 
 import math,time,os,sys,re
+from math import *
+
 import resource
 resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
 sys.setrecursionlimit(10**6)
@@ -1415,7 +1417,7 @@ def delete(x=[],lista=[]):
 
 
 
-loadlisp("editor.lsp")
+loadlisp("EDITOR.LSP")
 loadlisp("COMP.LSP")
 lsp("(compile 'comyp2)")
 lsp("(setq eeprint251 eeprint25)")
