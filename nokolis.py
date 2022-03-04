@@ -836,10 +836,6 @@ lsp(""" (progn
     ((equal (car x9) 'lambda)
      (cons (car x9) (cons (cadr x9) (macroexpand (cddr x9)))))
     ((and
-      (equal (car x9) 'if)
-      (member (car (cadr x9)) '(null not)))
-     (macroexpand (list 'if (cadr (cadr x9)) (cadddr x9) (caddr x9))))
-    ((and
       (not hantaa-vaan)
       (identp (car x9))
       (member (car (eval (car x9))) '(macro mlambda)))
@@ -1113,8 +1109,6 @@ def macroexpand(x9,hv=()):
         return x9
     elif equal(car(x9),"lambda"):
         return cons(car(x9),cons(cadr(x9),macroexpand(cddr(x9))))
-    elif (equal(car(x9),"if") and member(car(cadr(x9)),['null', ['not', []]])):
-        return macroexpand(cons("if",cons(cadr(cadr(x9)),cons(cadddr(x9),cons(caddr(x9),[])))))
     elif (not(hv) and (identp(car(x9)) and member(car(Neval(car(x9))),['macro', ['mlambda', []]]))):
         if equal(car(Neval(car(x9))),"mlambda"):
             iik="nlambda"
@@ -1427,6 +1421,9 @@ lsp("(compile 'comyp2)")
 lsp("(setq eeprint251 eeprint25)")
 lsp("(compile-edit)")
 defq('eeprint25','lambda x: eeprint25(Neval(car(x)),Neval(cadr(x)))')
+loadlisp("MATH.LSP")
+lsp("(define-all)")
+
 lsp("(setq MODULE 'NEW)")
 
 defq('repl','lambda x: repl(Neval(car(x)))')
