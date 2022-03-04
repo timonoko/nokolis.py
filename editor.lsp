@@ -215,10 +215,12 @@
           (nthcdr (plus v 2) x)))))
       (eeprint x))
      (v
-      (setq ch (nth v x))
-      (rplaca (nthcdr v x) (car (nthcdr (add1 v) x)))
-      (rplaca (nthcdr (add1 v) x) ch)
-      (setq v (add1 v))
+      (when
+       (cdr (nthcdr v x))
+       (setq ch (nth v x))
+       (rplaca (nthcdr v x) (car (nthcdr (add1 v) x)))
+       (rplaca (nthcdr (add1 v) x) ch)
+       (setq v (add1 v)))
       (eeprint x))
      (f (eeprint x))
      (k (setq x (copy x)) (eeprint x))
