@@ -32,7 +32,7 @@ def repl(n=0):
     try:
         oblist.func=[]
         oblist.args=[]
-        if n>0: print(f'E{n}',end="")
+        if n>0: print(f'E{n}',end=" ")
         rivi=Nread()
         if rivi=="":
             pass
@@ -1303,8 +1303,8 @@ def saveimage(im,f):
     return f
 
 def getpixel(im,x,y):
-    a,b,c=im.getpixel((x,y)) 
-    return cons(a,cons(b,cons(c,[])))
+    p=im.getpixel((x,y)) 
+    return cons(p[0],cons(p[1],cons(p[2])))
                     
 def putpixel(im,x,y,v):
     v2=(car(v),cadr(v),caddr(v))
@@ -1340,12 +1340,14 @@ lsp(""" (progn
 	  FreeSerifBoldItalic.ttf  FreeSerif.ttf)))) """)
 
 
+WHITE=[255,[255,[255,[]]]]
 def imagepaste(im=[],p=[],uusi=[]):
-    uusi=loadimage(uusi)
     s=imagesize(uusi)
     for x in range(0,(1 + (s[0] - 1))):
         for y in range(0,(1 + (s[1][0] - 1))):
-            putpixel(im,(p[0] + x),(p[1][0] + y),getpixel(uusi,x,y))
+            pix=getpixel(uusi,x,y)
+            if not equal(pix,WHITE):
+                putpixel(im,(p[0] + x),(p[1][0] + y),pix)
 defq('imagepaste','lambda x: imagepaste(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
 
 def eeprint25(x,dec):
