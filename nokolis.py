@@ -1277,7 +1277,6 @@ defq("imagedraw",'lambda x: imagedraw(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x
 
 from PIL import Image,ImageDraw,ImageFont
 
-
 def imagedraw (im,s,e,c):
     line=(car(s),cadr(s),car(e),cadr(e))
     color=(car(c),cadr(c),caddr(c))
@@ -1410,6 +1409,16 @@ lsp(""" (defq  dir-tree
       ((pwd (cd)))
       (if (error-trap (cd z)) (prog1 (cons z (dir-tree)) (cd pwd)) z))
      z))))))""")
+
+defq('delete','lambda x: delete(Neval(car(x)),Neval(cadr(x)))')
+def delete(x=[],lista=[]):
+    if lista!=[]:
+        if equal(x,lista[0]):
+            return delete(x,lista[1])
+        else:
+            return cons(lista[0],delete(x,lista[1]))
+    return lista
+
 
 
 loadlisp("editor.lsp")
