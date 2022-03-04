@@ -1,6 +1,25 @@
 
 (progn
  (defq MODULE MATH)
+ (defq
+  curve
+  (lambda
+   ()
+   (setq im (newimage 600 600 '(0 50 0)))
+   (imagetext
+    im
+    '(30 30)
+    '(FreeSansBold.ttf 40 (0 255 255))
+    (quote SIN))
+   (setq start '(0 0))
+   (for
+    (x 0 599 10)
+    (setq
+     end
+     (list x (int (+ 300 (* 200 (sin (radians x)))))))
+    (imagedraw im start end WHITE)
+    (setq start end))
+   (showimage im)))
  (defq PRIMES (31 29 23 19 17 13 11 7 5 2 3))
  (defq
   prime
@@ -55,8 +74,8 @@
      (python-eval (compress (list (explode 'dir) 40 (explode 'math) 41)))))
    (map math MATH-ALL)
    (map math2 '(pow log copysign))
-   (setq pi (python-eval 'math.pi))
-   (setq e (python-eval 'math.e))
+   (setq PI (python-eval 'math.pi))
+   (setq E (python-eval 'math.e))
    (setq
     round
     (backquote
@@ -64,7 +83,7 @@
      (x)
      (python-eval (compress (list (explode 'round) 40 (explode x) 41)))))
    MATH-ALL))
- (defq MATH (PRIMES prime PYTHON fib math2 define-all MATH math))
+ (defq MATH (curve PRIMES prime PYTHON fib math2 define-all MATH math))
  (defq
   math
   (lambda
