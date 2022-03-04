@@ -615,7 +615,10 @@ def catch(name,data):
        return Neval(data) 
     except Exception as inst:
         oblist.enviro=unwind_enviro(oblist.enviro,len(oblist.enviro)-enviro)
-        name2,data2 = inst.args     # unpack args
+        try:
+            name2,data2 = inst.args
+        except:
+            name2,data2 = ('?',inst)
         if name==name2:
             return data2
         else:
@@ -1195,9 +1198,12 @@ def error_trap(x):
     try:
         return Nprogn(x)
     except Exception as ex:
-        name2,data2 = ex.args     # unpack args
-        if "return"==name2:
-            throw(name2,data2)
+        try:
+            name,data=ex.args
+        except:
+            name,data=('?',ex)
+        if "return"==name :
+            raise Exception("return",data)
         else:
             print("Error: ",ex)
             return []
@@ -1345,7 +1351,6 @@ def imagepaste(im=[],p=[],uusi=[]):
     for x in range(0,(1 + (s[0] - 1))):
         for y in range(0,(1 + (s[1][0] - 1))):
             putpixel(im,(p[0] + x),(p[1][0] + y),getpixel(uusi,x,y))
-
 defq('imagepaste','lambda x: imagepaste(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
 
 def eeprint25(x,dec):
@@ -1387,28 +1392,36 @@ def eeprint25(x,dec):
             gensymz8
         return printc(41)
 
-
-
+    
+defq('chdir','lambda x: os.chdir(Neval(car(x)))')
+defq('getcwd','lambda x: os.getcwd()')
+lsp("(defq cd (lambda (x) (if x (chdir x)) (getcwd))))")
 lsp("(defun sys.argv() (cdr (array2list (python-eval 'sys.argv))))")
+defq('isdir','lambda x: Ntest(os.path.isdir(Neval(car(x))))')
+lsp(""" (defq  dir-tree
+  (lambda
+   (z)
+   (if
+    (null z)
+    (map dir-tree (dir))
+    (if
+     (isdir z)
+     (let
+      ((pwd (cd)))
+      (if (error-trap (cd z)) (prog1 (cons z (dir-tree)) (cd pwd)) z))
+     z))))))""")
+
 
 loadlisp("editor.lsp")
 loadlisp("COMP.LSP")
 lsp("(compile 'comyp2)")
-
 lsp("(setq eeprint251 eeprint25)")
 lsp("(compile-edit)")
-
 defq('eeprint25','lambda x: eeprint25(Neval(car(x)),Neval(cadr(x)))')
-
-
 lsp("(setq MODULE 'NEW)")
 
 defq('repl','lambda x: repl(Neval(car(x)))')
 
-
-#lsp(""" (print (cdr (python-eval 'sys.argv)))   """)
-
-#repl()
 
     
 
