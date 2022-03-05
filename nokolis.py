@@ -24,6 +24,7 @@ class oblist:
     _id_T="T"
     _id_nil=[]
     _id_NIL=[]
+    _id_HISTORY=[]
     
 
 def repl(n=0):
@@ -41,6 +42,7 @@ def repl(n=0):
         else:
             pprint(Neval(rivi),1,True)
         print('')
+        oblist._id_HISTORY=cons(rivi,oblist._id_HISTORY)
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
     except Exception as ex:
@@ -58,7 +60,7 @@ def repl(n=0):
             except:
                 oblist.enviro=[]
   if n==0:
-     ni="OBLIST"+str(time.localtime().tm_hour)+"c"+str(time.localtime().tm_min)+"c"+str(time.localtime().tm_sec)
+     ni=f"OBLIST{time.localtime().tm_hour:02d}{time.localtime().tm_min:02d}{time.localtime().tm_sec:02d}"
      print(f"saving {ni}.npy")
      lsp(f"(setq {ni} (oblist))")
      lsp(f"(save-module-npy '{ni})")
@@ -540,6 +542,8 @@ def a2(x):return Neval(cadr(x))
 def a3(x):return Neval(caddr(x))
 def a4(x):return Neval(cadddr(x))
 def a5(x):return Neval(caddddr(x))
+def a6(x):return Neval(car(cdr(cddddr(x))))
+def a7(x):return Neval(car(cddr(cddddr(x))))
 defq('plus', 'lambda x: a1(x)+a2(x)')
 defq('difference','lambda x: a1(x)-a2(x)')
 defq('times','lambda x: a1(x)*a2(x)')
@@ -1343,7 +1347,7 @@ lsp(""" (progn
         (defq RED (255 0 0))
         (defq GREEN ( 0 255 0))
         (defq BLUE ( 0 0 255))
-        (defq YELLOW ( 0 255 255))
+        (defq YELLOW (255 255 0))
         (defq BLACK ( 0 0 0))
         (defq WHITE ( 255 255 255))
         (defq FONTTI (FreeSansBold.ttf 20 (0 0 0))) 
@@ -1463,13 +1467,11 @@ def imagefill(im,x,y,col,border):
 defq('imagefill','lambda x: imagefill(a1(x),a2(x),a3(x),a4(x),a5(x))')
 
 lsp("""(defq imagebox
-  (lambda
-   (im p s c)
+  (lambda (im p s c)
    (let
     ((p1 (list (car p) (cadr p)))
      (p2 (list (+ (car p) (car s)) (cadr p)))
-     (p3
-      (list (+ (car p) (car s)) (+ (cadr p) (cadr s))))
+     (p3 (list (+ (car p) (car s)) (+ (cadr p) (cadr s))))
      (p4 (list (car p) (+ (cadr p) (cadr s)))))
     (imagedraw im p1 p2 c)
     (imagedraw im p2 p3 c)
@@ -1477,6 +1479,9 @@ lsp("""(defq imagebox
     (imagedraw im p4 p1 c))))
 """)
 
+defq('time','lambda x: parse(f"({time.localtime().tm_mon} {time.localtime().tm_mday} {time.localtime().tm_hour} {time.localtime().tm_min} {time.localtime().tm_sec})")')
+
+defq('sleep','lambda x: time.sleep(a1(x))')
 
 loadlisp("EDITOR.LSP")
 loadlisp("COMP.LSP")
