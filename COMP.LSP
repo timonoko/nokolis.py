@@ -8,7 +8,7 @@
   full-oblist-name
   (lambda (x) (compress (nconc (explode 'oblist.) (explode (oblist-name-raw x))))))
  (defq print-nice (nlambda (x) (print (compress (cdr x)))))
- (defq PYTHON ())
+ (defq PYTHON (PRIMES prime fib))
  (defq
   save-py
   (lambda
@@ -102,19 +102,12 @@
    (print-nice (34 39 44 39 108 97 109 98 100 97 32 120 58 32))
    (print x)
    (printc 40)
-   (if
-    (car (cadr y))
-    (print-nice (34 78 101 118 97 108 40 99 97 114 40 120 41 41)))
-   (if
-    (cdr (cadr y))
-    (print-nice
-     (34 , 78 101 118 97 108 40 99 97 d
-      114 40 120 41 41)))
-   (if
-    (cddr (cadr y))
-    (print-nice
-     (34 , 78 101 118 97 108 40 99 97 d
-      d 114 40 120 41 41)))
+   (for
+    (z 1 (length (cadr y)))
+    (print 'a)
+    (print z)
+    (print '(x))
+    (if (< z (length (cadr y))) (print ',)))
    (print-nice (34 41 39 41))
    True))
  (defq expand4ever (lambda (x) (do-lambda (macroexpand (ch-name x)) tabs)))
