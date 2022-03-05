@@ -1479,7 +1479,9 @@ lsp("""(defq imagebox
     (imagedraw im p4 p1 c))))
 """)
 
-defq('time','lambda x: parse(f"({time.localtime().tm_mon} {time.localtime().tm_mday} {time.localtime().tm_hour} {time.localtime().tm_min} {time.localtime().tm_sec})")')
+defq('time','lambda x: parse(f"({time.localtime().tm_year} {time.localtime().tm_mon}\
+             {time.localtime().tm_mday} {time.localtime().tm_hour} {time.localtime().tm_min}\
+             {time.localtime().tm_sec})")')
 
 defq('sleep','lambda x: time.sleep(a1(x))')
 
