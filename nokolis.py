@@ -535,14 +535,11 @@ readcc=_GetchUnix()
 def printc(x):
     print(chr(x),end="")
 
-
 def a1(x):return Neval(car(x))
 def a2(x):return Neval(cadr(x))
 def a3(x):return Neval(caddr(x))
 def a4(x):return Neval(cadddr(x))
 def a5(x):return Neval(caddddr(x))
-    
-
 defq('plus', 'lambda x: a1(x)+a2(x)')
 defq('difference','lambda x: a1(x)-a2(x)')
 defq('times','lambda x: a1(x)*a2(x)')
@@ -1465,29 +1462,19 @@ def imagefill(im,x,y,col,border):
     return True
 defq('imagefill','lambda x: imagefill(a1(x),a2(x),a3(x),a4(x),a5(x))')
 
-lsp(""" (defq  box
+lsp("""(defq imagebox
   (lambda
    (im p s c)
-   (imagedraw
-    im
-    (list (car p) (cadr p))
-    (list (+ (car p) (car s)) (cadr p))
-    c)
-   (imagedraw
-    im
-    (list (+ (car p) (car s)) (cadr p))
-    (list (+ (car p) (car s)) (+ (cadr p) (cadr s)))
-    c)
-   (imagedraw
-    im
-    (list (+ (car p) (car s)) (+ (cadr p) (cadr s)))
-    (list (car p) (+ (cadr p) (cadr s)))
-    c)
-   (imagedraw
-    im
-    (list (car p) (+ (cadr p) (cadr s)))
-    (list (car p) (cadr p))
-    c)))
+   (let
+    ((p1 (list (car p) (cadr p)))
+     (p2 (list (+ (car p) (car s)) (cadr p)))
+     (p3
+      (list (+ (car p) (car s)) (+ (cadr p) (cadr s))))
+     (p4 (list (car p) (+ (cadr p) (cadr s)))))
+    (imagedraw im p1 p2 c)
+    (imagedraw im p2 p3 c)
+    (imagedraw im p3 p4 c)
+    (imagedraw im p4 p1 c))))
 """)
 
 
