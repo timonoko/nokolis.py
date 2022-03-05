@@ -6,6 +6,7 @@
   edit
   (nlambda
    (THISNAME)
+   (setq e (list 'edit THISNAME))
    (uncompile THISNAME)
    (setq EXIT ())
    (when

@@ -197,11 +197,17 @@ def cddr(x):
 def cdddr(x):
     return cdr(cddr(x))
 
+def cddddr(x):
+    return cdr(cdddr(x))
+
 def caddr(x):
     return car(cddr(x))
 
 def cadddr(x):
     return car(cdddr(x))
+
+def caddddr(x):
+    return car(cddddr(x))
 
 def atom(x):
     if x==[]: return True
@@ -465,6 +471,11 @@ def array2list(x):
   else:
     return []
 
+def tuple2list(x):
+    return array2list(list(x))
+def list2tuple(x):
+    return tuple(list2array(x))
+
 def compr2(x):
      if x==[]:
          return ""
@@ -491,6 +502,7 @@ def list2array(x):
     else:
          return [y]+list2array(cdr(x))
 
+     
 def arraynthset(x,y,z):
      y[x]=z
      return y
@@ -522,28 +534,36 @@ readcc=_GetchUnix()
 
 def printc(x):
     print(chr(x),end="")
-     
-defq('plus', 'lambda x: Neval(car(x))+Neval(cadr(x))')
-defq('difference','lambda x: Neval(car(x))-Neval(cadr(x))')
-defq('times','lambda x: Neval(car(x))*Neval(cadr(x))')
-defq('quotient','lambda x: Neval(car(x))/Neval(cadr(x))')
-defq('remainder','lambda x: Neval(car(x))%Neval(cadr(x))')
-defq('eqn','lambda x: Ntest(Neval(car(x))==Neval(cadr(x)))')
-defq('eq','lambda x: Ntest(Neval(car(x)) is Neval(cadr(x)))')
-defq('lessp','lambda x: Ntest(Neval(car(x))<Neval(cadr(x)))')
-defq('greaterp','lambda x: Ntest(Neval(car(x))>Neval(cadr(x)))')
-defq('atom','lambda x: Ntest(atom(Neval(car(x))))')
-defq('not','lambda x: Nnot(Neval(car(x)))')
-defq('print','lambda x: Nprint(Neval(car(x)),Neval(cadr(x)))')
+
+
+def a1(x):return Neval(car(x))
+def a2(x):return Neval(cadr(x))
+def a3(x):return Neval(caddr(x))
+def a4(x):return Neval(cadddr(x))
+def a5(x):return Neval(caddddr(x))
+    
+
+defq('plus', 'lambda x: a1(x)+a2(x)')
+defq('difference','lambda x: a1(x)-a2(x)')
+defq('times','lambda x: a1(x)*a2(x)')
+defq('quotient','lambda x: a1(x)/a2(x)')
+defq('remainder','lambda x: a1(x)%a2(x)')
+defq('eqn','lambda x: Ntest(a1(x)==a2(x))')
+defq('eq','lambda x: Ntest(a1(x) is a2(x))')
+defq('lessp','lambda x: Ntest(a1(x)<a2(x))')
+defq('greaterp','lambda x: Ntest(a1(x)>a2(x))')
+defq('atom','lambda x: Ntest(atom(a1(x)))')
+defq('not','lambda x: Nnot(a1(x))')
+defq('print','lambda x: Nprint(a1(x),a2(x))')
 defq('quote','lambda x: car(x)')
 defq('function','lambda x: car(x)')
-defq('setq','lambda x: Nset(car(x),Neval(cadr(x)))')
-defq('set','lambda x: Nset(Neval(car(x)),Neval(cadr(x)))')
+defq('setq','lambda x: Nset(car(x),a2(x))')
+defq('set','lambda x: Nset(a1(x),a2(x))')
 defq('defq','lambda x: defq(car(x),cadr(x))')
-defq('cons', 'lambda x: [Neval(car(x)),Neval(cadr(x))]')
-defq('car', 'lambda x: car(Neval(car(x)))')
-defq('cdr', 'lambda x: cdr(Neval(car(x)))')
-defq('cddr', 'lambda x: cddr(Neval(car(x)))')
+defq('cons', 'lambda x: [a1(x),a2(x)]')
+defq('car', 'lambda x: car(a1(x))')
+defq('cdr', 'lambda x: cdr(a1(x))')
+defq('cddr', 'lambda x: cddr(a1(x))')
 defq('list', 'lambda x: Nlist(x)')
 defq('lambda', 'lambda x: Nlambda(car(x),oblist.args[-1],cdr(x))')
 defq('progn', 'lambda x: Nprogn(x)')
@@ -560,35 +580,35 @@ defq('sp', 'lambda x: print(" ",end="")')
 defq('lb', 'lambda x: print("(",end="")')
 defq('rb', 'lambda x: print(")",end="")')
 defq('while', 'lambda x: Nwhile(car(x),cdr(x))')
-defq('eval', 'lambda x: Neval(Neval(car(x)))')
-defq('repeat-times', 'lambda x: Nrepeat_times(Neval(car(x)),cdr(x))')
-defq('rplaca', 'lambda x: rplaca(Neval(car(x)),Neval(cadr(x)))')
-defq('rplacd', 'lambda x: rplacd(Neval(car(x)),Neval(cadr(x)))')
-defq('last', 'lambda x: last(Neval(car(x)))')
-defq('nconc', 'lambda x: nconc(Neval(car(x)),Neval(cadr(x)))')
-defq('identp', 'lambda x: Ntest(identp(Neval(car(x))))')
-defq('type', 'lambda x: str(type(Neval(car(x))))')
-defq('str-raw', 'lambda x: str(Neval(car(x)))')
+defq('eval', 'lambda x: Neval(a1(x))')
+defq('repeat-times', 'lambda x: Nrepeat_times(a1(x),cdr(x))')
+defq('rplaca', 'lambda x: rplaca(a1(x),a2(x))')
+defq('rplacd', 'lambda x: rplacd(a1(x),a2(x))')
+defq('last', 'lambda x: last(a1(x))')
+defq('nconc', 'lambda x: nconc(a1(x),a2(x))')
+defq('identp', 'lambda x: Ntest(identp(a1(x)))')
+defq('type', 'lambda x: str(type(a1(x)))')
+defq('str-raw', 'lambda x: str(a1(x))')
 defq('oblist', 'lambda x: array2list(oblist.names)')
-defq('oblist-name-raw', 'lambda x: str(oblist_name2(Neval(car(x))))')
-defq('explode', 'lambda x: explode(Neval(car(x)))')
-defq('compress', 'lambda x: compress(Neval(car(x)))')
-defq('array2list', 'lambda x: array2list(Neval(car(x)))')
-defq('list2array', 'lambda x: list2array(Neval(car(x)))')
-defq('python-eval', 'lambda x: eval(Neval(car(x)))')
-defq('python-exec', 'lambda x: exec(Neval(car(x)))')
+defq('oblist-name-raw', 'lambda x: str(oblist_name2(a1(x)))')
+defq('explode', 'lambda x: explode(a1(x))')
+defq('compress', 'lambda x: compress(a1(x))')
+defq('array2list', 'lambda x: array2list(a1(x))')
+defq('list2array', 'lambda x: list2array(a1(x))')
+defq('python-eval', 'lambda x: eval(a1(x))')
+defq('python-exec', 'lambda x: exec(a1(x))')
 defq('quit', 'lambda x: os._exit(1)')
-defq('array-nth', 'lambda x: Neval(cadr(x))[Neval(car(x))]')
-defq('array-nth-set', 'lambda x: arraynthset(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
-defq('array-append', 'lambda x: Neval(car(x))+Neval(cadr(x))')
-defq('array-length', 'lambda x: len(Neval(car(x)))')
-defq('nthcdr', 'lambda x: nthcdr(Neval(car(x)),Neval(cadr(x)))')
-defq('int', 'lambda x: int(Neval(car(x)))')
-defq('printc', 'lambda x: print(chr(Neval(car(x))),end="")')
+defq('array-nth', 'lambda x: a2(x)[a1(x)]')
+defq('array-nth-set', 'lambda x: arraynthset(a1(x),a2(x),a3(x))')
+defq('array-append', 'lambda x: a1(x)+a2(x)')
+defq('array-length', 'lambda x: len(a1(x))')
+defq('nthcdr', 'lambda x: nthcdr(a1(x),a2(x))')
+defq('int', 'lambda x: int(a1(x))')
+defq('printc', 'lambda x: print(chr(a1(x)),end="")')
 defq('readcc', 'lambda x: ord(readcc())')
 defq('read-str', 'lambda x: input("? ")')
-defq('read-from-str', 'lambda x: parse(Neval(car(x)))')
-defq('return', 'lambda x: throw("return",Neval(car(x)))')
+defq('read-from-str', 'lambda x: parse(a1(x))')
+defq('return', 'lambda x: throw("return",a1(x))')
 defq('readc', 'lambda x: readc() ')
 defq('read', 'lambda x: Nread()')
 defq('readline', 'lambda x: parse(input("> "))')
@@ -606,11 +626,11 @@ def readc():
  
 def null(x): return x==[]
 
-defq('throw', 'lambda x: throw(Neval(car(x)),Neval(cadr(x)))')
+defq('throw', 'lambda x: throw(a1(x),a2(x))')
 def throw(name,data):
       raise Exception(name,data)
 
-defq('catch', 'lambda x: catch(Neval(car(x)),cadr(x))' )
+defq('catch', 'lambda x: catch(a1(x),cadr(x))' )
 def catch(name,data):
     enviro=len(oblist.enviro)
     try:
@@ -638,8 +658,10 @@ lsp(""" (progn
 lsp(""" (progn
  (defun cadr (x) (car (cdr x)))
  (defun cdddr (x) (cdr (cddr x)))
+ (defun cddddr (x) (cdr (cdddr x)))
  (defun caddr (x) (car (cddr x)))
  (defun cadddr (x) (car (cdddr x)))
+ (defun caddddr (x) (car (cddddr x)))
  (defun caar (x) (car (car x))) 
 
 
@@ -888,7 +910,7 @@ lsp(""" (progn
 )))""")
 
 lsp("(defun sort (x) (array2list (arraysort (list2array x))))")
-defq('arraysort', 'lambda x: arraysort(Neval(car(x)))')
+defq('arraysort', 'lambda x: arraysort(a1(x))')
 def arraysort(x): x.sort(); return x
 
 
@@ -905,7 +927,7 @@ def print_to_file(x,y,pretty):
         print("")
         f.close()
         sys.stdout = original_stdout
-defq('print-to-file', 'lambda x: print_to_file(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
+defq('print-to-file', 'lambda x: print_to_file(a1(x),a2(x),a3(x))')
 
 def with_out_file(x,y):
     original_stdout = sys.stdout
@@ -917,7 +939,7 @@ def with_out_file(x,y):
         f.close()
     sys.stdout = original_stdout
     return tulos
-defq('with-out-file', 'lambda x: with_out_file(Neval(car(x)),cdr(x))')
+defq('with-out-file', 'lambda x: with_out_file(a1(x),cdr(x))')
 
 def with_in_file(x,y):
     original_stdin = sys.stdin
@@ -928,7 +950,7 @@ def with_in_file(x,y):
         f.close()
     sys.stdin = original_stdin
     return tulos
-defq('with-in-file', 'lambda x: with_in_file(Neval(car(x)),cdr(x))')
+defq('with-in-file', 'lambda x: with_in_file(a1(x),cdr(x))')
 
 def hii(lis):
     if lis!=[]:
@@ -948,18 +970,18 @@ def loadlisp(name):
     return name
 
 array2list(os.listdir())    
-defq('load', 'lambda x: loadlisp(Neval(car(x)))')
+defq('load', 'lambda x: loadlisp(a1(x))')
 
 def write_npy(na,ar):
     from numpy import save,array
     nar=array(ar,dtype=object)
     return save(na,nar)
-defq('write-npy','lambda x: write_npy(Neval(car(x)),Neval(cadr(x)))')
+defq('write-npy','lambda x: write_npy(a1(x),a2(x))')
 
 def read_npy(na):
     from numpy import load
     return load(na,allow_pickle=True).tolist()
-defq('read-npy','lambda x: read_npy(Neval(car(x)))')
+defq('read-npy','lambda x: read_npy(a1(x))')
 
 lsp("""(progn
 (defun save-formula (m)
@@ -1007,13 +1029,13 @@ defq('gensym','lambda x: gensym()')
 
 def equal(x,y):
     return ((x is y) or ((x == y) or (car(x) and (car(y) and (equal(car(x),car(y)) and equal(cdr(x),cdr(y)))))))
-defq('equal', 'lambda x:  Ntest(equal(Neval(car(x)),Neval(cadr(x))))')
+defq('equal', 'lambda x:  Ntest(equal(a1(x),a2(x)))')
 
 def python_exec_file(n):
   with open(n, 'r') as file:
     data = "".join(file.read())
   exec(data)
-defq('python-exec-file', 'lambda x: python_exec_file(Neval(car(x)))')
+defq('python-exec-file', 'lambda x: python_exec_file(a1(x))')
 
 def depthless(n,x):
     if (0 > n):
@@ -1023,7 +1045,7 @@ def depthless(n,x):
             return (n - 1)
         else:
             return depthless(depthless(n,car(x)),cdr(x))
-defq('depthless2','lambda x: Ntest(depthless(Neval(car(x)),Neval(cadr(x))))')
+defq('depthless2','lambda x: Ntest(depthless(a1(x),a2(x)))')
 
 def tab(x):
     if (0 < x):
@@ -1039,7 +1061,7 @@ def flat(x):
             return False
     else:
         return True
-defq('flat','lambda x: Ntest(flat(Neval(car(x))))')
+defq('flat','lambda x: Ntest(flat(a1(x)))')
     
 def pprint(x,tabs=1,strings=False):
     if not numberp(tabs): tabs=1
@@ -1092,9 +1114,9 @@ def pprint(x,tabs=1,strings=False):
                 tab(tabs)
             x=cdr(x)
         print(")",end="")
-defq('pprint', 'lambda x: pprint(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
+defq('pprint', 'lambda x: pprint(a1(x),a2(x),a3(x))')
 
-defq('member','lambda x:member(Neval(car(x)),Neval(cadr(x)))')
+defq('member','lambda x:member(a1(x),a2(x))')
 def member(x,y):
     if y == []:
         return []
@@ -1119,10 +1141,10 @@ def macroexpand(x9,hv=()):
         return macroexpand(Neval(cons(cons("function",cons(cons(iik,cdr(Neval(car(x9)))),[])),cdr(x9))))
     elif True:
         return cons(macroexpand(car(x9)),macroexpand(cdr(x9),t))
-defq('macroexpand','lambda x: macroexpand(Neval(car(x)),Neval(cadr(x)))')
+defq('macroexpand','lambda x: macroexpand(a1(x),a2(x))')
 
 
-defq('subst','lambda x: subst(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')                    
+defq('subst','lambda x: subst(a1(x),a2(x),a3(x))')                    
 def subst(old,new,tree):
     if tree:
         if equal(old,tree):
@@ -1136,7 +1158,7 @@ def subst(old,new,tree):
     else:
         return tree
 
-defq('copy','lambda x: copy(Neval(car(x)))')
+defq('copy','lambda x: copy(a1(x))')
 def copy(x):
     if atom(x):
         return x
@@ -1147,20 +1169,20 @@ def copy(x):
 def mappy(f,x):
     if x==[]: return []
     else: return cons(f(car(x)),mappy(f,cdr(x)))
-defq('mappy','lambda x: mappy(eval(car(x)),Neval(cadr(x)))')  
+defq('mappy','lambda x: mappy(eval(car(x)),a2(x))')  
 
 def mapcpy(f,x):
     if x==[]: pass
     else:
         f(car(x))
         mapcpy(f,cdr(x))
-defq('mapcpy','lambda x: mapcpy(eval(car(x)),Neval(cadr(x)))')  
+defq('mapcpy','lambda x: mapcpy(eval(car(x)),a2(x))')  
 
 def apppy(f,x):return f(x)
-defq('apppy','lambda x: apppy(eval(car(x)),Neval(cadr(x)))')  
+defq('apppy','lambda x: apppy(eval(car(x)),a2(x))')  
 lsp("(defmacro apply (f x) (cons f x))")
 
-defq('blockq3','lambda x: blockq2(Neval(car(x)))')
+defq('blockq3','lambda x: blockq2(a1(x))')
 def blockq2(XYPY):
     if atom(XYPY):
         return XYPY
@@ -1181,14 +1203,14 @@ def reverse(x):
         return nconc(reverse(cdr(x)),cons(car(x),[]))
     else:
         return cons(car(x),[])
-defq('reverse','lambda x: reverse(Neval(car(x)))')
+defq('reverse','lambda x: reverse(a1(x))')
 
 def append(x9,y9):
     if x9:
         return cons(car(x9),append(cdr(x9),y9))
     else:
         return y9
-defq('append','lambda x: append(Neval(car(x)),Neval(cadr(x)))')
+defq('append','lambda x: append(a1(x),a2(x))')
 
 def error_trap(x):
     try:
@@ -1243,12 +1265,12 @@ def re_search(x,y):
         if re.search(x,l):
             tulos.append(l)
     return tulos
-defq('search-array','lambda x: re_search(Neval(car(x)),Neval(cadr(x)))')
+defq('search-array','lambda x: re_search(a1(x),a2(x))')
 lsp("(defun search (x y) (array2list (search-array x (list2array y))))")
 defq('dir-raw', 'lambda x: os.listdir()')
 lsp("(defun dir (x) (array2list(if x (search-array x (dir-raw)) (dir-raw))))")
 lsp("(defun continue () (load (car (reverse (sort (dir '^OBLIST))))))")
-defq('os-remove','lambda x: os.remove(Neval(car(x)))')
+defq('os-remove','lambda x: os.remove(a1(x))')
 lsp("(defun del-file (x) (mapc os-remove (dir x)) (dir))") 
 lsp("""(defq os-
   (lambda
@@ -1260,22 +1282,22 @@ lsp("""(defq os-
       (nconc (explode x) (list 40 (if y (explode y) 32) 41))))))))""")
 lsp("(defun perkele () (del-file '^OBLIST))")
 
-defq("loadimage", 'lambda x: loadimage(Neval(car(x)))')
-defq("saveimage", 'lambda x: saveimage(Neval(car(x)),Neval(cadr(x)))')
-defq("showimage", 'lambda x: showimage(Neval(car(x)))')
-defq("putpixel", 'lambda x: putpixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)))')
-defq("getpixel", 'lambda x: getpixel(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
-defq("imagesize", 'lambda x: imagesize(Neval(car(x)))')
-defq("newimage", 'lambda x: newimage(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
+defq("loadimage", 'lambda x: loadimage(a1(x))')
+defq("saveimage", 'lambda x: saveimage(a1(x),a2(x))')
+defq("showimage", 'lambda x: showimage(a1(x))')
+defq("putpixel", 'lambda x: putpixel(a1(x),a2(x),a3(x),a4(x))')
+defq("getpixel", 'lambda x: getpixel(a1(x),a2(x),a3(x))')
+defq("imagesize", 'lambda x: imagesize(a1(x))')
+defq("newimage", 'lambda x: newimage(a1(x),a2(x),a3(x),a4(x))')
 defq("killdisplay", 'lambda x: killdisplay()')
-defq("imagetext",'lambda x: imagetext(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)))')
-defq("imagedraw",'lambda x: imagedraw(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)),Neval(cadddr(x)))')
+defq("imagetext",'lambda x: imagetext(a1(x),a2(x),a3(x),a4(x))')
+defq("imagedraw",'lambda x: imagedraw(a1(x),a2(x),a3(x),a4(x))')
 
 from PIL import Image,ImageDraw,ImageFont
 
 def imagedraw (im,s,e,c):
     line=(car(s),cadr(s),car(e),cadr(e))
-    color=(car(c),cadr(c),caddr(c))
+    color=list2tuple(c)
     draw = ImageDraw.Draw(im)
     draw.line(line,color)
     return im
@@ -1285,7 +1307,7 @@ def imagetext(im,p,fsc,text):
     fnt=car(fsc)
     size=cadr(fsc)
     v=caddr(fsc)
-    color=(car(v),cadr(v),caddr(v))
+    color=list2tuple(v)
     fnt = ImageFont.truetype("/usr/share/fonts/truetype/freefont/"+fnt,size)
     d = ImageDraw.Draw(im)
     d.text(pos, str(text), font=fnt, fill=color)
@@ -1303,24 +1325,19 @@ def saveimage(im,f):
     return f
 
 def getpixel(im,x,y):
-    p=im.getpixel((x,y)) 
-    return cons(p[0],cons(p[1],cons(p[2])))
+    return tuple2list(im.getpixel((x,y)))
+    
                     
 def putpixel(im,x,y,v):
-    v2=(car(v),cadr(v),caddr(v))
-    im.putpixel((x,y),v2)
+    im.putpixel((x,y),list2tuple(v))
     return v
 
 def imagesize(im):
-    x,y=im.size
-    return cons(x,cons(y))
+    return tuple2list(im.size)
     
-def newimage(x,y,v):
-    if v!=[]:
-       c=(car(v),cadr(v),caddr(v))
-    else:
-       c=(0,0,0)
-    return Image.new('RGB',(x,y),c)
+def newimage(x,y,v,typ=[]):
+    if typ==[]: typ="RGB"
+    return Image.new(typ,(x,y),list2tuple(v))
 
 def killdisplay():
     os.system("killall display")
@@ -1340,15 +1357,14 @@ lsp(""" (progn
 	  FreeSerifBoldItalic.ttf  FreeSerif.ttf)))) """)
 
 
-WHITE=[255,[255,[255,[]]]]
-def imagepaste(im=[],p=[],uusi=[]):
+def imagepaste(im=[],p=[],uusi=[],color=[255,[255,[255,[]]]]):
     s=imagesize(uusi)
     for x in range(0,(1 + (s[0] - 1))):
         for y in range(0,(1 + (s[1][0] - 1))):
             pix=getpixel(uusi,x,y)
-            if not equal(pix,WHITE):
+            if not equal(pix,color):
                 putpixel(im,(p[0] + x),(p[1][0] + y),pix)
-defq('imagepaste','lambda x: imagepaste(Neval(car(x)),Neval(cadr(x)),Neval(caddr(x)))')
+defq('imagepaste','lambda x: imagepaste(a1(x),a2(x),a3(x))')
 
 def eeprint25(x,dec):
     printc(9)
@@ -1390,11 +1406,11 @@ def eeprint25(x,dec):
         return printc(41)
 
     
-defq('chdir','lambda x: os.chdir(Neval(car(x)))')
+defq('chdir','lambda x: os.chdir(a1(x))')
 defq('getcwd','lambda x: os.getcwd()')
 lsp("(defq cd (lambda (x) (if x (chdir x)) (getcwd))))")
 lsp("(defun sys.argv() (cdr (array2list (python-eval 'sys.argv))))")
-defq('isdir','lambda x: Ntest(os.path.isdir(Neval(car(x))))')
+defq('isdir','lambda x: Ntest(os.path.isdir(a1(x)))')
 lsp(""" (defq  dir-tree
   (lambda
    (z)
@@ -1408,7 +1424,7 @@ lsp(""" (defq  dir-tree
       (if (error-trap (cd z)) (prog1 (cons z (dir-tree)) (cd pwd)) z))
      z))))))""")
 
-defq('delete','lambda x: delete(Neval(car(x)),Neval(cadr(x)))')
+defq('delete','lambda x: delete(a1(x),a2(x))')
 def delete(x=[],lista=[]):
     if lista!=[]:
         if equal(x,lista[0]):
@@ -1417,6 +1433,62 @@ def delete(x=[],lista=[]):
             return cons(lista[0],delete(x,lista[1]))
     return lista
 
+lsp("""
+ (defq imagefill
+  (lambda
+   (im x y color border)
+   (setq p (getpixel im x y))
+   (cond
+    ((equal p color) pass)
+    ((equal p border) pass)
+    (t
+     (putpixel im x y color)
+     (imagefill im (+ x 1) y color border)
+     (imagefill im x (+ y 1) color border)
+     (imagefill im (- x 1) y color border)
+     (imagefill im x (- y 1) color border)))
+   True))
+""")
+
+def imagefill(im,x,y,col,border):
+    p=getpixel(im,x,y)
+    if equal(p,col):
+        pass
+    elif equal(p,border):
+        pass
+    elif True:
+        putpixel(im,x,y,col)
+        imagefill(im,(x + 1),y,col,border)
+        imagefill(im,x,(y + 1),col,border)
+        imagefill(im,(x - 1),y,col,border)
+        imagefill(im,x,(y - 1),col,border)
+    return True
+defq('imagefill','lambda x: imagefill(a1(x),a2(x),a3(x),a4(x),a5(x))')
+
+lsp(""" (defq  box
+  (lambda
+   (im p s c)
+   (imagedraw
+    im
+    (list (car p) (cadr p))
+    (list (+ (car p) (car s)) (cadr p))
+    c)
+   (imagedraw
+    im
+    (list (+ (car p) (car s)) (cadr p))
+    (list (+ (car p) (car s)) (+ (cadr p) (cadr s)))
+    c)
+   (imagedraw
+    im
+    (list (+ (car p) (car s)) (+ (cadr p) (cadr s)))
+    (list (car p) (+ (cadr p) (cadr s)))
+    c)
+   (imagedraw
+    im
+    (list (car p) (+ (cadr p) (cadr s)))
+    (list (car p) (cadr p))
+    c)))
+""")
 
 
 loadlisp("EDITOR.LSP")
@@ -1424,13 +1496,13 @@ loadlisp("COMP.LSP")
 lsp("(compile 'comyp2)")
 lsp("(setq eeprint251 eeprint25)")
 lsp("(compile-edit)")
-defq('eeprint25','lambda x: eeprint25(Neval(car(x)),Neval(cadr(x)))')
+defq('eeprint25','lambda x: eeprint25(a1(x),a2(x))')
 loadlisp("MATH.LSP")
 lsp("(define-all)")
 
 lsp("(setq MODULE 'NEW)")
 
-defq('repl','lambda x: repl(Neval(car(x)))')
+defq('repl','lambda x: repl(a1(x))')
 
 
     
