@@ -1506,6 +1506,19 @@ defq('sleep','lambda x: time.sleep(a1(x))')
 
 lsp("(set (compress '(955)) lambda)")
 
+def googlemap(xtile,ytile, zoom):
+    from urllib.request import urlretrieve
+    urlretrieve('https://mts1.google.com/vt/x=%d&y=%d&z=%d' % (int(xtile),int(ytile), zoom),"/tmp/temp.png")
+    return loadimage("/tmp/temp.png")
+defq('googlemap','lambda x: googlemap(a1(x),a2(x),a3(x))')
+
+def maptile(lat_deg, lon_deg, zoom):
+    lat_rad = math.radians(lat_deg)
+    n = 2.0 ** zoom
+    xtile = (lon_deg + 180.0) / 360.0 * n
+    ytile = ((1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
+    return cons(xtile,cons(ytile))
+defq('maptile','lambda x: maptile(a1(x),a2(x),a3(x))')
 
 loadlisp("EDITOR.LSP")
 loadlisp("COMP.LSP")
@@ -1522,4 +1535,3 @@ defq('repl','lambda x: repl(a1(x))')
 
 
     
-
