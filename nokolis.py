@@ -59,12 +59,7 @@ def repl(n=0):
                 oblist.enviro=unwind_enviro(oblist.enviro,len(oblist.enviro))
             except:
                 oblist.enviro=[]
-  if n==0:
-     ni=f"OBLIST{time.localtime().tm_hour:02d}{time.localtime().tm_min:02d}{time.localtime().tm_sec:02d}"
-     print(f"saving {ni}.npy")
-     lsp(f"(setq {ni} (oblist))")
-     lsp(f"(save-module-npy '{ni})")
-
+  if n==0: save_all()
 
      
      
@@ -865,7 +860,7 @@ lsp(""" (progn
     (cons 'progn y))))
 
 
-(defun macroexpand   (x9 hantaa-vaan)
+(defun macroexpand-old   (x9 hantaa-vaan)
    (cond
     ((atom x9) x9)
     ((equal (car x9) 'quote) x9)
@@ -996,22 +991,31 @@ def read_npy(na):
 defq('read-npy','lambda x: read_npy(a1(x))')
 
 lsp("""(progn
-(defun save-formula (m)
+ (defq
+  save-formula
+  (lambda
+   (module)
+   (cons
+    (quote progn)
     (cons
-     'progn
-     (cons
-      (list 'defq 'MODULE m)
-      (map
-       (function
-        (lambda
-         (x)
-         (uncompile x)
-         (if (or (equal (type (eval x)) (type car))
-		         (equal (type (eval x)) (type plus))
-		         (member x '(m%f m%x m x )))
-	       NIL
-	      (list 'defq x (eval x)))))
-       (eval m)))))
+     (list 'defq 'MODULE module)
+     (let
+      ((tulo_s nil)
+       (modu_le (eval module))
+       (myfu
+        (function
+         (lambda
+          (x%x)
+          (uncompile x%x)
+          (if
+           (or
+            (equal (type (eval x%x)) (type car))
+            (equal (type (eval x%x)) (type plus))
+            (member x%x '(m%f m%x module x%x True False T NIL nil t)))
+           x%x
+           (list 'defq x%x (eval x%x)))))))
+      (while modu_le (push (myfu (pop modu_le)) tulo_s))
+      tulo_s)))))
  (defq
   save
   (lambda
@@ -1520,6 +1524,13 @@ def maptile(lat_deg, lon_deg, zoom):
     return cons(xtile,cons(ytile))
 defq('maptile','lambda x: maptile(a1(x),a2(x),a3(x))')
 
+def save_all():
+     ni=f"OBLIST{time.localtime().tm_hour:02d}{time.localtime().tm_min:02d}{time.localtime().tm_sec:02d}"
+     print(f"saving {ni}.npy")
+     lsp(f"(setq {ni} (oblist))")
+     lsp(f"(save-module-npy '{ni})")
+defq('save-all','lambda x: save_all()')
+
 loadlisp("EDITOR.LSP")
 loadlisp("COMP.LSP")
 lsp("(compile 'comyp2)")
@@ -1532,6 +1543,9 @@ lsp("(define-all)")
 lsp("(setq MODULE 'NEW)")
 
 defq('repl','lambda x: repl(a1(x))')
+
+defq('sun_alt','lambda x: sun.alt(a1(x),a2(x),a3(x),a4(x))')
+import sun
 
 
     
