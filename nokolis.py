@@ -771,6 +771,17 @@ lsp(""" (progn
   (if m%x
    (progn (m%f (car m%x)) (map m%f (cdr m%x)) t)))
 
+ (defq
+  filter
+  (lambda
+   (f%m x%m)
+   (if
+    x%m
+    (if
+     (f%m (car x%m))
+     (cons (car x%m) (filter f%m (cdr x%m)))
+     (filter f%m (cdr x%m))))))
+
 (defmacro backquote ZYKSX (blockq2 ZYKSX))
 
 (defun blockq2
@@ -1179,6 +1190,14 @@ def mapcpy(f,x):
         mapcpy(f,cdr(x))
 defq('mapcpy','lambda x: mapcpy(eval(car(x)),a2(x))')  
 
+def filterpy(f,x):
+    if x==[]: return []
+    elif f(car(x)):
+        return cons(car(x),filterpy(f,cdr(x)))
+    else:
+        return filterpy(f,cdr(x))
+defq('filterpy','lambda x: filterpy(eval(car(x)),a2(x))')  
+
 def apppy(f,x):return f(x)
 defq('apppy','lambda x: apppy(eval(car(x)),a2(x))')  
 lsp("(defmacro apply (f x) (cons f x))")
@@ -1484,6 +1503,9 @@ defq('time','lambda x: parse(f"({time.localtime().tm_year} {time.localtime().tm_
              {time.localtime().tm_sec})")')
 
 defq('sleep','lambda x: time.sleep(a1(x))')
+
+lsp("(set (compress '(955)) lambda)")
+
 
 loadlisp("EDITOR.LSP")
 loadlisp("COMP.LSP")

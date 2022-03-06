@@ -117,6 +117,7 @@
    (foreach python-foreach)
    (for python_for)
    (eval Neval)
+   (filter filterpy)
    (mapp mappy)
    (map mappy)
    (mapc mapcpy)
