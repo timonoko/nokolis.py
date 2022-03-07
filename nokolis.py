@@ -1000,9 +1000,9 @@ lsp("""(progn
     (cons
      (list 'defq 'MODULE module)
      (let
-      ((tulo_s nil)
-       (modu_le (eval module))
-       (myfu
+      ((__tulo_s nil)
+       (__modu_le (eval module))
+       (__myfu
         (function
          (lambda
           (x%x)
@@ -1011,11 +1011,11 @@ lsp("""(progn
            (or
             (equal (type (eval x%x)) (type car))
             (equal (type (eval x%x)) (type plus))
-            (member x%x '(m%f m%x module x%x True False T NIL nil t)))
+            (member x%x '(m%f m%x module x%x True False T NIL nil t __myfu __modu_le)))
            x%x
            (list 'defq x%x (eval x%x)))))))
-      (while modu_le (push (myfu (pop modu_le)) tulo_s))
-      tulo_s)))))
+      (while __modu_le (push (__myfu (pop __modu_le)) __tulo_s))
+      __tulo_s)))))
  (defq
   save
   (lambda
@@ -1525,7 +1525,7 @@ def maptile(lat_deg, lon_deg, zoom):
 defq('maptile','lambda x: maptile(a1(x),a2(x),a3(x))')
 
 def save_all():
-     ni=f"OBLIST{time.localtime().tm_hour:02d}{time.localtime().tm_min:02d}{time.localtime().tm_sec:02d}"
+     ni=f"OBLIST{time.localtime().tm_mday:02d}{time.localtime().tm_hour:02d}{time.localtime().tm_min:02d}"
      print(f"saving {ni}.npy")
      lsp(f"(setq {ni} (oblist))")
      lsp(f"(save-module-npy '{ni})")

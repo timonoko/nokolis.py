@@ -1,0 +1,10 @@
+#! /usr/bin/python3
+
+import os
+
+os.chdir('/home/tnoko/nlispy/')
+
+from nokolis import *
+
+lsp("(print(continue))")
+repl()
