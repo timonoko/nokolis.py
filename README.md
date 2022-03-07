@@ -9,3 +9,5 @@ At the end of nokolis.py are examples of generated python code.
 
 Some issues remaining about True and False, T and NIL. 
 -- Problem solved: NULL(x) : x==[ ] and NOT is logical NOT.
+
+Nokolisp had no strings, but I invented new practise: a flat list of numbers with first number as 34, is prettyprinted as string in the editor. Then you can edit the numberlist normally. 
