@@ -436,9 +436,12 @@ def last(x):
         return last(cdr(x))
 
 def nconc(x,y):
-    rplacd(last(x),y)
-    return x
-
+    if len(x)==2:
+        rplacd(last(x),y)
+        return x
+    else:
+        return y
+    
 def Nnot(x):
     if x==[]:
         return "t"
@@ -1229,6 +1232,15 @@ def reverse(x):
         return cons(car(x),[])
 defq('reverse','lambda x: reverse(a1(x))')
 
+def nreverse(lst=[]):
+    if lst[1]:
+        return nconc(nreverse(lst[1]),rplacd(lst,nil))
+    else:
+        return lst
+defq('nreverse','lambda x: nreverse(a1(x))')
+
+
+
 def append(x9,y9):
     if x9:
         return cons(car(x9),append(cdr(x9),y9))
@@ -1531,7 +1543,7 @@ def save_all():
      lsp(f"(save-module-npy '{ni})")
 defq('save-all','lambda x: save_all()')
 
-
+defq('mouse','lambda x: mouse(a1(x))')
 def mouse(id=14):
     if id==[]:
         return os.popen('xinput').read()
@@ -1540,8 +1552,19 @@ def mouse(id=14):
         b=os.popen(f'xinput --query-state {id}|grep "valuator"|grep "\[0\]\|\[1\]"|cut -d "=" -f 2 -').read()
         return parse("("+b+a+")))")
 
-defq('mouse','lambda x: mouse(a1(x))')
-
+defq('sun_alt','lambda x: sun_alt(a1(x),a2(x),a3(x),a4(x),a5(x),a6(x))')
+def sun_alt(mon,day,hour,mins,lat,lon):
+    import astropy.coordinates as coord
+    from astropy.time import Time
+    import astropy.units as u
+    if  lat==[]: lat=60.1
+    if  lon==[]: lon=25
+    loc = coord.EarthLocation(lon=lon * u.deg, lat=lat * u.deg)
+    times = f'2022-{mon}-{day}T{hour}:{mins}:00'
+    now  = Time(times, format='isot', scale='utc')
+    altaz = coord.AltAz(location=loc, obstime=now)
+    sun = coord.get_sun(now).transform_to(altaz).alt
+    return sun.degree
 
 loadlisp("EDITOR.LSP")
 loadlisp("COMP.LSP")
@@ -1556,8 +1579,6 @@ lsp("(setq MODULE 'NEW)")
 
 defq('repl','lambda x: repl(a1(x))')
 
-defq('sun_alt','lambda x: sun.alt(a1(x),a2(x),a3(x),a4(x))')
-import sun
 
 
 
