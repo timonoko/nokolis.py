@@ -1531,6 +1531,18 @@ def save_all():
      lsp(f"(save-module-npy '{ni})")
 defq('save-all','lambda x: save_all()')
 
+
+def mouse(id=14):
+    if id==[]:
+        return os.popen('xinput').read()
+    else:    
+        a=os.popen(f'xinput --query-state {id}|grep "button"|grep "\[1\]\|\[2\]\|\[3\]"|cut -d "=" -f 2 -').read()
+        b=os.popen(f'xinput --query-state {id}|grep "valuator"|grep "\[0\]\|\[1\]"|cut -d "=" -f 2 -').read()
+        return parse("("+b+a+")))")
+
+defq('mouse','lambda x: mouse(a1(x))')
+
+
 loadlisp("EDITOR.LSP")
 loadlisp("COMP.LSP")
 lsp("(compile 'comyp2)")
@@ -1548,4 +1560,4 @@ defq('sun_alt','lambda x: sun.alt(a1(x),a2(x),a3(x),a4(x))')
 import sun
 
 
-    
+
