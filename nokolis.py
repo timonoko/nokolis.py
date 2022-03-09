@@ -593,7 +593,7 @@ defq('compress', 'lambda x: compress(a1(x))')
 defq('array2list', 'lambda x: array2list(a1(x))')
 defq('list2array', 'lambda x: list2array(a1(x))')
 defq('python-eval', 'lambda x: eval(a1(x))')
-defq('python-exec', 'lambda x: exec(a1(x))')
+defq('python-exec', 'lambda x: exec(a1(x),globals())')
 defq('quit', 'lambda x: os._exit(1)')
 defq('array-nth', 'lambda x: a2(x)[a1(x)]')
 defq('array-nth-set', 'lambda x: arraynthset(a1(x),a2(x),a3(x))')
@@ -835,7 +835,7 @@ lsp(""" (progn
 
 (defun length (x) 
     (if x 
-      (if (arrayp x) (array-length x) (plus 1 (length(cdr x))))
+      (plus 1 (length(cdr x)))
        0))
 
 (defmacro nth-set (x y z)
@@ -1052,12 +1052,6 @@ defq('gensym','lambda x: gensym()')
 def equal(x,y):
     return ((x is y) or ((x == y) or (car(x) and (car(y) and (equal(car(x),car(y)) and equal(cdr(x),cdr(y)))))))
 defq('equal', 'lambda x:  Ntest(equal(a1(x),a2(x)))')
-
-def python_exec_file(n):
-  with open(n, 'r') as file:
-    data = "".join(file.read())
-  exec(data)
-defq('python-exec-file', 'lambda x: python_exec_file(a1(x))')
 
 def depthless(n,x):
     if (0 > n):
@@ -1568,6 +1562,14 @@ def sun_alt(mon,day,hour,mins,lat,lon):
     altaz = coord.AltAz(location=loc, obstime=now)
     sun = coord.get_sun(now).transform_to(altaz).alt
     return sun.degree
+
+def length(x=[]):
+    if x!=[]:
+        return (1 + length(cdr(x)))
+    else:
+        return 0
+defq('length','lambda x: length(a1(x))')
+
 
 loadlisp("EDITOR.LSP")
 loadlisp("COMP.LSP")
