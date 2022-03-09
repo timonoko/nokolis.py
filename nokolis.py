@@ -451,8 +451,6 @@ def Nnot(x):
 def explode(x):
     if numberp(x):
        return explode(str(x))
-    if numberp(x):
-       return explode(str(x))
     if identp(x):
        return array2list([ord(char) for char in x])
     elif atom(x): return []
@@ -611,6 +609,11 @@ defq('return', 'lambda x: throw("return",a1(x))')
 defq('readc', 'lambda x: readc() ')
 defq('read', 'lambda x: Nread()')
 defq('readline', 'lambda x: parse(input("> "))')
+defq('file2str', 'lambda x: file2str(a1(x))')
+
+def file2str(x):
+    from pathlib import Path
+    return Path(x).read_text()
 
 def Nread():
      global MORE
