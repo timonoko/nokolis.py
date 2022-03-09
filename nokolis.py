@@ -206,6 +206,9 @@ def cadddr(x):
 def caddddr(x):
     return car(cddddr(x))
 
+def caar(x):
+    return car(car(x))
+
 def atom(x):
     if x==[]: return True
     return type(x) != type([1])
@@ -926,6 +929,13 @@ lsp("(defun sort (x) (array2list (arraysort (list2array x))))")
 defq('arraysort', 'lambda x: arraysort(a1(x))')
 def arraysort(x): x.sort(); return x
 
+defq('cadr', 'lambda x: cadr(a1(x))')
+defq('cdddr', 'lambda x: cdddr(a1(x))')
+defq('cddddr', 'lambda x: cddddr(a1(x))')
+defq('caddr', 'lambda x: caddr(a1(x))')
+defq('cadddr', 'lambda x: cadddr(a1(x))')
+defq('caddddr', 'lambda x: caddddr(a1(x))')
+defq('caar', 'lambda x: caar(a1(x))')
 
 def print_to_file(x,y,pretty):
     original_stdout = sys.stdout

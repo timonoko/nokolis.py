@@ -22,6 +22,7 @@
        return)
       (case
        (car x)
+       (global (print 'global) (sp) (print (cadr x)))
        (setq
         (if
          (member (car (caddr x)) STATEMENTS)
@@ -196,8 +197,9 @@
         (printc 41))))))))
  (defq
   COMP
-  (comppy do-globals full-oblist-name print-nice PYTHON save-py esimerkki_copy esimerkki ch-name want_value STATEMENTS
-   link-str expand4ever CH-NAME COZMP-MACROS do-lambda cozmp-lambda comppp cozmp-progn lambda-args COMP comyp2))
+  (hui global comppy do-globals full-oblist-name print-nice PYTHON save-py esimerkki_copy esimerkki ch-name
+   want_value STATEMENTS link-str expand4ever CH-NAME COZMP-MACROS do-lambda cozmp-lambda comppp cozmp-progn lambda-args
+   COMP comyp2))
  (defq
   lambda-args
   (lambda
@@ -430,8 +432,36 @@
   comppy
   (lambda
    (x)
+   (unless
+    (identp x)
+    (uncompile 'TEMPFUNC)
+    (setq TEMPFUNC (list 'lambda () x))
+    (setq x 'TEMPFUNC))
    (if (assoc x _COMPILED_) (uncompile x))
    (push (cons x (eval x)) _COMPILED_)
    (with-out-file '/tmp/tmp.py (comppp x))
    (python-exec (file2str '/tmp/tmp.py))
-   (file2str '/tmp/tmp.py))))
+   (file2str '/tmp/tmp.py)))
+ (defq
+  global
+  (nlambda
+   (x%2 y%2)
+   (if y%2 (python-exec (compress (list x%2 '= (str-raw (eval y%2))))))
+   (python-exec (compress (list 'global 32 x%2)))
+   (python-eval x%2)))
+ (defq
+  hui
+  (lambda
+   (x)
+   (global c 0)
+   (defun
+    fib
+    (x)
+    (global c)
+    (setq c (+ 1 c))
+    (if
+     (< x 2)
+     x
+     (+ (fib (- x 1)) (fib (- x 2)))))
+   (comppy 'fib)
+   (list (fib x) (global c)))))
