@@ -1,7 +1,7 @@
 
 The purpose of this project seems to be now that I can dick around in Lisp-environment using Nokolisp-editor and easily produce errorfree python code.
 
-Has python-like primitives like "return", which is (throw return) and the lambda has the (catch return).  And "global" which initiates variables in python globals()-environment.
+Has python-like primitives like "return", which is (throw return) and the lambda has the (catch return).  And "global" which initiates and imports variables to/fron python globals()-environment.
 
 At the end of nokolis.py are examples of generated python code.
 
