@@ -827,6 +827,8 @@ lsp(""" (progn
 
 (defmacro push (x y) (backquote setq ,y (cons ,x ,y)))
 (defmacro pop (x) (backquote prog1 (car ,x) (setq ,x (cdr ,x))))
+(defmacro setqpop (x y) (backquote progn (setq ,x (car ,y)) (setq ,y (cdr ,y))))
+
 
 (defun numberp (x) (equal (type x) (type 1)))
 
@@ -1570,8 +1572,7 @@ lsp("""(defun imagefill1 (im x y color border)
    (setq DOIT (list (list x y)))
    (while
     DOIT
-    (setq zz (car DOIT))
-    (setq DOIT (cdr DOIT))
+    (setqpop zz DOIT)
     (setq x (car zz))
     (setq y (cadr zz))
     (when
@@ -1611,9 +1612,6 @@ def imagefill(im=[],x=[],y=[],color=[],border=[]):
                 DOIT=nconc(cons(cons((x + 1),cons(y,[])),cons(cons(x,cons((y + 1),[])),cons(cons((x - 1),cons(y,[])),cons(cons(x,cons((y - 1),[])),[])))),DOIT)
     return True
 defq('imagefill','lambda x: imagefill(a1(x),a2(x),a3(x),a4(x),a5(x))')
-
-
-
 
 
 loadlisp("EDITOR.LSP")
