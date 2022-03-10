@@ -1246,8 +1246,6 @@ def nreverse(lst=[]):
         return lst
 defq('nreverse','lambda x: nreverse(a1(x))')
 
-
-
 def append(x9,y9):
     if x9:
         return cons(car(x9),append(cdr(x9),y9))
@@ -1310,20 +1308,13 @@ def re_search(x,y):
     return tulos
 defq('search-array','lambda x: re_search(a1(x),a2(x))')
 lsp("(defun search (x y) (array2list (search-array x (list2array y))))")
-defq('dir-raw', 'lambda x: os.listdir()')
-lsp("(defun dir (x) (array2list(if x (search-array x (dir-raw)) (dir-raw))))")
+defq('listdir', 'lambda x: os.listdir(a1(x))')
+lsp("(defun dir (x y) (if (null y) (setq y '.)) (array2list(if x (search-array x (listdir y)) (listdir y))))")
 lsp("(defun continue () (load (car (reverse (sort (dir '^OBLIST))))))")
 defq('os-remove','lambda x: os.remove(a1(x))')
 lsp("(defun del-file (x) (mapc os-remove (dir x)) (dir))") 
-lsp("""(defq os-
-  (lambda
-   (x y)
-   (python-eval
-    (compress
-     (nconc
-      (explode 'os.)
-      (nconc (explode x) (list 40 (if y (explode y) 32) 41))))))))""")
 lsp("(defun perkele () (del-file '^OBLIST))")
+defq('ls','lambda x: array2list(os.popen("ls "+a1(x)).read().split())')
 
 defq("loadimage", 'lambda x: loadimage(a1(x))')
 defq("saveimage", 'lambda x: saveimage(a1(x),a2(x))')
@@ -1336,6 +1327,16 @@ defq("killdisplay", 'lambda x: killdisplay()')
 defq("imagetext",'lambda x: imagetext(a1(x),a2(x),a3(x),a4(x))')
 defq("imagedraw",'lambda x: imagedraw(a1(x),a2(x),a3(x),a4(x))')
 
+lsp("""
+ (defun image-example ()
+   (setq im (newimage 100 50 RED))
+   (imagebox im '(3 3) '(93 43) WHITE)
+   (imagetext im '(10 10) FONTTI 'HELLO)
+   (showimage im)
+   (sleep 1)
+   (killdisplay))) """)
+
+
 from PIL import Image,ImageDraw,ImageFont
 
 def imagedraw (im,s,e,c):
@@ -1345,13 +1346,16 @@ def imagedraw (im,s,e,c):
     draw.line(line,color)
     return im
 
+FreeFonts="/usr/share/fonts/truetype/freefont/"
+defq('FONTS',array2list(os.listdir(FreeFonts)))
+
 def imagetext(im,p,fsc,text):
     pos=(car(p),cadr(p))
     fnt=car(fsc)
     size=cadr(fsc)
     v=caddr(fsc)
     color=list2tuple(v)
-    fnt = ImageFont.truetype("/usr/share/fonts/truetype/freefont/"+fnt,size)
+    fnt = ImageFont.truetype(FreeFonts+fnt,size)
     d = ImageDraw.Draw(im)
     d.text(pos, str(text), font=fnt, fill=color)
     return im
@@ -1369,7 +1373,6 @@ def saveimage(im,f):
 
 def getpixel(im,x,y):
     return tuple2list(im.getpixel((x,y)))
-    
                     
 def putpixel(im,x,y,v):
     im.putpixel((x,y),list2tuple(v))
@@ -1392,13 +1395,7 @@ lsp(""" (progn
         (defq YELLOW (255 255 0))
         (defq BLACK ( 0 0 0))
         (defq WHITE ( 255 255 255))
-        (defq FONTTI (FreeSansBold.ttf 20 (0 0 0))) 
-     (defq FONTS (FreeMonoBoldOblique.ttf  FreeMono.ttf
-		  FreeSansOblique.ttf	   FreeSerifBold.ttf
-       FreeMonoBold.ttf	 FreeSansBoldOblique.ttf  FreeSans.ttf
- 	 FreeSerifItalic.ttf FreeMonoOblique.ttf	 FreeSansBold.ttf
-	  FreeSerifBoldItalic.ttf  FreeSerif.ttf)))) """)
-
+        (defq FONTTI (FreeSansBold.ttf 20 (0 0 0))) """)
 
 def imagepaste(im=[],p=[],uusi=[],color=[255,[255,[255,[]]]]):
     s=imagesize(uusi)

@@ -445,15 +445,20 @@
  (defq
   global
   (nlambda
-   (x%2 y%2)
-   (if y%2 (python-exec (compress (list x%2 '= (str-raw (eval y%2))))))
-   (python-exec (compress (list 'global 32 x%2)))
-   (python-eval x%2)))
+   x%2
+   (if
+    (cdr x%2)
+    (python-exec
+     (compress (list (car x%2) '= (str-raw (eval (cadr x%2)))))))
+   (python-exec (compress (list 'global 32 (car x%2))))
+   (python-eval (car x%2))))
  (defq
   hui
   (lambda
    (x)
    (global c 0)
+   (setq c 0)
+   (uncompile 'fib)
    (defun
     fib
     (x)
@@ -463,5 +468,5 @@
      (< x 2)
      x
      (+ (fib (- x 1)) (fib (- x 2)))))
-   (comppy 'fib)
-   (list (fib x) (global c)))))
+   (if (< 12 x) (comppy 'fib))
+   (list (fib x) c (global c)))))
