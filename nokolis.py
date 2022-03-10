@@ -5,7 +5,7 @@ from math import *
 
 import resource
 resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
-sys.setrecursionlimit(10**6)
+sys.setrecursionlimit(10**5)
 
 t="t"
 T="T"
@@ -1474,36 +1474,25 @@ def delete(x=[],lista=[]):
     return lista
 
 lsp("""
- (defq imagefill
+ (defq
+  imagefill
   (lambda
    (im x y color border)
-   (setq p (getpixel im x y))
-   (cond
-    ((equal p color) pass)
-    ((equal p border) pass)
-    (t
-     (putpixel im x y color)
-     (imagefill im (+ x 1) y color border)
-     (imagefill im x (+ y 1) color border)
-     (imagefill im (- x 1) y color border)
-     (imagefill im x (- y 1) color border)))
+   (when
+    (and (< x (car (imagesize im))) (< y (cadr (imagesize im))))
+    (setq p (getpixel im x y))
+    (cond
+     ((equal p color) pass)
+     ((equal p border) pass)
+     (t
+      (putpixel im x y color)
+      (imagefill im (+ x 1) y color border)
+      (imagefill im x (+ y 1) color border)
+      (imagefill im (- x 1) y color border)
+      (imagefill im x (- y 1) color border))))
    True))
 """)
 
-def imagefill(im,x,y,col,border):
-    p=getpixel(im,x,y)
-    if equal(p,col):
-        pass
-    elif equal(p,border):
-        pass
-    elif True:
-        putpixel(im,x,y,col)
-        imagefill(im,(x + 1),y,col,border)
-        imagefill(im,x,(y + 1),col,border)
-        imagefill(im,(x - 1),y,col,border)
-        imagefill(im,x,(y - 1),col,border)
-    return True
-defq('imagefill','lambda x: imagefill(a1(x),a2(x),a3(x),a4(x),a5(x))')
 
 lsp("""(defq imagebox
   (lambda (im p s c)
@@ -1576,6 +1565,55 @@ def length(x=[]):
     else:
         return 0
 defq('length','lambda x: length(a1(x))')
+
+lsp("""(defun imagefill1 (im x y color border)
+   (setq DOIT (list (list x y)))
+   (while
+    DOIT
+    (setq zz (car DOIT))
+    (setq DOIT (cdr DOIT))
+    (setq x (car zz))
+    (setq y (cadr zz))
+    (when
+     (and (< x (car (imagesize im))) (< y (cadr (imagesize im))))
+     (setq p (getpixel im x y))
+     (cond
+      ((equal p color) pass)
+      ((equal p border) pass)
+      (t
+       (putpixel im x y color)
+       (setq
+        DOIT
+        (nconc
+         (list
+          (list (+ x 1) y)
+          (list x (+ y 1))
+          (list (- x 1) y)
+          (list x (- y 1)))
+         DOIT))))))
+   True))""")
+
+def imagefill(im=[],x=[],y=[],color=[],border=[]):
+    DOIT=cons(cons(x,cons(y,[])),[])
+    while DOIT:
+        zz=DOIT[0]
+        DOIT=DOIT[1]
+        x=zz[0]
+        y=zz[1][0]
+        if ((x < imagesize(im)[0]) and (y < imagesize(im)[1][0])):
+            p=getpixel(im,x,y)
+            if equal(p,color):
+                pass
+            elif equal(p,border):
+                pass
+            elif True:
+                putpixel(im,x,y,color)
+                DOIT=nconc(cons(cons((x + 1),cons(y,[])),cons(cons(x,cons((y + 1),[])),cons(cons((x - 1),cons(y,[])),cons(cons(x,cons((y - 1),[])),[])))),DOIT)
+    return True
+defq('imagefill','lambda x: imagefill(a1(x),a2(x),a3(x),a4(x),a5(x))')
+
+
+
 
 
 loadlisp("EDITOR.LSP")
