@@ -1454,18 +1454,6 @@ defq('chdir','lambda x: os.chdir(a1(x))')
 defq('getcwd','lambda x: os.getcwd()')
 lsp("(defq cd (lambda (x) (if x (chdir x)) (getcwd))))")
 defq('isdir','lambda x: Ntest(os.path.isdir(a1(x)))')
-lsp(""" (defq  dir-tree
-  (lambda
-   (z)
-   (if
-    (null z)
-    (map dir-tree (dir))
-    (if
-     (isdir z)
-     (let
-      ((pwd (cd)))
-      (if (error-trap (cd z)) (prog1 (cons z (dir-tree)) (cd pwd)) z))
-     z))))))""")
 
 defq('delete','lambda x: delete(a1(x),a2(x))')
 def delete(x=[],lista=[]):
@@ -1475,27 +1463,6 @@ def delete(x=[],lista=[]):
         else:
             return cons(lista[0],delete(x,lista[1]))
     return lista
-
-lsp("""
- (defq
-  imagefill
-  (lambda
-   (im x y color border)
-   (when
-    (and (< x (car (imagesize im))) (< y (cadr (imagesize im))))
-    (setq p (getpixel im x y))
-    (cond
-     ((equal p color) pass)
-     ((equal p border) pass)
-     (t
-      (putpixel im x y color)
-      (imagefill im (+ x 1) y color border)
-      (imagefill im x (+ y 1) color border)
-      (imagefill im (- x 1) y color border)
-      (imagefill im x (- y 1) color border))))
-   True))
-""")
-
 
 lsp("""(defq imagebox
   (lambda (im p s c)
@@ -1615,6 +1582,19 @@ def imagefill(im=[],x=[],y=[],color=[],border=[]):
     return True
 defq('imagefill','lambda x: imagefill(a1(x),a2(x),a3(x),a4(x),a5(x))')
 
+lsp(""" (defq secret (lambda (s)
+   (setq tulos 0)
+   (setq koodi (reverse (explode 'oizeasbthg)))
+   (foreach
+    (x (explode s))
+    (if (member x koodi)
+       (setq tulos (+ (* 10 tulos) (+ -1 (length (member x koodi)))))))
+   tulos)) """)
+
+import random
+defq('random','lambda x: random.random()')
+
+
 
 loadlisp("EDITOR.LSP")
 loadlisp("COMP.LSP")
@@ -1631,7 +1611,7 @@ lsp("(defun sys.argv() (cdr (array2list (python-eval 'sys.argv))))")
 lsp("(defq -l (nlambda (x) (load x)))")
 lsp("(defq -s (nlambda (x) (eval(read-from-str x))))")
 lsp("(defq -e (nlambda (x) (pprint (eval(read-from-str x)) 1 t) (cr) (quit)))")
-lsp("(defq -f (nlambda x (with-out-file (car x) (pprint (eval(read-from-str (cadr x))) 1 t) (cr)) (quit)))")
+lsp("(defq -f (nlambda (x y) (with-out-file x (pprint (eval(read-from-str y)) 1 t) (cr)) (quit)))")
 
 
 
