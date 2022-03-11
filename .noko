@@ -1,8 +1,10 @@
 #! /usr/bin/python3
 
 import os
+
+CWD=os.getcwd()
 os.chdir('/home/tnoko/nlispy/')
-
 from nokolis import *
-
+os.chdir(CWD)
+lsp("(eval(sys.argv))")
 repl()

@@ -2,9 +2,13 @@
 
 import os
 
+a=os.getcwd()
+
 os.chdir('/home/tnoko/nlispy/')
 
 from nokolis import *
+
+os.chdir(a)
 
 lsp("(print(continue))")
 repl()
