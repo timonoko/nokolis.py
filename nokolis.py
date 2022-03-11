@@ -33,7 +33,8 @@ def repl(n=0):
     try:
         oblist.func=[]
         oblist.args=[]
-        if n>0: print(f'E{n}',end=" ")
+        if n==[]:n=0
+        for x in range(0,n): print('',end='>')
         rivi=Nread()
         if rivi=="":
             pass
@@ -59,8 +60,8 @@ def repl(n=0):
                 oblist.enviro=unwind_enviro(oblist.enviro,len(oblist.enviro))
             except:
                 oblist.enviro=[]
+  print("")
   if n==0: save_all()
-
      
      
 import readline
@@ -260,7 +261,8 @@ def Neval(x):
         eka=Neval(car(x))
         if eka==[]: print(f'Error: {car(x)} == [] ')
         retu=Neval(eka)
-        oblist.func.pop()
+        try: oblist.func.pop()
+        except: pass
         return retu
     
 def value_of(x):
@@ -1312,10 +1314,10 @@ defq('search-array','lambda x: re_search(a1(x),a2(x))')
 lsp("(defun search (x y) (array2list (search-array x (list2array y))))")
 defq('listdir', 'lambda x: os.listdir(a1(x))')
 lsp("(defun dir (x y) (if (null y) (setq y '.)) (array2list(if x (search-array x (listdir y)) (listdir y))))")
-lsp("(defun continue () (load (car (reverse (sort (dir '^OBLIST))))))")
+lsp("(defun continue () (cd '/tmp/) (load (car (reverse (sort (dir '^OBLIST))))) (cd CWD))")
 defq('os-remove','lambda x: os.remove(a1(x))')
 lsp("(defun del-file (x) (mapc os-remove (dir x)) (dir))") 
-lsp("(defun perkele () (del-file '^OBLIST))")
+lsp("(defun perkele () (setq CWD (cd)) (cd '/tmp/) (del-file '^OBLIST) (cd CWD))")
 defq('ls','lambda x: array2list(os.popen("ls "+a1(x)).read().split())')
 
 defq("loadimage", 'lambda x: loadimage(a1(x))')
@@ -1451,7 +1453,6 @@ def eeprint25(x,dec):
 defq('chdir','lambda x: os.chdir(a1(x))')
 defq('getcwd','lambda x: os.getcwd()')
 lsp("(defq cd (lambda (x) (if x (chdir x)) (getcwd))))")
-lsp("(defun sys.argv() (cdr (array2list (python-eval 'sys.argv))))")
 defq('isdir','lambda x: Ntest(os.path.isdir(a1(x)))')
 lsp(""" (defq  dir-tree
   (lambda
@@ -1532,8 +1533,9 @@ def maptile(lat_deg, lon_deg, zoom):
 defq('maptile','lambda x: maptile(a1(x),a2(x),a3(x))')
 
 def save_all():
-     ni=f"OBLIST{time.localtime().tm_mday:02d}{time.localtime().tm_hour:02d}{time.localtime().tm_min:02d}"
+     ni=f"/tmp/OBLIST{time.localtime().tm_mday:02d}{time.localtime().tm_hour:02d}{time.localtime().tm_min:02d}"
      print(f"saving {ni}.npy")
+     lsp("(setq CWD (cd))")
      lsp(f"(setq {ni} (oblist))")
      lsp(f"(save-module-npy '{ni})")
 defq('save-all','lambda x: save_all()')
@@ -1622,11 +1624,17 @@ lsp("(compile-edit)")
 defq('eeprint25','lambda x: eeprint25(a1(x),a2(x))')
 loadlisp("MATH.LSP")
 lsp("(define-all)")
-
 lsp("(setq MODULE 'NEW)")
 
 defq('repl','lambda x: repl(a1(x))')
+lsp("(defun sys.argv() (cdr (array2list (python-eval 'sys.argv))))")
+lsp("(defq -l (nlambda (x) (load x)))")
+lsp("(defq -s (nlambda (x) (eval(read-from-str x))))")
+lsp("(defq -e (nlambda (x) (pprint (eval(read-from-str x)) 1 t) (cr) (quit)))")
+lsp("(defq -f (nlambda x (with-out-file (car x) (pprint (eval(read-from-str (cadr x))) 1 t) (cr)) (quit)))")
 
+
+lsp("(eval(sys.argv))")
 
 
 
