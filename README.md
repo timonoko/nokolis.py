@@ -10,4 +10,9 @@ Some issues remaining about True and False, T and NIL.
 
 Nokolisp had no strings, but I invented new practise: a flat list of numbers with first number as 34, is prettyprinted as string in the editor. Then you can edit the numberlist normally and the editor shows range(32,256) as chracters alongsside.
 
-Now with flag -e,-f,-s etc, which are defined at the end of nokolisp.py
+Now with flag -e,-f,-s etc, which are defined at the end of nokolisp.py . 
+
+noko -e "(showimage (imagetext (newimage 170 40 RED) '(5 5) (list 'FreeSansBold.ttf 30 WHITE) 'NOKOLISP)))"
+
+
+
