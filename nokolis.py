@@ -1614,5 +1614,5 @@ lsp("(defq -e (nlambda (x) (pprint (eval(read-from-str x)) 1 t) (cr) (quit)))")
 lsp("(defq -f (nlambda (x y) (with-out-file x (pprint (eval(read-from-str y)) 1 t) (cr)) (quit)))")
 
 
-
-
+#lsp("(eval(sys.argv))")
+#repl()
