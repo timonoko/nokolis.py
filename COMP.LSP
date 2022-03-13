@@ -201,9 +201,9 @@
         (printc 41))))))))
  (defq
   COMP
-  (hui global comppy do-globals full-oblist-name print-nice PYTHON save-py esimerkki_copy esimerkki ch-name
-   want_value STATEMENTS link-str expand4ever CH-NAME COZMP-MACROS do-lambda cozmp-lambda comppp cozmp-progn lambda-args
-   COMP comyp2))
+  (globals hui global comppy do-globals full-oblist-name print-nice PYTHON save-py esimerkki_copy esimerkki
+   ch-name want_value STATEMENTS link-str expand4ever CH-NAME COZMP-MACROS do-lambda cozmp-lambda comppp cozmp-progn
+   lambda-args COMP comyp2))
  (defq
   lambda-args
   (lambda
@@ -450,13 +450,13 @@
   global
   (nlambda
    x%2
-   (if
-    (cdr x%2)
-    (python-exec
-     (compress (list (car x%2) '= (str-raw (eval (cadr x%2)))))))
-   (if (cdr x%2) (set (car x%2) (eval (cadr x%2))))
    (python-exec (compress (list 'global 32 (car x%2))))
-   (python-eval (car x%2))))
+   (when
+    (cdr x%2)
+    (setq TEMPZ (eval (cadr x%2)))
+    (python-exec (compress (list (car x%2) '=oblist._id_TEMPZ)))
+    (set (car x%2) TEMPZ))
+   (error-trap (python-eval (car x%2)))))
  (defq
   hui
   (lambda
@@ -474,4 +474,11 @@
      x
      (+ (fib (- x 1)) (fib (- x 2)))))
    (if (< 12 x) (comppy 'fib))
-   (list (fib x) c (global c)))))
+   (list (fib x) c (global c))))
+ (defq
+  globals
+  (mlambda
+   x
+   (cons
+    (quote progn)
+    (map (function (lambda (y) (list 'global y))) x)))))
