@@ -45,7 +45,10 @@ def repl(n=0):
         print('')
         oblist._id_HISTORY.append(rivi)
     except KeyboardInterrupt:
-        print("KeyboardInterrupt")
+        print("KeyboardInterrupt. Stack=",end=""),
+        Nprint(array2list(oblist.func))
+        print(""),
+        oblist.enviro=unwind_enviro(oblist.enviro,len(oblist.enviro))
     except Exception as ex:
         if oblist.func==[]:
             quit=True
@@ -1632,7 +1635,7 @@ def python_repl():
             except Exception as e:
                 print(f"Error: {e}")
     except KeyboardInterrupt as e:
-        print("\nExiting...")
+       return "\nExiting..."
 defq('python-repl','lambda x: python_repl()')
 
 import random
