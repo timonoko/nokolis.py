@@ -181,6 +181,12 @@
              (100 (setq y (list 'cdr y))))))
           (reverse (explode (car x))))
          (comyp2 y tabs return)))
+       (cons
+        (printc 91)
+        (comyp2 (cadr x) tab)
+        (printc 44)
+        (comyp2 (caddr x) tab)
+        (printc 93))
        (return (comyp2 (cadr x) tabs 'return))
        (lambda (print '(mita paskaa)))
        (t
