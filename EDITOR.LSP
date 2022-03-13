@@ -71,43 +71,43 @@
    (if (null v) (setq v 0))
    (erase_page)
    (eeprint x)
-   (error-trap
-    (while
-     (and (not exit) (not EXIT))
-     (setq THIS (nth v x))
-     (if
-      goto
-      (setq ch 6)
+   (while
+    (and (not exit) (not EXIT))
+    (setq THIS (nth v x))
+    (if
+     goto
+     (setq ch 6)
+     (progn
+      (set_cursor 2 1)
       (progn
-       (set_cursor 2 1)
-       (progn
-        (repeat-times
-         (length x)
-         (sp)
-         (sp)
-         (sp)
-         (sp)
-         (sp)
-         (sp)
-         (cr))
-        (printc 41)
+       (repeat-times
+        (length x)
         (sp)
         (sp)
         (sp)
         (sp)
-        (sp))
-       (set_cursor (+ v 2) 3)
-       (print '===>)
-       (repeat-times (- (+ 1 (length x)) v) (cr))
-       (repeat-times 60 (print '-))
-       (cr)
-       (setq ch (readcc))
-       (if (member ch '(111 40 13 32)) (setq ch 110))
-       (if (eqn ch 27) (setq ch (readcc)))
-       (if
-        (member ch '(0 91))
-        (setq ch (plus 200 (readcc)))
-        (setq ch (compress (list ch))))))
+        (sp)
+        (sp)
+        (cr))
+       (printc 41)
+       (sp)
+       (sp)
+       (sp)
+       (sp)
+       (sp))
+      (set_cursor (+ v 2) 3)
+      (print '===>)
+      (repeat-times (- (+ 1 (length x)) v) (cr))
+      (repeat-times 60 (print '-))
+      (cr)
+      (setq ch (readcc))
+      (if (member ch '(111 40 13 32)) (setq ch 110))
+      (if (eqn ch 27) (setq ch (readcc)))
+      (if
+       (member ch '(0 91))
+       (setq ch (plus 200 (readcc)))
+       (setq ch (compress (list ch))))))
+    (error-trap
      (case
       ch
       (6
