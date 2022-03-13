@@ -22,7 +22,11 @@
        return)
       (case
        (car x)
-       (global (print 'global) (sp) (print (cadr x)))
+       (global
+        (print 'global)
+        (sp)
+        (print (cadr x))
+        (if (cddr x) (comyp2 (cons 'setq (cdr x)) tabs)))
        (setq
         (if
          (member (car (caddr x)) STATEMENTS)
@@ -450,6 +454,7 @@
     (cdr x%2)
     (python-exec
      (compress (list (car x%2) '= (str-raw (eval (cadr x%2)))))))
+   (if (cdr x%2) (set (car x%2) (eval (cadr x%2))))
    (python-exec (compress (list 'global 32 (car x%2))))
    (python-eval (car x%2))))
  (defq

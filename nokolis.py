@@ -43,7 +43,7 @@ def repl(n=0):
         else:
             pprint(Neval(rivi),1,True)
         print('')
-        oblist._id_HISTORY=cons(rivi,oblist._id_HISTORY)
+        oblist._id_HISTORY.append(rivi)
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
     except Exception as ex:
@@ -761,10 +761,21 @@ lsp(""" (progn
  (defun cond-jatko (((xZ . yZ) . zZ))
            (list 'if xZ (if (cdr yZ) (cons 'progn yZ) (car yZ)) (if zZ (cond-jatko zZ))))
 
- (defnacro cond (xZ) (cond-jatko xZ)))
+(defnacro cond (xZ) (cond-jatko xZ))
+
+(defun condf-jatko (((xZ . yZ) . zZ))
+           (list 'iff xZ (if (cdr yZ) (cons 'progn yZ) (car yZ)) (if zZ (condf-jatko zZ))))
+
+(defmacro condf xZ (condf-jatko xZ)))
 
 )))""")
 
+def iff(x=[],y=[],z=[]):
+    if x==[]: return z
+    if x : return y
+    else: return z
+defq('iff','lambda x: iff(a1(x),a2(x),a3(x))')
+    
 lsp(""" (progn 
 
 (defun append  (x9 y9) (if x9 (cons (car x9) (append (cdr x9) y9)) y9))
@@ -910,6 +921,20 @@ lsp(""" (progn
  (defmacro case (x  .  y )
        (cons
         'cond
+        (map
+         (function
+          (lambda
+           (y)
+           (cond
+            ((equal (car y) 't) y)
+            ((atom (car y))
+             (backquote (equal , x QUOTE (car y)) @ (cdr y)))
+            (t (backquote (member , x QUOTE (car y)) @ (cdr y))))))
+         y)))
+
+(defmacro casef (x  .  y )
+       (cons
+        'condf
         (map
          (function
           (lambda
@@ -1392,14 +1417,14 @@ def newimage(x,y,v,typ=[]):
 def killdisplay():
     os.system("killall display")
 
-lsp(""" (progn
-        (defq RED (255 0 0))
-        (defq GREEN ( 0 255 0))
-        (defq BLUE ( 0 0 255))
-        (defq YELLOW (255 255 0))
-        (defq BLACK ( 0 0 0))
-        (defq WHITE ( 255 255 255))
-        (defq FONTTI (FreeSansBold.ttf 20 (0 0 0))) """)
+lsp(""" (defun global-colors()
+        (global RED '(255 0 0))
+        (global GREEN '( 0 255 0))
+        (global BLUE '( 0 0 255))
+        (global YELLOW '(255 255 0))
+        (global BLACK '( 0 0 0))
+        (global WHITE '( 255 255 255))
+        (global FONTTI '(FreeSansBold.ttf 20 (0 0 0))))) """)
 
 def imagepaste(im=[],p=[],uusi=[],color=[255,[255,[255,[]]]]):
     s=imagesize(uusi)
@@ -1482,7 +1507,8 @@ defq('time','lambda x: parse(f"({time.localtime().tm_year} {time.localtime().tm_
              {time.localtime().tm_sec})")')
 
 defq('sleep','lambda x: time.sleep(a1(x))')
-
+def sleep(x): time.sleep(x)
+    
 lsp("(set (compress '(955)) lambda)")
 
 def googlemap(xtile,ytile, zoom):
@@ -1517,7 +1543,7 @@ def mouse(id=14):
         return parse("("+b+a+")))")
 
 defq('sun_alt','lambda x: sun_alt(a1(x),a2(x),a3(x),a4(x),a5(x),a6(x))')
-def sun_alt(mon,day,hour,mins,lat,lon):
+def sun_alt(mon,day,hour,mins,lat=60.1,lon=25):
     import astropy.coordinates as coord
     from astropy.time import Time
     import astropy.units as u
@@ -1593,8 +1619,9 @@ lsp(""" (defq secret (lambda (s)
 
 import random
 defq('random','lambda x: random.random()')
-
-
+defq('nthchar','lambda x: ord(a2(x)[a1(x)])')
+def nthchar (x,y): return ord(y[x])
+defq('arraypop','lambda x: a1(x).pop()')
 
 loadlisp("EDITOR.LSP")
 loadlisp("COMP.LSP")
@@ -1605,6 +1632,7 @@ defq('eeprint25','lambda x: eeprint25(a1(x),a2(x))')
 loadlisp("MATH.LSP")
 lsp("(define-all)")
 lsp("(setq MODULE 'NEW)")
+lsp("(global-colors)")
 
 defq('repl','lambda x: repl(a1(x))')
 lsp("(defun sys.argv() (cdr (array2list (python-eval 'sys.argv))))")
