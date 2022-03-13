@@ -1617,6 +1617,24 @@ lsp(""" (defq secret (lambda (s)
        (setq tulos (+ (* 10 tulos) (+ -1 (length (member x koodi)))))))
    tulos)) """)
 
+
+def python_repl():
+    try:
+        while True:
+            try:
+                _in = input("P> ")
+                try:
+                    print(eval(_in))
+                except:
+                    out = exec(_in,globals())
+                    if out != None:
+                        print(out)
+            except Exception as e:
+                print(f"Error: {e}")
+    except KeyboardInterrupt as e:
+        print("\nExiting...")
+defq('python-repl','lambda x: python_repl()')
+
 import random
 defq('random','lambda x: random.random()')
 defq('nthchar','lambda x: ord(a2(x)[a1(x)])')

@@ -126,7 +126,7 @@
           (comyp2 (cons (car x) (cddr x)))
           (printc 41))
          (comyp2 (cadr x) tabs)))
-       (python_for
+       (pyzzzzz-for
         (print 'for)
         (sp)
         (print (car (cadr x)))
@@ -145,7 +145,7 @@
         (printc 41)
         (print ':)
         (cozmp-progn (macroexpand (cddr x)) (+ 4 tabs)))
-       (python-foreach
+       (pyzzz-foreach
         (print 'for)
         (sp)
         (print (car (cadr x)))
@@ -158,7 +158,7 @@
         (printc 41)
         (print ':)
         (cozmp-progn (macroexpand (cddr x)) (+ 4 tabs)))
-       (python-let
+       (pyzzz-let
         (mapc
          (function (lambda (x) (comyp2 (cons 'setq x) tabs)))
          (cadr x))
@@ -238,7 +238,7 @@
      (not
       (member
        (caar x)
-       '(python-let return foreach elif python-foreach python_for for setq progn if while prog1))))
+       '(pyzzz-let return foreach elif pyzzz-foreach pyzzzzz-for for setq progn if while prog1))))
     (print 'return)
     (sp))
    (comyp2 (car x) tabs (unless (cdr x) return))
@@ -318,9 +318,9 @@
         (setq , name (- , name 1)))))))))
  (defq
   CH-NAME
-  ((let python-let)
-   (foreach python-foreach)
-   (for python_for)
+  ((let pyzzz-let)
+   (foreach pyzzz-foreach)
+   (for pyzzzzz-for)
    (eval Neval)
    (filter filterpy)
    (mapp mappy)
