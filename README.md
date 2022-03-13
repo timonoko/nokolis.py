@@ -9,7 +9,6 @@ Nokolisp had no strings, but I invented new practise: a flat list of numbers wit
 
 Now with flags -e, -f, -s etc, which are defined at the end of nokolisp.py . 
 
-noko -e "(showimage (imagetext (newimage 170 40 RED) '(5 5) (list 'FreeSansBold.ttf 30 WHITE) 'NOKOLISP)))"
 
 
 
