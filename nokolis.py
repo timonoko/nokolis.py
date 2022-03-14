@@ -384,10 +384,10 @@ def Nmacro(vars,args,y):
     return Neval(Nexpand(vars,args,y))
 
 def Nif(x,y,z):
-    if Neval(x)!=[]:
-        return Neval(y)
-    else:
+    if Neval(x) in [None,False,[]] :
         return Neval(z)
+    else:
+        return Neval(y)
 
 def Nand(x):
     tempo=Neval(car(x))
@@ -860,8 +860,8 @@ lsp(""" (progn
                  (rplaca (nthcdr ,x ,y) ,z))
     ,y))
 
-(defun add1 (x) (plus 1 x))
-(defun sub1 (x) (difference x 1))
+(defmacro add1 (x) (backquote plus 1 ,x))
+(defmacro sub1 (x) (backquote difference ,x 1))
 
 (setq null not)
 
