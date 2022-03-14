@@ -251,13 +251,10 @@ def Neval(x):
     elif atom(x):
         if x==[] :
             return []
-        try:
-            return int(x)
-        except:
-            try:
-                return float(x)
-            except:
-                return value_of(x)
+        elif numberp(x):
+            return x
+        else:
+            return value_of(x)
     else:
         oblist.func.append(car(x))
         oblist.args.append(cdr(x))
