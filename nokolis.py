@@ -171,8 +171,8 @@ def readtokens(tokens,at_array=False):
 
 def atomi(token):
     try:
-        if float(token)==int(token):
-            return int(token)
+        if float(token)==int(float(token)):
+            return int(float(token))
         else:
             return float(token)
     except:
@@ -845,14 +845,11 @@ lsp(""" (progn
 (defmacro pop (x) (backquote prog1 (car ,x) (setq ,x (cdr ,x))))
 (defmacro setqpop (x y) (backquote progn (setq ,x (car ,y)) (setq ,y (cdr ,y))))
 
-
-(defun numberp (x) (equal (type x) (type 1)))
-
-(defun listp (x) (equal (type x) (type '(1 2))))
+(defmacro listp (x) (backquote equal (type ,x) (type '(1 2))))
 
 (defun array x (array2list x))
 
-(defun arrayp (x) (> (array-length x) 2))
+(defmacro arrayp (x) (backquote > (array-length ,x) 2))
 
 (defun length (x) 
     (if x 
@@ -871,8 +868,8 @@ lsp(""" (progn
 
 (setq null not)
 
-(defun numberp(x) (or (equal (type x) (type 1))
-                      (equal (type x) (type 1.1))))
+(defun  numberp(x) (or (equal (type x) (type 1))
+                        (equal (type x) (type 1.1))))
 
 (defun getchar (x n) (nth (difference n 1) (explode x)))
 
