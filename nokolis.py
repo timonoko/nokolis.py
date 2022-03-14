@@ -1658,7 +1658,7 @@ lsp("(global-colors)")
 defq('repl','lambda x: repl(a1(x))')
 lsp("(defun sys.argv() (cdr (array2list (python-eval 'sys.argv))))")
 lsp("(defq -l (nlambda (x) (load x)))")
-lsp("(defq -s (nlambda (x) (eval(read-from-str x))))")
+lsp("(defq -s (nlambda (x) (pprint(eval(read-from-str x)))))")
 lsp("(defq -e (nlambda (x) (pprint (eval(read-from-str x)) 1 t) (cr) (quit)))")
 lsp("(defq -f (nlambda (x y) (with-out-file x (pprint (eval(read-from-str y)) 1 t) (cr)) (quit)))")
 
