@@ -414,9 +414,10 @@ def Ntest(x):
         return []
  
 def Nwhile(x,y):
-    while Neval(x)!=[]:
+    tul=[]
+    while not Neval(x) in [False,None,[]]:
         tul=Nprogn(y)       
-    return []
+    return tul
 
 def Nrepeat_times(x,y):
     x=int(x)
@@ -771,9 +772,8 @@ lsp(""" (progn
 )))""")
 
 def iff(x=[],y=[],z=[]):
-    if x==[]: return z
-    if x : return y
-    else: return z
+    if x in [None,False,[]]: return z
+    else: return y
 defq('iff','lambda x: iff(a1(x),a2(x),a3(x))')
     
 lsp(""" (progn 
