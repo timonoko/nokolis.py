@@ -384,7 +384,7 @@ def Nmacro(vars,args,y):
     return Neval(Nexpand(vars,args,y))
 
 def Nif(x,y,z):
-    if Neval(x) in [None,False,[]] :
+    if Neval(x) in [None,'False',[]] :
         return Neval(z)
     else:
         return Neval(y)
@@ -1637,6 +1637,7 @@ defq('random','lambda x: random.random()')
 defq('nthchar','lambda x: ord(a2(x)[a1(x)])')
 def nthchar (x,y): return ord(y[x])
 defq('arraypop','lambda x: a1(x).pop()')
+defq('abs','lambda x: abs(a1(x))')
 
 loadlisp("EDITOR.LSP")
 loadlisp("COMP.LSP")
