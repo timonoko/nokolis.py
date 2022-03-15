@@ -9,5 +9,5 @@ Now with flags -e, -f, -s etc, which are defined at the end of nokolisp.py .
 
 Problems with logical falsehood continue. Now the symbol guoted "False" is the best bet for the Falsehood, if you are to "comppy" a function. 
 
-New functions: iff, condf and casef, are preferable if your are using those in inside expressions.
+New macros: iff, condf and casef are for the expressions in comppy.  There is a generic solution but we are not going to implement, because we want this layer to be as 1-to-1 pythonic as possible.
 
