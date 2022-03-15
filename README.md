@@ -7,4 +7,4 @@ Nokolisp had no strings, but I invented new practise: a flat list of numbers wit
 
 Now with flags -e, -f, -s etc, which are defined at the end of nokolisp.py . 
 
-Problems with logical falsehood continue. Now the symbol guoted symbol "False" is the best bet for a False, if you are "comppy" a function.
+Problems with logical falsehood continue. Now the symbol guoted "False" is the best bet for the Falsehood, if you are "comppy" a function.
