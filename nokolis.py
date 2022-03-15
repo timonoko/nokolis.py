@@ -415,7 +415,7 @@ def Ntest(x):
  
 def Nwhile(x,y):
     tul=[]
-    while not Neval(x) in [False,None,[]]:
+    while not Neval(x) in ['False',None,[]]:
         tul=Nprogn(y)       
     return tul
 
