@@ -1,7 +1,10 @@
-#! /usr/bin/python3
+#! python3
+
 
 import math,time,os,sys,re
 from math import *
+
+TERMUX=os.path.exists("/sdcard")
 
 import resource
 resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
@@ -64,7 +67,8 @@ def repl(n=0):
             except:
                 oblist.enviro=[]
   print("")
-  if n==0: save_all()
+  if not TERMUX:
+      if n==0: save_all()
      
      
 import readline
@@ -1372,8 +1376,9 @@ def imagedraw (im,s,e,c):
     draw.line(line,color)
     return im
 
-FreeFonts="/usr/share/fonts/truetype/freefont/"
-defq('FONTS',array2list(os.listdir(FreeFonts)))
+if not TERMUX:
+    FreeFonts="/usr/share/fonts/truetype/freefont/"
+    defq('FONTS',array2list(os.listdir(FreeFonts)))
 
 def imagetext(im,p,fsc,text):
     pos=(car(p),cadr(p))
@@ -1657,6 +1662,7 @@ lsp("(defq -s (nlambda (x) (pprint(eval(read-from-str x)))))")
 lsp("(defq -e (nlambda (x) (pprint (eval(read-from-str x)) 1 t) (cr) (quit)))")
 lsp("(defq -f (nlambda (x y) (with-out-file x (pprint (eval(read-from-str y)) 1 t) (cr)) (quit)))")
 
-
-#lsp("(eval(sys.argv))")
-#repl()
+if TERMUX:
+    lsp("(setq TERMUX 'TERMUX)")
+    lsp("(eval(sys.argv))")
+    repl()

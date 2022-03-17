@@ -3,7 +3,7 @@
  (defq MODULE EDITOR)
  (defq EDITOR (compile-edit edit eeinsert locate depthless nedit eeprint25 eeprint set_cursor erase_page home EDITOR))
  (defq home (set_cursor 0 0))
- (defq erase_page (progn (repeat-times 10000 (sp)) (home)))
+ (defq erase_page (progn (repeat-times (if TERMUX 1000 10000) (sp)) (home)))
  (defq
   set_cursor
   (lambda
@@ -15,10 +15,11 @@
    (x)
    (erase_page)
    (printc 40)
-   (repeat-times 40 (sp))
-   (print THISNAME)
-   (sp)
-   (print MODULE)
+   (unless TERMUX
+     (repeat-times 40 (sp))
+     (print THISNAME)
+     (sp)
+     (print MODULE))
    (cr)
    ((function
      (lambda
@@ -98,8 +99,8 @@
       (set_cursor (+ v 2) 3)
       (print '===>)
       (repeat-times (- (+ 1 (length x)) v) (cr))
-      (repeat-times 60 (print '-))
-      (cr)
+      (unless TERMUX      (repeat-times 60 (print '-))
+       (cr))
       (setq ch (readcc))
       (if (member ch '(111 40 13 32)) (setq ch 110))
       (if (eqn ch 27) (setq ch (readcc)))

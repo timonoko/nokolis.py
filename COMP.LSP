@@ -449,9 +449,10 @@
     (setq x 'TEMPFUNC))
    (if (assoc x _COMPILED_) (uncompile x))
    (push (cons x (eval x)) _COMPILED_)
-   (with-out-file '/tmp/tmp.py (comppp x))
-   (python-exec (file2str '/tmp/tmp.py))
-   (file2str '/tmp/tmp.py)))
+   (setq TMPPY (if TERMUX 'tmp.py '/tmp/tmp.py))
+   (with-out-file TMPPY (comppp x))
+   (python-exec (file2str TMPPY)) 
+   (file2str TMPPY)))
  (defq
   global
   (nlambda
@@ -468,7 +469,6 @@
   (lambda
    (x)
    (global c 0)
-   (setq c 0)
    (uncompile 'fib)
    (defun
     fib
