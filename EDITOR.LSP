@@ -3,7 +3,7 @@
  (defq MODULE EDITOR)
  (defq EDITOR (compile-edit edit eeinsert locate depthless nedit eeprint25 eeprint set_cursor erase_page home EDITOR))
  (defq home (set_cursor 0 0))
- (defq erase_page (progn (repeat-times (if TERMUX 1000 10000) (sp)) (home)))
+ (defq erase_page (progn (repeat-times 200 (cr)) (home)))
  (defq
   set_cursor
   (lambda

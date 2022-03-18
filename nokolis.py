@@ -1359,9 +1359,11 @@ defq("imagedraw",'lambda x: imagedraw(a1(x),a2(x),a3(x),a4(x))')
 
 lsp("""
  (defun image-example ()
+   (setq FONTTI (list (compress (list FONTS (caddr (ls FONTS)))) 20 '(0 0 0))) 
    (setq im (newimage 100 50 RED))
    (imagebox im '(3 3) '(93 43) WHITE)
    (imagetext im '(10 10) FONTTI 'HELLO)
+   (saveimage im 'koe.png)
    (showimage im)
    (sleep 1)
    (killdisplay))) """)
@@ -1376,9 +1378,13 @@ def imagedraw (im,s,e,c):
     draw.line(line,color)
     return im
 
-if not TERMUX:
-    FreeFonts="/usr/share/fonts/truetype/freefont/"
-    defq('FONTS',array2list(os.listdir(FreeFonts)))
+
+
+if TERMUX:
+    lsp("(defq FONTS /data/data/com.termux/files/usr/share/fonts/TTF/")
+else:
+    lsp("(defq FONTS /usr/share/fonts/truetype/freefont/")
+
 
 def imagetext(im,p,fsc,text):
     pos=(car(p),cadr(p))
@@ -1386,7 +1392,7 @@ def imagetext(im,p,fsc,text):
     size=cadr(fsc)
     v=caddr(fsc)
     color=list2tuple(v)
-    fnt = ImageFont.truetype(FreeFonts+fnt,size)
+    fnt = ImageFont.truetype(fnt,size)
     d = ImageDraw.Draw(im)
     d.text(pos, str(text), font=fnt, fill=color)
     return im
@@ -1425,17 +1431,19 @@ lsp(""" (defun global-colors()
         (global BLUE '( 0 0 255))
         (global YELLOW '(255 255 0))
         (global BLACK '( 0 0 0))
-        (global WHITE '( 255 255 255))
-        (global FONTTI '(FreeSansBold.ttf 20 (0 0 0))))) """)
+        (global WHITE '( 255 255 255))))
+         """)
 
-def imagepaste(im=[],p=[],uusi=[],color=[255,[255,[255,[]]]]):
+def imagepaste(im=[],p=[],uusi=[]):
     s=imagesize(uusi)
     for x in range(0,(1 + (s[0] - 1))):
         for y in range(0,(1 + (s[1][0] - 1))):
             pix=getpixel(uusi,x,y)
-            if not equal(pix,color):
-                putpixel(im,(p[0] + x),(p[1][0] + y),pix)
+            putpixel(im,(p[0] + x),(p[1][0] + y),pix)
+    return im
 defq('imagepaste','lambda x: imagepaste(a1(x),a2(x),a3(x))')
+lsp("""(defun imagepaste-example ()
+      (showimage (imagepaste (newimage 100 100 RED) '(10 10) (newimage 50 50  GREEN)))))""")
 
 def eeprint25(x,dec):
     printc(9)
@@ -1666,3 +1674,4 @@ if TERMUX:
     lsp("(setq TERMUX 'TERMUX)")
     lsp("(eval(sys.argv))")
     repl()
+
