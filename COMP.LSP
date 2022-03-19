@@ -259,6 +259,7 @@
   (lambda
    (x tabs)
    (cr)
+   (when MIUMAU (cr) (tab tabs) (print MIUMAU))
    (cr)
    (tab tabs)
    (print 'def)
@@ -451,7 +452,7 @@
    (push (cons x (eval x)) _COMPILED_)
    (setq TMPPY (if TERMUX 'tmp.py '/tmp/tmp.py))
    (with-out-file TMPPY (comppp x))
-   (python-exec (file2str TMPPY)) 
+   (python-exec (file2str TMPPY))
    (file2str TMPPY)))
  (defq
   global

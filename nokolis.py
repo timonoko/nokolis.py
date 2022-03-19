@@ -5,6 +5,8 @@ import math,time,os,sys,re
 from math import *
 
 TERMUX=os.path.exists("/sdcard")
+if not TERMUX:
+    from numba import jit,njit
 
 import resource
 resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
@@ -1600,13 +1602,14 @@ lsp("""(defun imagefill1 (im x y color border)
    True))""")
 
 def imagefill(im=[],x=[],y=[],color=[],border=[]):
-    DOIT=cons(cons(x,cons(y,[])),[])
+    DOIT=[[x,[y,[]]],[]]
+    zzz=imagesize(im)
     while DOIT:
         zz=DOIT[0]
         DOIT=DOIT[1]
         x=zz[0]
         y=zz[1][0]
-        if ((x < imagesize(im)[0]) and (y < imagesize(im)[1][0])):
+        if ((x < zzz[0]) and (y < zzz[1][0])):
             p=getpixel(im,x,y)
             if equal(p,color):
                 pass
@@ -1614,7 +1617,7 @@ def imagefill(im=[],x=[],y=[],color=[],border=[]):
                 pass
             elif True:
                 putpixel(im,x,y,color)
-                DOIT=nconc(cons(cons((x + 1),cons(y,[])),cons(cons(x,cons((y + 1),[])),cons(cons((x - 1),cons(y,[])),cons(cons(x,cons((y - 1),[])),[])))),DOIT)
+                DOIT=nconc([[(x + 1),[y,[]]],[[x,[(y + 1),[]]],[[(x - 1),[y,[]]],[[x,[(y - 1),[]]],[]]]]],DOIT)
     return True
 defq('imagefill','lambda x: imagefill(a1(x),a2(x),a3(x),a4(x),a5(x))')
 
