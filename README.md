@@ -11,3 +11,4 @@ Problems with logical falsehood continue. Now the symbol guoted "False" is the b
 
 New macros: iff, condf and casef are for the expressions in comppy.  There is a generic solution but we are not going to implement, because we want this layer to be as 1-to-1 pythonic as possible.
 
+"compile" is just the macroexpand. "comppy" translates to python in situ. "uncompile" reverses them both.
